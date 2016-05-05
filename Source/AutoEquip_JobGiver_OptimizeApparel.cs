@@ -11,7 +11,7 @@ namespace AutoEquip
     public static class AutoEquip_JobGiver_OptimizeApparel
     {
         private const int ApparelOptimizeCheckInterval = 3000;
-        private const float MinScoreGainToCare = 0.09f;
+        private const float MinScoreGainToCare = 0.05f;
         private const float ScoreFactorIfNotReplacing = 10f;
         private static NeededWarmth neededWarmth;
 #if LOG
@@ -20,22 +20,20 @@ namespace AutoEquip
 
         private static readonly SimpleCurve InsulationColdScoreFactorCurve_NeedWarm = new SimpleCurve
         {
-            new CurvePoint(-30f, 8f),
-            new CurvePoint(0f, 1f)
+            new CurvePoint(-100f, 1f),
+            new CurvePoint(0f, 0.1f)
         };
 
         private static readonly SimpleCurve InsulationWarmScoreFactorCurve_NeedCold = new SimpleCurve
         {
-            new CurvePoint(30f, 8f),
-            new CurvePoint(0f, 1f),
-            new CurvePoint(-10, 0.1f)
+            new CurvePoint(100f, 1f),
+            new CurvePoint(0f, 0.1f)
         };
 
         private static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
         {
-            new CurvePoint(0f, 0f),
-            new CurvePoint(0.25f, 0.15f),
-            new CurvePoint(0.5f, 0.7f),
+            new CurvePoint(0f, 0.1f),
+            new CurvePoint(0.6f, 0.7f),
             new CurvePoint(1f, 1f)
         };
 
