@@ -13,25 +13,25 @@ namespace AutoEquip
 		private const float TopButtonHeight = 35f;
 		private const float TopButtonWidth = 150f;
 
-		private Vector2 scrollPosition;
-        private Vector2 scrollPositionStats;
-		private Outfit selOutfitInt;
-        private static StatDef[] sortedDefs;
+		private Vector2 _scrollPosition;
+        private Vector2 _scrollPositionStats;
+		private Outfit _selOutfitInt;
+        private static StatDef[] _sortedDefs;
 
-        private static ThingFilter apparelGlobalFilter;
+        private static ThingFilter _apparelGlobalFilter;
 
-		private static Regex validNameRegex = new Regex("^[a-zA-Z0-9 '\\-]*$");
+		private static Regex _validNameRegex = new Regex("^[a-zA-Z0-9 '\\-]*$");
 
 		private Outfit SelectedOutfit
 		{
 			get
 			{
-				return this.selOutfitInt;
+				return this._selOutfitInt;
 			}
 			set
 			{
 				this.CheckSelectedOutfitHasName();
-				this.selOutfitInt = value;
+				this._selOutfitInt = value;
 			}
 		}
 
@@ -51,10 +51,10 @@ namespace AutoEquip
 			this.doCloseButton = true;
 			this.closeOnClickedOutside = true;
 			this.absorbInputAroundWindow = true;
-            if (Dialog_ManageOutfitsAutoEquip.apparelGlobalFilter == null)
+            if (Dialog_ManageOutfitsAutoEquip._apparelGlobalFilter == null)
 			{
-                Dialog_ManageOutfitsAutoEquip.apparelGlobalFilter = new ThingFilter();
-                Dialog_ManageOutfitsAutoEquip.apparelGlobalFilter.SetAllow(ThingCategoryDefOf.Apparel, true);
+                Dialog_ManageOutfitsAutoEquip._apparelGlobalFilter = new ThingFilter();
+                Dialog_ManageOutfitsAutoEquip._apparelGlobalFilter.SetAllow(ThingCategoryDefOf.Apparel, true);
 			}
 			this.SelectedOutfit = selectedOutfit;
 		}
@@ -114,8 +114,8 @@ namespace AutoEquip
                             {
                                 this.SelectedOutfit = null;
                             }
-                            foreach (Saveable_Outfit s in MapComponent_AutoEquip.Get.outfitCache.Where(i => i.outfit == localOut).ToArray())
-                                MapComponent_AutoEquip.Get.outfitCache.Remove(s);
+                            foreach (Saveable_Outfit s in MapComponent_AutoEquip.Get.OutfitCache.Where(i => i.Outfit == localOut).ToArray())
+                                MapComponent_AutoEquip.Get.OutfitCache.Remove(s);
                         }                        
 					}, MenuOptionPriority.Medium, null, null));
 				}
@@ -135,7 +135,7 @@ namespace AutoEquip
 			Rect rect5 = new Rect(0f, 0f, 200f, 30f);
             Dialog_ManageOutfitsAutoEquip.DoNameInputRect(rect5, ref this.SelectedOutfit.label, 30);
 			Rect rect6 = new Rect(0f, 40f, rect4.width, rect4.height - 45f - 10f);
-            ThingFilterUI.DoThingFilterConfigWindow(rect6, ref this.scrollPosition, this.SelectedOutfit.filter, Dialog_ManageOutfitsAutoEquip.apparelGlobalFilter, 16);
+            ThingFilterUI.DoThingFilterConfigWindow(rect6, ref this._scrollPosition, this.SelectedOutfit.filter, Dialog_ManageOutfitsAutoEquip._apparelGlobalFilter, 16);
             GUI.EndGroup();
 
             Saveable_Outfit saveout = MapComponent_AutoEquip.Get.GetOutfit(this.SelectedOutfit);
@@ -143,10 +143,10 @@ namespace AutoEquip
             rect4 = new Rect(300f, 40f, inRect.width - 300f, inRect.height - 40f - this.CloseButSize.y).ContractedBy(10f);
             GUI.BeginGroup(rect4);
 
-            saveout.addWorkStats = GUI.Toggle(new Rect(000f, 00f, rect4.width, 20f), saveout.addWorkStats, "AddWorkingStats".Translate());
+            saveout.AddWorkStats = GUI.Toggle(new Rect(000f, 00f, rect4.width, 20f), saveout.AddWorkStats, "AddWorkingStats".Translate());
 
             rect6 = new Rect(0f, 40f, rect4.width, rect4.height - 45f - 10f);
-            Dialog_ManageOutfitsAutoEquip.DoStatsInput(rect6, ref this.scrollPositionStats, saveout.stats);
+            Dialog_ManageOutfitsAutoEquip.DoStatsInput(rect6, ref this._scrollPositionStats, saveout.Stats);
             GUI.EndGroup();
 		}
 
@@ -159,7 +159,7 @@ namespace AutoEquip
 		public static void DoNameInputRect(Rect rect, ref string name, int maxLength)
 		{
 			string text = Widgets.TextField(rect, name);
-            if (text.Length <= maxLength && Dialog_ManageOutfitsAutoEquip.validNameRegex.IsMatch(text))
+            if (text.Length <= maxLength && Dialog_ManageOutfitsAutoEquip._validNameRegex.IsMatch(text))
 			{
 				name = text;
 			}
@@ -205,39 +205,39 @@ namespace AutoEquip
 
             rect6.yMin += 12f;
 
-            Listing_Standard listing_Standard = new Listing_Standard(rect6);
-            listing_Standard.OverrideColumnWidth = rect6.width;
+            Listing_Standard listingStandard = new Listing_Standard(rect6);
+            listingStandard.OverrideColumnWidth = rect6.width;
 
-            if (Dialog_ManageOutfitsAutoEquip.sortedDefs == null)
-                Dialog_ManageOutfitsAutoEquip.sortedDefs = DefDatabase<StatDef>.AllDefs.OrderBy(i => i.category.LabelCap).ThenBy(i => i.LabelCap).ToArray();
+            if (Dialog_ManageOutfitsAutoEquip._sortedDefs == null)
+                Dialog_ManageOutfitsAutoEquip._sortedDefs = DefDatabase<StatDef>.AllDefs.OrderBy(i => i.category.LabelCap).ThenBy(i => i.LabelCap).ToArray();
 
-            foreach (StatDef stat in Dialog_ManageOutfitsAutoEquip.sortedDefs)
-                DrawStat(stats, listing_Standard, stat);
+            foreach (StatDef stat in Dialog_ManageOutfitsAutoEquip._sortedDefs)
+                DrawStat(stats, listingStandard, stat);
 
-            listing_Standard.End();
+            listingStandard.End();
 
 
             Widgets.EndScrollView();
         }
 
-        private static void DrawStat(List<Saveable_Outfit_StatDef> stats, Listing_Standard listing_Standard, StatDef stat)
+        private static void DrawStat(List<Saveable_Outfit_StatDef> stats, Listing_Standard listingStandard, StatDef stat)
         {
-            Saveable_Outfit_StatDef outfitStat = stats.FirstOrDefault(i => i.statDef == stat);
+            Saveable_Outfit_StatDef outfitStat = stats.FirstOrDefault(i => i.StatDef == stat);
             bool active = outfitStat != null;
-            listing_Standard.DoLabelCheckbox(stat.label, ref active);
+            listingStandard.DoLabelCheckbox(stat.label, ref active);
 
             if (active)
             {
                 if (outfitStat == null)
                 {
                     outfitStat = new Saveable_Outfit_StatDef();
-                    outfitStat.statDef = stat;
-                    outfitStat.strength = 0;
+                    outfitStat.StatDef = stat;
+                    outfitStat.Strength = 0;
                 }
                 if (!stats.Contains(outfitStat))
                     stats.Add(outfitStat);
 
-                outfitStat.strength = listing_Standard.DoSlider(outfitStat.strength, -1f, 1f);
+                outfitStat.Strength = listingStandard.DoSlider(outfitStat.Strength, -1f, 1f);
             }
             else
             {

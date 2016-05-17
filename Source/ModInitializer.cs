@@ -26,28 +26,28 @@ namespace AutoEquip
     class ModInitializerBehaviour : MonoBehaviour
     {
         protected GameObject ModObject;
-        protected bool reinjectNeeded = false;
-        protected float reinjectTime = 0;
+        protected bool ReinjectNeeded = false;
+        protected float ReinjectTime = 0;
 
         public void OnLevelWasLoaded(int level)
         {
-            reinjectNeeded = true;
+            ReinjectNeeded = true;
             if (level >= 0)
-                reinjectTime = 1;
+                ReinjectTime = 1;
             else
-                reinjectTime = 0;
+                ReinjectTime = 0;
         }        
 
         public void FixedUpdate()
         {
-            if (reinjectNeeded)
+            if (ReinjectNeeded)
             {
-                reinjectTime -= Time.fixedDeltaTime;
+                ReinjectTime -= Time.fixedDeltaTime;
 
-                if (reinjectTime <= 0)
+                if (ReinjectTime <= 0)
                 {
-                    reinjectNeeded = false;
-                    reinjectTime = 0;
+                    ReinjectNeeded = false;
+                    ReinjectTime = 0;
 
 #if LOG
                     Log.Message("AutoEquip Injected");

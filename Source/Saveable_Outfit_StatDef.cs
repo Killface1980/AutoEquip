@@ -10,13 +10,13 @@ namespace AutoEquip
             Log.Message("Saveable_Outfit Constructor");
         }        
 
-        public StatDef statDef;
-        public float strength;
+        public StatDef StatDef;
+        public float Strength;
 
         public void ExposeData()
         {
-            Scribe_Defs.LookDef(ref this.statDef, "statDef");
-            Scribe_Values.LookValue(ref this.strength, "strength");
+            Scribe_Defs.LookDef(ref this.StatDef, "statDef");
+            Scribe_Values.LookValue(ref this.Strength, "strength");
         }
     }
 }

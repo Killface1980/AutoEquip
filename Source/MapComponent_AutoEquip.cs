@@ -8,7 +8,7 @@ namespace AutoEquip
 {
     public class MapComponent_AutoEquip : MapComponent
     {
-        public List<Saveable_Outfit> outfitCache = new List<Saveable_Outfit>();
+        public List<Saveable_Outfit> OutfitCache = new List<Saveable_Outfit>();
 
         public static MapComponent_AutoEquip Get
         {
@@ -27,7 +27,7 @@ namespace AutoEquip
 
         public override void ExposeData()
         {
-            Scribe_Collections.LookList(ref this.outfitCache, "outfits", LookMode.Deep);
+            Scribe_Collections.LookList(ref this.OutfitCache, "outfits", LookMode.Deep);
             base.ExposeData();
         }
 
@@ -35,16 +35,16 @@ namespace AutoEquip
 
         public Saveable_Outfit GetOutfit(Outfit outfit)
         {
-            foreach (Saveable_Outfit o in this.outfitCache)
-                if (o.outfit == outfit)
+            foreach (Saveable_Outfit o in this.OutfitCache)
+                if (o.Outfit == outfit)
                     return o;
 
             Saveable_Outfit ret = new Saveable_Outfit();
-            ret.outfit = outfit;
-            ret.stats.Add(new Saveable_Outfit_StatDef() { statDef = StatDefOf.ArmorRating_Sharp, strength = 1.00f });
-            ret.stats.Add(new Saveable_Outfit_StatDef() { statDef = StatDefOf.ArmorRating_Blunt, strength = 0.75f });
+            ret.Outfit = outfit;
+            ret.Stats.Add(new Saveable_Outfit_StatDef() { StatDef = StatDefOf.ArmorRating_Sharp, Strength = 1.00f });
+            ret.Stats.Add(new Saveable_Outfit_StatDef() { StatDef = StatDefOf.ArmorRating_Blunt, Strength = 0.75f });
 
-            this.outfitCache.Add(ret);
+            this.OutfitCache.Add(ret);
 
             return ret;
         }

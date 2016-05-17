@@ -6,15 +6,15 @@ namespace AutoEquip
 {
     public class Saveable_Outfit : IExposable
     {
-        public Outfit outfit;
-        public bool addWorkStats = false;
-        public List<Saveable_Outfit_StatDef> stats = new List<Saveable_Outfit_StatDef>();
+        public Outfit Outfit;
+        public bool AddWorkStats = false;
+        public List<Saveable_Outfit_StatDef> Stats = new List<Saveable_Outfit_StatDef>();
 
         public void ExposeData()
         {
-            Scribe_Values.LookValue(ref this.addWorkStats, "addWorkStats", false, false);
-            Scribe_References.LookReference(ref this.outfit, "outfit");
-            Scribe_Collections.LookList(ref this.stats, "stats", LookMode.Deep);
+            Scribe_Values.LookValue(ref this.AddWorkStats, "addWorkStats", false, false);
+            Scribe_References.LookReference(ref this.Outfit, "outfit");
+            Scribe_Collections.LookList(ref this.Stats, "stats", LookMode.Deep);
         }
     }
 }
