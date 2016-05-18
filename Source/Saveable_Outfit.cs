@@ -9,14 +9,14 @@ namespace AutoEquip
         public Outfit Outfit;
         public bool AddWorkStats = false;
         public List<Saveable_Outfit_StatDef> Stats = new List<Saveable_Outfit_StatDef>();
-        public bool appendIndividualPawnStatus;
+        public bool AppendIndividualPawnStatus;
 
 
         public void ExposeData()
         {
             Scribe_Values.LookValue(ref this.AddWorkStats, "addWorkStats", false, false);
             Scribe_References.LookReference(ref this.Outfit, "outfit");
-            Scribe_Values.LookValue(ref this.appendIndividualPawnStatus, "IndividualStatus", true);
+            Scribe_Values.LookValue(ref this.AppendIndividualPawnStatus, "IndividualStatus", true);
             Scribe_Collections.LookList(ref this.Stats, "stats", LookMode.Deep);
         }
     }

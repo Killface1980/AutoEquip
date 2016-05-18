@@ -104,7 +104,7 @@ namespace AutoEquip
                             break;
                         }
 
-                    foreach (Apparel a in mapComponent.GetCache(pawn).targetApparel)
+                    foreach (Apparel a in mapComponent.GetCache(pawn).TargetApparel)
                         if (a == currentAppel)
                         {
                             target = pawn;

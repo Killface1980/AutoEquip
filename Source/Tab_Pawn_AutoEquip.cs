@@ -93,9 +93,9 @@ namespace AutoEquip
                 rect3 = new Rect(rect3.xMax + 4f, outRect.yMin, 100f, 30f);
                 if (Widgets.TextButton(rect3, "AutoEquipStatus".Translate(), true, false))
                 {
-                    if (pawnSave.stats == null)
-                        pawnSave.stats = new List<Saveable_Outfit_StatDef>();
-                    Find.WindowStack.Add(new Dialog_ManagePawnOutfit(pawnSave.stats));
+                    if (pawnSave.Stats == null)
+                        pawnSave.Stats = new List<Saveable_Outfit_StatDef>();
+                    Find.WindowStack.Add(new Dialog_ManagePawnOutfit(pawnSave.Stats));
                 }
 
                 outRect.yMin += rect3.height + 4f;
@@ -120,21 +120,21 @@ namespace AutoEquip
             }
             if (pawnSave != null)
             {
-                if ((pawnSave.toWearApparel != null) &&
-                    (pawnSave.toWearApparel.Any()))
+                if ((pawnSave.ToWearApparel != null) &&
+                    (pawnSave.ToWearApparel.Any()))
                 {
                     Widgets.ListSeparator(ref num, viewRect.width, "ToWear".Translate());
-                    foreach (Apparel current2 in from ap in pawnSave.toWearApparel
+                    foreach (Apparel current2 in from ap in pawnSave.ToWearApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
                         this.DrawThingRow(ref num, viewRect.width, current2, false, ITab_Pawn_AutoEquip.ThingToEquipLabelColor, pawnSave, pawnCalc);
                 }
 
-                if ((pawnSave.toDropApparel != null) &&
-                    (pawnSave.toDropApparel.Any()))
+                if ((pawnSave.ToDropApparel != null) &&
+                    (pawnSave.ToDropApparel.Any()))
                 {
                     Widgets.ListSeparator(ref num, viewRect.width, "ToDrop".Translate());
-                    foreach (Apparel current2 in from ap in pawnSave.toDropApparel
+                    foreach (Apparel current2 in from ap in pawnSave.ToDropApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
                         this.DrawThingRow(ref num, viewRect.width, current2, this.SelPawnForGear.apparel.WornApparel.Contains(current2), ITab_Pawn_AutoEquip.ThingToDropLabelColor, pawnSave, pawnCalc);
@@ -262,7 +262,7 @@ namespace AutoEquip
             if (thing is Apparel)
             {
                 if ((pawnSave != null) &&
-                    (pawnSave.targetApparel != null))
+                    (pawnSave.TargetApparel != null))
                     text = pawnCalc.CalculateApparelScoreRaw((Apparel)thing).ToString("N5") + "   " + text;
 
                 if (this.SelPawnForGear.outfits != null && this.SelPawnForGear.outfits.forcedHandler.IsForced((Apparel)thing))

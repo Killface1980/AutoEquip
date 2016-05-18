@@ -453,9 +453,9 @@ namespace AutoEquip
 
         private void PassToSaveable()
         {
-            this.saveablePawn.toWearApparel = new List<Apparel>();
-            this.saveablePawn.toDropApparel = new List<Apparel>();
-            this.saveablePawn.targetApparel = this.calculedApparelItems;
+            this.saveablePawn.ToWearApparel = new List<Apparel>();
+            this.saveablePawn.ToDropApparel = new List<Apparel>();
+            this.saveablePawn.TargetApparel = this.calculedApparelItems;
 
             List<Apparel> pawnApparel = new List<Apparel>(this.saveablePawn.pawn.apparel.WornApparel);
             foreach (Apparel ap in this.calculedApparelItems)
@@ -465,10 +465,10 @@ namespace AutoEquip
                     pawnApparel.Remove(ap);
                     continue;
                 }
-                this.saveablePawn.toWearApparel.Add(ap);
+                this.saveablePawn.ToWearApparel.Add(ap);
             }
             foreach (Apparel ap in pawnApparel)
-                this.saveablePawn.toDropApparel.Add(ap);
+                this.saveablePawn.ToDropApparel.Add(ap);
 
 #if LOG && CHANGES
             if (this.saveablePawn.toWearApparel.Any() || this.saveablePawn.toDropApparel.Any())

@@ -11,7 +11,7 @@ namespace AutoEquip
     public class MapComponent_AutoEquip : MapComponent
     {
         public List<Saveable_Outfit> OutfitCache = new List<Saveable_Outfit>();
-        public List<Saveable_Pawn> pawnCache = new List<Saveable_Pawn>();
+        public List<Saveable_Pawn> PawnCache = new List<Saveable_Pawn>();
 
         public int nextOptimization;
 
@@ -33,14 +33,14 @@ namespace AutoEquip
         public override void ExposeData()
         {
             Scribe_Collections.LookList(ref this.OutfitCache, "outfits", LookMode.Deep);
-            Scribe_Collections.LookList(ref this.pawnCache, "pawns", LookMode.Deep);
+            Scribe_Collections.LookList(ref this.PawnCache, "pawns", LookMode.Deep);
             base.ExposeData();
 
             if (this.OutfitCache == null)
                 this.OutfitCache = new List<Saveable_Outfit>();
 
-            if (this.pawnCache == null)
-                this.pawnCache = new List<Saveable_Pawn>();
+            if (this.PawnCache == null)
+                this.PawnCache = new List<Saveable_Pawn>();
         }
 
         public Saveable_Outfit GetOutfit(Pawn pawn) { return this.GetOutfit(pawn.outfits.CurrentOutfit); }
@@ -63,12 +63,12 @@ namespace AutoEquip
 
         public Saveable_Pawn GetCache(Pawn pawn)
         {
-            foreach (Saveable_Pawn c in this.pawnCache)
+            foreach (Saveable_Pawn c in this.PawnCache)
                 if (c.pawn == pawn)
                     return c;
             Saveable_Pawn n = new Saveable_Pawn();
             n.pawn = pawn;
-            this.pawnCache.Add(n);
+            this.PawnCache.Add(n);
             return n;
         }
 
@@ -90,7 +90,7 @@ namespace AutoEquip
             List<Apparel> allApparels = new List<Apparel>(Find.ListerThings.ThingsInGroup(ThingRequestGroup.Apparel).OfType<Apparel>());
             foreach (Pawn pawn in Find.Map.mapPawns.FreeColonists)
             {
-                this.InjectTab(pawn.def);
+                InjectTab(pawn.def);
                 Saveable_Pawn newPawnSaveable = this.GetCache(pawn);
                 PawnCalcForApparel newPawnCalc = new PawnCalcForApparel(newPawnSaveable);
 
@@ -100,7 +100,7 @@ namespace AutoEquip
                 newPawnCalc.InitializeFixedApparelsAndGetAvaliableApparels(allApparels);
             }
 
-            this.pawnCache = newSaveableList;
+            this.PawnCache = newSaveableList;
             PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
 
 #if LOG
@@ -110,7 +110,7 @@ namespace AutoEquip
 #endif
         }
 
-        private void InjectTab(ThingDef thingDef)
+        private static void InjectTab(ThingDef thingDef)
         {
             Debug.Log("Inject Tab");
             if (thingDef.inspectorTabsResolved == null)

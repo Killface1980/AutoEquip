@@ -145,7 +145,11 @@ namespace AutoEquip
 
             saveout.AddWorkStats = GUI.Toggle(new Rect(000f, 00f, rect4.width, 20f), saveout.AddWorkStats, "AddWorkingStats".Translate());
 
-            rect6 = new Rect(0f, 40f, rect4.width, rect4.height - 45f - 10f);
+		    saveout.AppendIndividualPawnStatus = GUI.Toggle(new Rect(000f, 20f, rect4.width, 20f),
+		        saveout.AppendIndividualPawnStatus, "AppendIndividualStats".Translate());
+         
+
+            rect6 = new Rect(0f, 60f, rect4.width, rect4.height - 45f - 10f);
             Dialog_ManageOutfitsAutoEquip.DoStatsInput(rect6, ref this._scrollPositionStats, saveout.Stats);
             GUI.EndGroup();
 		}

@@ -10,16 +10,16 @@ namespace AutoEquip
     {
         // Exposed members
         public Pawn pawn;
-        public List<Saveable_Outfit_StatDef> stats = new List<Saveable_Outfit_StatDef>();
+        public List<Saveable_Outfit_StatDef> Stats = new List<Saveable_Outfit_StatDef>();
 
-        public List<Apparel> toWearApparel = new List<Apparel>();
-        public List<Apparel> toDropApparel = new List<Apparel>();
-        public List<Apparel> targetApparel = new List<Apparel>();
+        public List<Apparel> ToWearApparel = new List<Apparel>();
+        public List<Apparel> ToDropApparel = new List<Apparel>();
+        public List<Apparel> TargetApparel = new List<Apparel>();
 
         public void ExposeData()
         {
             Scribe_References.LookReference(ref this.pawn, "pawn");
-            Scribe_Collections.LookList(ref this.stats, "stats", LookMode.Deep);
+            Scribe_Collections.LookList(ref this.Stats, "stats", LookMode.Deep);
         }
 
         public IEnumerable<Saveable_Outfit_StatDef> NormalizeCalculedStatDef()
@@ -27,10 +27,10 @@ namespace AutoEquip
             Saveable_Outfit outFit = MapComponent_AutoEquip.Get.GetOutfit(this.pawn);
             List<Saveable_Outfit_StatDef> calculedStatDef = new List<Saveable_Outfit_StatDef>(outFit.Stats);
 
-            if ((outFit.appendIndividualPawnStatus) &&
-                (this.stats != null))
+            if ((outFit.AppendIndividualPawnStatus) &&
+                (this.Stats != null))
             {
-                foreach (Saveable_Outfit_StatDef stat in this.stats)
+                foreach (Saveable_Outfit_StatDef stat in this.Stats)
                 {
                     int index = -1;
                     for (int i = 0; i < calculedStatDef.Count; i++)
