@@ -29,7 +29,7 @@ namespace AutoEquip
             new CurvePoint(-10, 0.1f)
         };
 
-        private static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
+        internal static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
         {
             new CurvePoint(0f, 0.1f),
             new CurvePoint(0.6f, 0.7f),
@@ -42,7 +42,6 @@ namespace AutoEquip
 
         private static void SetNextOptimizeTick(Pawn pawn)
         {
-
             pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 3000;
         }
 

@@ -52,12 +52,18 @@
   <ItemGroup>
     <Compile Include="Dialog_ManageOutfitsAutoEquip.cs" />
     <Compile Include="AutoEquip_JobGiver_OptimizeApparel.cs" />
+    <Compile Include="Dialog_ManagePawnOutfit.cs" />
+    <Compile Include="Dialog_PawnApparelComparer.cs" />
+    <Compile Include="Dialog_PawnApparelDetail.cs" />
     <Compile Include="MainTabWindow_AssignAutoEquip.cs" />
     <Compile Include="MapComponent_AutoEquip.cs" />
     <Compile Include="ModInitializer.cs" />
+    <Compile Include="PawnCalcForApparel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Saveable_Outfit.cs" />
     <Compile Include="Saveable_Outfit_StatDef.cs" />
+    <Compile Include="Saveable_Pawn.cs" />
+    <Compile Include="Tab_Pawn_AutoEquip.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\About\About.xml">
