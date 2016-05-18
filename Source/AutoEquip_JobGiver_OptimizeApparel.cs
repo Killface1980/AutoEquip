@@ -13,12 +13,20 @@ namespace AutoEquip
         private const int ApparelOptimizeCheckInterval = 3000;
         private const float MinScoreGainToCare = 0.05f;
         private const float ScoreFactorIfNotReplacing = 10f;
-        private static float _wantedWarmthTemperature = 0.1f;
 
-        private static SimpleCurve _coldCurve = new SimpleCurve
+        private static NeededWarmth _neededWarmth;
+
+        private static readonly SimpleCurve InsulationColdScoreFactorCurve_NeedWarm = new SimpleCurve
         {
-            new CurvePoint(-100f, 1f),
-            new CurvePoint(0f, 0.1f)
+            new CurvePoint(-30f, 8f),
+            new CurvePoint(0f, 1f)
+        };
+
+        private static readonly SimpleCurve InsulationWarmScoreFactorCurve_NeedCold = new SimpleCurve
+        {
+            new CurvePoint(30f, 8f),
+            new CurvePoint(0f, 1f),
+            new CurvePoint(-10, 0.1f)
         };
 
         private static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
@@ -34,6 +42,7 @@ namespace AutoEquip
 
         private static void SetNextOptimizeTick(Pawn pawn)
         {
+
             pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 3000;
         }
 
@@ -89,18 +98,8 @@ namespace AutoEquip
 
             #endregion
 
-            //edit new curve
-            _wantedWarmthTemperature = pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null) - GenTemperature.AverageTemperatureAtWorldCoordsForMonth(Find.Map.WorldCoords, GenDate.CurrentMonth);
-            _wantedWarmthTemperature = (_wantedWarmthTemperature == 0f) ? 0.1f : _wantedWarmthTemperature;
 
-            AutoEquip_JobGiver_OptimizeApparel._coldCurve = new SimpleCurve
-                {
-                    new CurvePoint(_wantedWarmthTemperature, 1f),
-                    new CurvePoint(_wantedWarmthTemperature * 0.75f, 0.9f),
-                    new CurvePoint(0f, 0.5f)
-                };
-
-            //            AutoEquip_JobGiver_OptimizeApparel._neededWarmth = AutoEquip_JobGiver_OptimizeApparel.CalculateNeededWarmth(pawn, GenDate.CurrentMonth);
+            AutoEquip_JobGiver_OptimizeApparel._neededWarmth = AutoEquip_JobGiver_OptimizeApparel.CalculateNeededWarmth(pawn, GenDate.CurrentMonth);
 #if LOG
             if (AutoEquip_JobGiver_OptimizeApparel.neededWarmth != NeededWarmth.Any)
                 AutoEquip_JobGiver_OptimizeApparel.debugSb.AppendLine("Temperature: " + AutoEquip_JobGiver_OptimizeApparel.neededWarmth);
@@ -226,7 +225,15 @@ namespace AutoEquip
             float protectionScore =
                 ap.GetStatValue(StatDefOf.ArmorRating_Sharp) +
                 ap.GetStatValue(StatDefOf.ArmorRating_Blunt) * 0.75f;
-            score += protectionScore * 1.25f;
+
+            if (outfit.AddWorkStats)
+            {
+                score = score + protectionScore * 0.1f;
+            }
+            else
+            {
+                score += protectionScore * 1.25f;
+            }
 
             //calculating HP
             if (ap.def.useHitPoints)
@@ -236,11 +243,7 @@ namespace AutoEquip
             }
 
             //calculating warmth
-            if (_wantedWarmthTemperature > 5)
-            {
-                float warmth = Math.Abs(ap.GetStatValue(StatDefOf.Insulation_Cold, true));
-                score *= AutoEquip_JobGiver_OptimizeApparel._coldCurve.Evaluate(warmth);
-            }
+            score *= ApparalScoreRawInsulationColdAdjust(ap);
 
             return score;
         }
@@ -327,7 +330,7 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.002f);
                     yield break;
                 case "Warden":
-                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SocialImpact"), 2.5f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SocialImpact"), 1f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("RecruitPrisonerChance"), 10f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("GiftImpact"), 2.5f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("TradePriceImprovement"), 2.5f);
@@ -366,13 +369,13 @@ namespace AutoEquip
                             priorityAdjust = 1.0f;
                             break;
                         case 2:
-                            priorityAdjust = 0.3f;
-                            break;
-                        case 3:
                             priorityAdjust = 0.2f;
                             break;
-                        case 4:
+                        case 3:
                             priorityAdjust = 0.1f;
+                            break;
+                        case 4:
+                            priorityAdjust = 0.05f;
                             break;
                         default:
                             continue;
@@ -421,7 +424,24 @@ namespace AutoEquip
             return nint;
         }
 
-
+        public static float ApparalScoreRawInsulationColdAdjust(Apparel ap)
+        {
+            switch (AutoEquip_JobGiver_OptimizeApparel._neededWarmth)
+            {
+                case NeededWarmth.Warm:
+                    {
+                        float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Cold, null);
+                        return AutoEquip_JobGiver_OptimizeApparel.InsulationColdScoreFactorCurve_NeedWarm.Evaluate(statValueAbstract);
+                    }
+                case NeededWarmth.Cool:
+                    {
+                        float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Heat, null);
+                        return AutoEquip_JobGiver_OptimizeApparel.InsulationWarmScoreFactorCurve_NeedCold.Evaluate(statValueAbstract);
+                    }
+                default:
+                    return 1;
+            }
+        }
 
         public static float ApparelScoreRawHitPointAjust(Apparel ap)
         {
@@ -435,7 +455,7 @@ namespace AutoEquip
         }
 
         public delegate void ApparelScoreRawStatsHandler(Pawn pawn, Apparel apparel, StatDef statDef, ref float num);
-        public static event ApparelScoreRawStatsHandler ApparelScoreRawStatsHandlers;        
+        public static event ApparelScoreRawStatsHandler ApparelScoreRawStatsHandlers;
 
         public static NeededWarmth CalculateNeededWarmth(Pawn pawn, Month month)
         {
@@ -466,4 +486,6 @@ namespace AutoEquip
             return NeededWarmth.Any;
         }
     }
+
 }
+
