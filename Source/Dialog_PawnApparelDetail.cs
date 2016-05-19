@@ -117,12 +117,12 @@ namespace AutoEquip
                 "", multiplierWidth,
                 "", finalValue);
 
-            itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
-            DrawLine(ref itemRect,
-                "AutoEquipWorkstats".Translate(), labelWidth,
-                PawnCalcForApparel.ApparelScoreRaw(_pawn, _apparel).ToString("N3"), baseValue,
-                "", multiplierWidth,
-                "", finalValue);
+      //    itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
+      //    DrawLine(ref itemRect,
+      //        "AutoEquipWorkstats".Translate(), labelWidth,
+      //        PawnCalcForApparel.ApparelScoreRawWorkStats(_pawn, _apparel).ToString("N3"), baseValue,
+      //        "", multiplierWidth,
+      //        "", finalValue);
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,

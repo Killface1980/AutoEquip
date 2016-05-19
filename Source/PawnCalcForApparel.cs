@@ -97,7 +97,8 @@ namespace AutoEquip
             foreach (Apparel apparel in pawn.apparel.WornApparel)
             {
                 _calculedApparelItems.Add(apparel);
-                _calculedApparelScore.Add(ApparelScoreRaw(apparel));
+                _calculedApparelScore.Add(ApparelScoreRaw(apparel))
+                   ;
             }
             _optimized = false;
         }
@@ -114,7 +115,7 @@ namespace AutoEquip
             _optimized = false;
         }
 
-        #region [  ApparelScoreRaw  ]
+        #region [  ApparelScoreRawWorkStats  ]
 
 
         public float ApparelScoreRaw(Apparel ap)
@@ -124,42 +125,42 @@ namespace AutoEquip
         }
 
 
-        public static float ApparelScoreRaw(Pawn pawn, Apparel ap)
-        {
-            Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(pawn.outfits.CurrentOutfit);
-            float score = ApparelScoreRawStats(pawn, outfit, ap);
-
-            //base score
-            //      float score = 0.1f;
-
-            //calculating protection, no buff
-            float protectionScore =
-                ap.GetStatValue(StatDefOf.ArmorRating_Sharp) +
-                ap.GetStatValue(StatDefOf.ArmorRating_Blunt) * 0.75f;
-
-
-            if (outfit.AddWorkStats)
-            {
-                score = score + protectionScore * 0.1f;
-            }
-            else
-            {
-                score += protectionScore * 1.25f;
-            }
-
-            //calculating HP
-            if (ap.def.useHitPoints)
-            {
-                float hpPercent = ap.HitPoints / (float)ap.MaxHitPoints;
-                score *= HitPointsPercentScoreFactorCurve.Evaluate(hpPercent);
-            }
-
-            //calculating warmth
-            
-            score *= ApparelScoreRawInsulationColdAdjust(ap);
-
-            return score;
-        }
+   //   public static float ApparelScoreRawWorkStats(Pawn pawn, Apparel ap)
+   //   {
+   //       Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(pawn.outfits.CurrentOutfit);
+   //       float score = 1.0f;
+   //
+   //       //base score
+   //       //      float score = 0.1f;
+   //
+   //       //calculating protection, no buff
+   //       float protectionScore =
+   //           ap.GetStatValue(StatDefOf.ArmorRating_Sharp) +
+   //           ap.GetStatValue(StatDefOf.ArmorRating_Blunt) * 0.75f;
+   //
+   //
+   //       if (outfit.AddWorkStats)
+   //       {
+   //           score = score + protectionScore * 0.1f;
+   //       }
+   //       else
+   //       {
+   //           score += protectionScore * 1.25f;
+   //       }
+   //
+   //       //calculating HP
+   //       if (ap.def.useHitPoints)
+   //       {
+   //           float hpPercent = ap.HitPoints / (float)ap.MaxHitPoints;
+   //           score *= HitPointsPercentScoreFactorCurve.Evaluate(hpPercent);
+   //       }
+   //
+   //       //calculating warmth
+   //       
+   //       score *= ApparelScoreRawInsulationColdAdjust(ap);
+   //
+   //       return score;
+   //   }
 
         public float ApparelScoreRawStats(Apparel ap)
         {
