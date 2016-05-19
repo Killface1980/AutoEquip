@@ -9,6 +9,13 @@ namespace AutoEquip
 {
     public class MapComponent_AutoEquip : MapComponent
     {
+
+        static MapComponent_AutoEquip()
+        {
+            Log.Message("AutoEquip with Infusion Initialized");
+            PawnCalcForApparel.ApparelScoreRawStatsHandlers += PawnCalcForApparel.InfusionApparelScoreRawStatsHandlers;
+        }
+
         public List<Saveable_Outfit> OutfitCache = new List<Saveable_Outfit>();
         public List<Saveable_Pawn> PawnCache = new List<Saveable_Pawn>();
 
@@ -105,7 +112,7 @@ namespace AutoEquip
 #if LOG
             this.nextOptimization = Find.TickManager.TicksGame + 500;
 #else
-            _nextOptimization = Find.TickManager.TicksGame + 500;
+            _nextOptimization = Find.TickManager.TicksGame + 1000;
             //this.nextOptimization = Find.TickManager.TicksGame + 5000;
 #endif
         }

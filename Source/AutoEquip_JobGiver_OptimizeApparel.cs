@@ -86,7 +86,11 @@ namespace AutoEquip
                     {
                         var ap = (Apparel) thing;
                         if (!configurarion.ToWearApparel.Contains(ap)) continue;
-                        if (!ap.IsInValidStorage()) continue;
+                        if (Find.SlotGroupManager.SlotGroupAt(thing.Position) == null) continue;
+                        if (thing.IsForbidden(pawn)) continue;
+                        if (!ApparelUtility.HasPartsToWear(pawn, thing.def)) continue;
+
+                            if (!ap.IsInValidStorage()) continue;
                         if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
 //                                if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
                         {
@@ -101,6 +105,8 @@ namespace AutoEquip
             }
 
             #endregion
+
+
 
 
             //  foreach (Thing t in list)

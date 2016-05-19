@@ -8,7 +8,7 @@ namespace AutoEquip
 {
     public class ModInitializer : ITab
     {
-        private readonly GameObject _modInitializerControllerObject;
+        protected GameObject _modInitializerControllerObject;
 
         public ModInitializer()
         {
@@ -22,29 +22,28 @@ namespace AutoEquip
 
     class ModInitializerBehaviour : MonoBehaviour
     {
-        protected GameObject ModObject;
-        private bool ReinjectNeeded;
-        private float ReinjectTime;
+        private bool _reinjectNeeded;
+        private float _reinjectTime;
 
         public void OnLevelWasLoaded(int level)
         {
-            ReinjectNeeded = true;
+            _reinjectNeeded = true;
             if (level >= 0)
-                ReinjectTime = 1;
+                _reinjectTime = 1;
             else
-                ReinjectTime = 0;
+                _reinjectTime = 0;
         }        
 
         public void FixedUpdate()
         {
-            if (ReinjectNeeded)
+            if (_reinjectNeeded)
             {
-                ReinjectTime -= Time.fixedDeltaTime;
+                _reinjectTime -= Time.fixedDeltaTime;
 
-                if (ReinjectTime <= 0)
+                if (_reinjectTime <= 0)
                 {
-                    ReinjectNeeded = false;
-                    ReinjectTime = 0;
+                    _reinjectNeeded = false;
+                    _reinjectTime = 0;
 
 #if LOG
                     Log.Message("AutoEquip Injected");

@@ -127,7 +127,7 @@ namespace AutoEquip
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipTotal".Translate(), labelWidth,
-                conf.OLD_CalculateApparelModifierRaw(_apparel).ToString("N3"), baseValue,
+                conf.ApparelModifierRaw(_apparel).ToString("N3"), baseValue,
                 "", multiplierWidth,
                 conf.ApparelScoreRaw(_apparel).ToString("N5"), finalValue);
 
