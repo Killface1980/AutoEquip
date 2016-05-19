@@ -1,10 +1,9 @@
 ﻿using System;
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
-using Verse.AI;
 
 namespace AutoEquip
 {
@@ -32,43 +31,43 @@ namespace AutoEquip
 
         public override void ExposeData()
         {
-            Scribe_Collections.LookList(ref this.OutfitCache, "outfits", LookMode.Deep);
-            Scribe_Collections.LookList(ref this.PawnCache, "pawns", LookMode.Deep);
+            Scribe_Collections.LookList(ref OutfitCache, "outfits", LookMode.Deep);
+            Scribe_Collections.LookList(ref PawnCache, "pawns", LookMode.Deep);
             base.ExposeData();
 
-            if (this.OutfitCache == null)
-                this.OutfitCache = new List<Saveable_Outfit>();
+            if (OutfitCache == null)
+                OutfitCache = new List<Saveable_Outfit>();
 
-            if (this.PawnCache == null)
-                this.PawnCache = new List<Saveable_Pawn>();
+            if (PawnCache == null)
+                PawnCache = new List<Saveable_Pawn>();
         }
 
-        public Saveable_Outfit GetOutfit(Pawn pawn) { return this.GetOutfit(pawn.outfits.CurrentOutfit); }
+        public Saveable_Outfit GetOutfit(Pawn pawn) { return GetOutfit(pawn.outfits.CurrentOutfit); }
 
         public Saveable_Outfit GetOutfit(Outfit outfit)
         {
-            foreach (Saveable_Outfit o in this.OutfitCache)
+            foreach (Saveable_Outfit o in OutfitCache)
                 if (o.Outfit == outfit)
                     return o;
 
             Saveable_Outfit ret = new Saveable_Outfit();
             ret.Outfit = outfit;
-            ret.Stats.Add(new Saveable_Outfit_StatDef() { StatDef = StatDefOf.ArmorRating_Sharp, Strength = 1.00f });
-            ret.Stats.Add(new Saveable_Outfit_StatDef() { StatDef = StatDefOf.ArmorRating_Blunt, Strength = 0.75f });
+            ret.Stats.Add(new Saveable_Outfit_StatDef { StatDef = StatDefOf.ArmorRating_Sharp, Strength = 1.00f });
+            ret.Stats.Add(new Saveable_Outfit_StatDef { StatDef = StatDefOf.ArmorRating_Blunt, Strength = 0.75f });
 
-            this.OutfitCache.Add(ret);
+            OutfitCache.Add(ret);
 
             return ret;
         }
 
         public Saveable_Pawn GetCache(Pawn pawn)
         {
-            foreach (Saveable_Pawn c in this.PawnCache)
+            foreach (Saveable_Pawn c in PawnCache)
                 if (c.pawn == pawn)
                     return c;
             Saveable_Pawn n = new Saveable_Pawn();
             n.pawn = pawn;
-            this.PawnCache.Add(n);
+            PawnCache.Add(n);
             return n;
         }
 
@@ -76,7 +75,7 @@ namespace AutoEquip
         {
             base.MapComponentTick();
 
-            if (Find.TickManager.TicksGame < this.nextOptimization)
+            if (Find.TickManager.TicksGame < nextOptimization)
                 return;
 
 #if LOG
@@ -91,7 +90,7 @@ namespace AutoEquip
             foreach (Pawn pawn in Find.Map.mapPawns.FreeColonists)
             {
                 InjectTab(pawn.def);
-                Saveable_Pawn newPawnSaveable = this.GetCache(pawn);
+                Saveable_Pawn newPawnSaveable = GetCache(pawn);
                 PawnCalcForApparel newPawnCalc = new PawnCalcForApparel(newPawnSaveable);
 
                 newSaveableList.Add(newPawnSaveable);
@@ -100,17 +99,18 @@ namespace AutoEquip
                 newPawnCalc.InitializeFixedApparelsAndGetAvaliableApparels(allApparels);
             }
 
-            this.PawnCache = newSaveableList;
+            PawnCache = newSaveableList;
             PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
 
 #if LOG
             this.nextOptimization = Find.TickManager.TicksGame + 500;
 #else
-            this.nextOptimization = Find.TickManager.TicksGame + 5000;
+            nextOptimization = Find.TickManager.TicksGame + 500;
+            //this.nextOptimization = Find.TickManager.TicksGame + 5000;
 #endif
         }
 
-        private static void InjectTab(ThingDef thingDef)
+        public static void InjectTab(ThingDef thingDef)
         {
             Debug.Log("Inject Tab");
             if (thingDef.inspectorTabsResolved == null)

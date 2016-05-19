@@ -15,8 +15,8 @@ namespace AutoEquip
 
         public void ExposeData()
         {
-            Scribe_Defs.LookDef(ref this.StatDef, "StatDef");
-            Scribe_Values.LookValue(ref this.Strength, "strength");
+            Scribe_Defs.LookDef(ref StatDef, "StatDef");
+            Scribe_Values.LookValue(ref Strength, "strength");
         }
     }
 }

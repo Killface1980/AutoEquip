@@ -1,8 +1,7 @@
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -24,39 +23,39 @@ namespace AutoEquip
         public static readonly Color ThingToDropLabelColor = new Color(1.0f, 0.7f, 0.7f, 1f);
         public static readonly Color HighlightColor = new Color(0.5f, 0.5f, 0.5f, 1f);
 
-        public override bool IsVisible { get { return this.SelPawnForGear.RaceProps.ToolUser; } }
-        private bool CanEdit { get { return this.SelPawnForGear.IsColonistPlayerControlled; } }
+        public override bool IsVisible { get { return SelPawnForGear.RaceProps.ToolUser; } }
+        private bool CanEdit { get { return SelPawnForGear.IsColonistPlayerControlled; } }
 
         private Pawn SelPawnForGear
         {
             get
             {
-                if (base.SelPawn != null)
+                if (SelPawn != null)
                 {
-                    return base.SelPawn;
+                    return SelPawn;
                 }
-                Corpse corpse = base.SelThing as Corpse;
+                Corpse corpse = SelThing as Corpse;
                 if (corpse != null)
                 {
                     return corpse.innerPawn;
                 }
-                throw new InvalidOperationException("Gear tab on non-pawn non-corpse " + base.SelThing);
+                throw new InvalidOperationException("Gear tab on non-pawn non-corpse " + SelThing);
             }
         }
 
         public ITab_Pawn_AutoEquip()
         {
-            this.size = new Vector2(540f, 550f);
-            this.labelKey = "TabGear";
+            size = new Vector2(540f, 550f);
+            labelKey = "TabGear";
         }
 
         protected override void FillTab()
         {
             Saveable_Pawn pawnSave;
             PawnCalcForApparel pawnCalc;
-            if (this.SelPawnForGear.IsColonist)
+            if (SelPawnForGear.IsColonist)
             {
-                pawnSave = MapComponent_AutoEquip.Get.GetCache(this.SelPawnForGear);
+                pawnSave = MapComponent_AutoEquip.Get.GetCache(SelPawnForGear);
                 pawnCalc = new PawnCalcForApparel(pawnSave);
             }
             else
@@ -66,7 +65,7 @@ namespace AutoEquip
             }
 
             Text.Font = GameFont.Small;
-            Rect rect = new Rect(0f, 20f, this.size.x, this.size.y - 20f);
+            Rect rect = new Rect(0f, 20f, size.x, size.y - 20f);
             Rect rect2 = rect.ContractedBy(10f);
             Rect position = new Rect(rect2.x, rect2.y, rect2.width, rect2.height);
             GUI.BeginGroup(position);
@@ -101,22 +100,22 @@ namespace AutoEquip
                 outRect.yMin += rect3.height + 4f;
             }
 
-            Rect viewRect = new Rect(0f, 0f, position.width - 16f, this.scrollViewHeight);
-            Widgets.BeginScrollView(outRect, ref this.scrollPosition, viewRect);
+            Rect viewRect = new Rect(0f, 0f, position.width - 16f, scrollViewHeight);
+            Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
             float num = 0f;
-            if (this.SelPawnForGear.equipment != null)
+            if (SelPawnForGear.equipment != null)
             {
                 Widgets.ListSeparator(ref num, viewRect.width, "Equipment".Translate());
-                foreach (ThingWithComps current in this.SelPawnForGear.equipment.AllEquipment)
-                    this.DrawThingRow(ref num, viewRect.width, current, true, ITab_Pawn_AutoEquip.ThingLabelColor, pawnSave, pawnCalc);
+                foreach (ThingWithComps current in SelPawnForGear.equipment.AllEquipment)
+                    DrawThingRow(ref num, viewRect.width, current, true, ThingLabelColor, pawnSave, pawnCalc);
             }
-            if (this.SelPawnForGear.apparel != null)
+            if (SelPawnForGear.apparel != null)
             {
                 Widgets.ListSeparator(ref num, viewRect.width, "Apparel".Translate());
-                foreach (Apparel current2 in from ap in this.SelPawnForGear.apparel.WornApparel
+                foreach (Apparel current2 in from ap in SelPawnForGear.apparel.WornApparel
                                              orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                              select ap)
-                    this.DrawThingRow(ref num, viewRect.width, current2, true, ITab_Pawn_AutoEquip.ThingLabelColor, pawnSave, pawnCalc);
+                    DrawThingRow(ref num, viewRect.width, current2, true, ThingLabelColor, pawnSave, pawnCalc);
             }
             if (pawnSave != null)
             {
@@ -127,7 +126,7 @@ namespace AutoEquip
                     foreach (Apparel current2 in from ap in pawnSave.ToWearApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
-                        this.DrawThingRow(ref num, viewRect.width, current2, false, ITab_Pawn_AutoEquip.ThingToEquipLabelColor, pawnSave, pawnCalc);
+                        DrawThingRow(ref num, viewRect.width, current2, false, ThingToEquipLabelColor, pawnSave, pawnCalc);
                 }
 
                 if ((pawnSave.ToDropApparel != null) &&
@@ -137,18 +136,18 @@ namespace AutoEquip
                     foreach (Apparel current2 in from ap in pawnSave.ToDropApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
-                        this.DrawThingRow(ref num, viewRect.width, current2, this.SelPawnForGear.apparel.WornApparel.Contains(current2), ITab_Pawn_AutoEquip.ThingToDropLabelColor, pawnSave, pawnCalc);
+                        DrawThingRow(ref num, viewRect.width, current2, SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
                 }
             }
-            if (this.SelPawnForGear.inventory != null)
+            if (SelPawnForGear.inventory != null)
             {
                 Widgets.ListSeparator(ref num, viewRect.width, "Inventory".Translate());
-                foreach (Thing current3 in this.SelPawnForGear.inventory.container)
-                    this.DrawThingRow(ref num, viewRect.width, current3, true, ITab_Pawn_AutoEquip.ThingLabelColor, pawnSave, pawnCalc);
+                foreach (Thing current3 in SelPawnForGear.inventory.container)
+                    DrawThingRow(ref num, viewRect.width, current3, true, ThingLabelColor, pawnSave, pawnCalc);
             }
 
             if (Event.current.type == EventType.Layout)
-                this.scrollViewHeight = num + 30f;
+                scrollViewHeight = num + 30f;
             Widgets.EndScrollView();
             GUI.EndGroup();
             GUI.color = Color.white;
@@ -160,7 +159,7 @@ namespace AutoEquip
             Rect rect = new Rect(0f, y, width, 28f);
             if (Mouse.IsOver(rect))
             {
-                GUI.color = ITab_Pawn_AutoEquip.HighlightColor;
+                GUI.color = HighlightColor;
                 GUI.DrawTexture(rect, TexUI.HighlightTex);
             }
             if (Widgets.InvisibleButton(rect) && Event.current.button == 1)
@@ -170,7 +169,7 @@ namespace AutoEquip
                 {
                     Find.WindowStack.Add(new Dialog_InfoCard(thing));
                 }, MenuOptionPriority.Medium, null, null));
-                if (this.CanEdit && equiped)
+                if (CanEdit && equiped)
                 {
                     Action action = null;
                     ThingWithComps eq = thing as ThingWithComps;
@@ -180,15 +179,15 @@ namespace AutoEquip
                         Apparel unused;
                         action = delegate
                         {
-                            this.SelPawnForGear.apparel.TryDrop(ap, out unused, this.SelPawnForGear.Position, true);
+                            SelPawnForGear.apparel.TryDrop(ap, out unused, SelPawnForGear.Position, true);
                         };
                     }
-                    else if (eq != null && this.SelPawnForGear.equipment.AllEquipment.Contains(eq))
+                    else if (eq != null && SelPawnForGear.equipment.AllEquipment.Contains(eq))
                     {
                         ThingWithComps unused;
                         action = delegate
                         {
-                            this.SelPawnForGear.equipment.TryDropEquipment(eq, out unused, this.SelPawnForGear.Position, true);
+                            SelPawnForGear.equipment.TryDropEquipment(eq, out unused, SelPawnForGear.Position, true);
                         };
                     }
                     else if (!thing.def.destroyOnDrop)
@@ -196,7 +195,7 @@ namespace AutoEquip
                         Thing unused;
                         action = delegate
                         {
-                            this.SelPawnForGear.inventory.container.TryDrop(thing, this.SelPawnForGear.Position, ThingPlaceMode.Near, out unused);
+                            SelPawnForGear.inventory.container.TryDrop(thing, SelPawnForGear.Position, ThingPlaceMode.Near, out unused);
                         };
                     }
                     list.Add(new FloatMenuOption("DropThing".Translate(), action, MenuOptionPriority.Medium, null, null));
@@ -263,9 +262,9 @@ namespace AutoEquip
             {
                 if ((pawnSave != null) &&
                     (pawnSave.TargetApparel != null))
-                    text = pawnCalc.CalculateApparelScoreRaw((Apparel)thing).ToString("N5") + "   " + text;
+                    text = pawnCalc.ApparelScoreRaw((Apparel)thing).ToString("N5") + "   " + text;
 
-                if (this.SelPawnForGear.outfits != null && this.SelPawnForGear.outfits.forcedHandler.IsForced((Apparel)thing))
+                if (SelPawnForGear.outfits != null && SelPawnForGear.outfits.forcedHandler.IsForced((Apparel)thing))
                     text = text + ", " + "ApparelForcedLower".Translate();
             }
             Widgets.Label(rect2, text);

@@ -1,7 +1,7 @@
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using Verse;
 
 namespace AutoEquip
@@ -18,19 +18,19 @@ namespace AutoEquip
 
         public void ExposeData()
         {
-            Scribe_References.LookReference(ref this.pawn, "pawn");
-            Scribe_Collections.LookList(ref this.Stats, "stats", LookMode.Deep);
+            Scribe_References.LookReference(ref pawn, "pawn");
+            Scribe_Collections.LookList(ref Stats, "stats", LookMode.Deep);
         }
 
         public IEnumerable<Saveable_Outfit_StatDef> NormalizeCalculedStatDef()
         {
-            Saveable_Outfit outFit = MapComponent_AutoEquip.Get.GetOutfit(this.pawn);
+            Saveable_Outfit outFit = MapComponent_AutoEquip.Get.GetOutfit(pawn);
             List<Saveable_Outfit_StatDef> calculedStatDef = new List<Saveable_Outfit_StatDef>(outFit.Stats);
 
             if ((outFit.AppendIndividualPawnStatus) &&
-                (this.Stats != null))
+                (Stats != null))
             {
-                foreach (Saveable_Outfit_StatDef stat in this.Stats)
+                foreach (Saveable_Outfit_StatDef stat in Stats)
                 {
                     int index = -1;
                     for (int i = 0; i < calculedStatDef.Count; i++)

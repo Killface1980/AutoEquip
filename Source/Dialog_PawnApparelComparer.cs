@@ -1,8 +1,6 @@
-using RimWorld;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -15,9 +13,9 @@ namespace AutoEquip
 
         public Dialog_PawnApparelComparer(Pawn pawn, Apparel apparel)
         {
-            this.doCloseX = true;
-            this.closeOnEscapeKey = true;
-            this.doCloseButton = true;
+            doCloseX = true;
+            closeOnEscapeKey = true;
+            doCloseButton = true;
 
             this.pawn = pawn;
             this.apparel = apparel;
@@ -45,7 +43,7 @@ namespace AutoEquip
                         allApparels.Add(pawnApparel);
             }
 
-            allApparels = allApparels.Where(i => !ApparelUtility.CanWearTogether(this.apparel.def, i.def)).ToList();
+            allApparels = allApparels.Where(i => !ApparelUtility.CanWearTogether(apparel.def, i.def)).ToList();
 
             Rect groupRect = windowRect.ContractedBy(10f);
             groupRect.height -= 100;
@@ -59,7 +57,7 @@ namespace AutoEquip
 
             Rect itemRect = new Rect(groupRect.xMin + 4f, groupRect.yMin, groupRect.width - 8f, 28f);
 
-            this.DrawLine(ref itemRect,
+            DrawLine(ref itemRect,
                 null, "Apparel", apparelLabelWidth,
                 null, "Equiped", apparelEquipedWidth,
                 null, "Target", apparelOwnerWidth,
@@ -80,7 +78,7 @@ namespace AutoEquip
 
             Widgets.BeginScrollView(groupRect, ref scrollPosition, viewRect);
 
-            allApparels = allApparels.OrderByDescending(i => { float g; if (pawnAutoEquip.CalculateApparelScoreGain(i, out g)) return g; return -1000f; }).ToList();
+            allApparels = allApparels.OrderByDescending(i => { float g; if (pawnAutoEquip.OLD_CalculateApparelScoreGain(i, out g)) return g; return -1000f; }).ToList();
 
             foreach (Apparel currentAppel in allApparels)
             {
@@ -117,19 +115,19 @@ namespace AutoEquip
                 }
 
                 float gain;
-                if (pawnAutoEquip.CalculateApparelScoreGain(currentAppel, out gain))
-                    this.DrawLine(ref itemRect,
+                if (pawnAutoEquip.OLD_CalculateApparelScoreGain(currentAppel, out gain))
+                    DrawLine(ref itemRect,
                         currentAppel, currentAppel.LabelCap, apparelLabelWidth,
                         equiped, equiped == null ? null : equiped.LabelCap, apparelEquipedWidth,
                         target, target == null ? null : target.LabelCap, apparelOwnerWidth,
-                        pawnAutoEquip.CalculateApparelScoreRaw(currentAppel).ToString("N5"), apparelScoreWidth,
+                        pawnAutoEquip.ApparelScoreRaw(currentAppel).ToString("N5"), apparelScoreWidth,
                         gain.ToString("N5"), apparelGainWidth);
                 else
-                    this.DrawLine(ref itemRect,
+                    DrawLine(ref itemRect,
                         currentAppel, currentAppel.LabelCap, apparelLabelWidth,
                         equiped, equiped == null ? null : equiped.LabelCap, apparelEquipedWidth,
                         target, target == null ? null : target.LabelCap, apparelOwnerWidth,
-                        pawnAutoEquip.CalculateApparelScoreRaw(currentAppel).ToString("N5"), apparelScoreWidth,
+                        pawnAutoEquip.ApparelScoreRaw(currentAppel).ToString("N5"), apparelScoreWidth,
                         "No Allow", apparelGainWidth);
 
                 listRect.yMin = itemRect.yMax;
@@ -162,7 +160,7 @@ namespace AutoEquip
                     Widgets.ThingIcon(fieldRect, apparelThing);
                 if (Widgets.InvisibleButton(fieldRect))
                 {
-                    this.Close(true);
+                    Close(true);
                     Find.MainTabsRoot.EscapeCurrentTab(true);
                     if (apparelEquipedThing != null)
                     {
@@ -202,7 +200,7 @@ namespace AutoEquip
                     Widgets.ThingIcon(fieldRect, apparelEquipedThing);
                 if (Widgets.InvisibleButton(fieldRect))
                 {
-                    this.Close(true);
+                    Close(true);
                     Find.MainTabsRoot.EscapeCurrentTab(true);
                     Find.CameraMap.JumpTo(apparelEquipedThing.PositionHeld);
                     Find.Selector.ClearSelection();
@@ -232,7 +230,7 @@ namespace AutoEquip
                     Widgets.ThingIcon(fieldRect, apparelOwnerThing);
                 if (Widgets.InvisibleButton(fieldRect))
                 {
-                    this.Close(true);
+                    Close(true);
                     Find.MainTabsRoot.EscapeCurrentTab(true);
                     Find.CameraMap.JumpTo(apparelOwnerThing.PositionHeld);
                     Find.Selector.ClearSelection();
@@ -260,9 +258,9 @@ namespace AutoEquip
                 Text.Anchor = TextAnchor.UpperLeft;
                 if (Widgets.InvisibleButton(fieldRect))
                 {
-                    this.Close(true);
+                    Close(true);
                     Find.MainTabsRoot.EscapeCurrentTab(true);
-                    Find.WindowStack.Add(new Dialog_PawnApparelDetail(this.pawn, apparelThing));
+                    Find.WindowStack.Add(new Dialog_PawnApparelDetail(pawn, apparelThing));
                     return;
                 }
             }

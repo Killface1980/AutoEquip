@@ -1,9 +1,6 @@
-﻿using RimWorld;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+﻿using System.Reflection;
+using CommunityCoreLibrary;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -17,7 +14,7 @@ namespace AutoEquip
         {
             modInitializerControllerObject = new GameObject("ModInitializer");
             modInitializerControllerObject.AddComponent<ModInitializerBehaviour>();
-            UnityEngine.Object.DontDestroyOnLoad((UnityEngine.Object)modInitializerControllerObject);
+            Object.DontDestroyOnLoad(modInitializerControllerObject);
         }
 
         protected override void FillTab() { }
@@ -26,8 +23,8 @@ namespace AutoEquip
     class ModInitializerBehaviour : MonoBehaviour
     {
         protected GameObject ModObject;
-        protected bool ReinjectNeeded = false;
-        protected float ReinjectTime = 0;
+        protected bool ReinjectNeeded;
+        protected float ReinjectTime;
 
         public void OnLevelWasLoaded(int level)
         {
@@ -62,7 +59,7 @@ namespace AutoEquip
             MethodInfo coreMethod = typeof(JobGiver_OptimizeApparel).GetMethod("TryGiveTerminalJob", BindingFlags.Instance | BindingFlags.NonPublic);
             MethodInfo autoEquipMethod = typeof(AutoEquip_JobGiver_OptimizeApparel).GetMethod("_TryGiveTerminalJob", BindingFlags.Static | BindingFlags.NonPublic);
 
-            if (!CommunityCoreLibrary.Detours.TryDetourFromTo(coreMethod, autoEquipMethod))
+            if (!Detours.TryDetourFromTo(coreMethod, autoEquipMethod))
                 Log.Error("Could not Detour AutoEquip.");
 
             OnLevelWasLoaded(-1);            

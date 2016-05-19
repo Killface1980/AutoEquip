@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -14,12 +11,12 @@ namespace AutoEquip
 
         public Dialog_ManagePawnOutfit(List<Saveable_Outfit_StatDef> stats)
         {
-            this.forcePause = true;
-            this.doCloseX = true;
-            this.closeOnEscapeKey = true;
-            this.doCloseButton = true;
-            this.closeOnClickedOutside = true;
-            this.absorbInputAroundWindow = true;
+            forcePause = true;
+            doCloseX = true;
+            closeOnEscapeKey = true;
+            doCloseButton = true;
+            closeOnClickedOutside = true;
+            absorbInputAroundWindow = true;
             this.stats = stats;
         }
 
@@ -33,10 +30,10 @@ namespace AutoEquip
 
         public override void DoWindowContents(Rect inRect)
         {
-            Rect rect = new Rect(0f, 0f, inRect.width, inRect.height - this.CloseButSize.y).ContractedBy(10f);
+            Rect rect = new Rect(0f, 0f, inRect.width, inRect.height - CloseButSize.y).ContractedBy(10f);
             GUI.BeginGroup(rect);
             Rect rect1 = new Rect(0f, 0f, rect.width, rect.height - 5f - 10f);
-            Dialog_ManageOutfitsAutoEquip.DoStatsInput(rect1, ref this.scrollPositionStats, this.stats);
+            Dialog_ManageOutfitsAutoEquip.DoStatsInput(rect1, ref scrollPositionStats, stats);
             GUI.EndGroup();
         }
     }
