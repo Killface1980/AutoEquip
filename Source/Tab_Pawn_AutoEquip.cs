@@ -136,7 +136,7 @@ namespace AutoEquip
                     foreach (Apparel current2 in from ap in pawnSave.ToDropApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
-                        DrawThingRow(ref num, viewRect.width, current2, SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
+                        DrawThingRow(ref num, viewRect.width, current2, SelPawnForGear.apparel != null && SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
                 }
             }
             if (SelPawnForGear.inventory != null)
@@ -238,7 +238,7 @@ namespace AutoEquip
                         }, MenuOptionPriority.Medium, null, null));
                     list.Add(new FloatMenuOption("AutoEquip Details", delegate
                     {
-                        Find.WindowStack.Add(new Dialog_PawnApparelDetail(pawnSave.pawn, (Apparel)thing));
+                        Find.WindowStack.Add(new DialogPawnApparelDetail(pawnSave.pawn, (Apparel)thing));
                     }, MenuOptionPriority.Medium, null, null));
 
                     list.Add(new FloatMenuOption("AutoEquip Comparer", delegate
@@ -258,13 +258,14 @@ namespace AutoEquip
             GUI.color = thingColor;
             Rect rect2 = new Rect(36f, y, width - 36f, 28f);
             string text = thing.LabelCap;
-            if (thing is Apparel)
+            var apparel = thing as Apparel;
+            if (apparel != null)
             {
                 if ((pawnSave != null) &&
                     (pawnSave.TargetApparel != null))
-                    text = pawnCalc.ApparelScoreRaw((Apparel)thing).ToString("N5") + "   " + text;
+                    text = pawnCalc.ApparelScoreRaw(apparel).ToString("N5") + "   " + text;
 
-                if (SelPawnForGear.outfits != null && SelPawnForGear.outfits.forcedHandler.IsForced((Apparel)thing))
+                if (SelPawnForGear.outfits != null && SelPawnForGear.outfits.forcedHandler.IsForced(apparel))
                     text = text + ", " + "ApparelForcedLower".Translate();
             }
             Widgets.Label(rect2, text);

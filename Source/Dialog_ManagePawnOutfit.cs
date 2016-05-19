@@ -6,8 +6,8 @@ namespace AutoEquip
 {
     public class Dialog_ManagePawnOutfit : Window
     {
-        private List<Saveable_Outfit_StatDef> stats;
-        private Vector2 scrollPositionStats;
+        private readonly List<Saveable_Outfit_StatDef> _stats;
+        private Vector2 _scrollPositionStats;
 
         public Dialog_ManagePawnOutfit(List<Saveable_Outfit_StatDef> stats)
         {
@@ -17,7 +17,7 @@ namespace AutoEquip
             doCloseButton = true;
             closeOnClickedOutside = true;
             absorbInputAroundWindow = true;
-            this.stats = stats;
+            this._stats = stats;
         }
 
         public override Vector2 InitialWindowSize
@@ -33,7 +33,7 @@ namespace AutoEquip
             Rect rect = new Rect(0f, 0f, inRect.width, inRect.height - CloseButSize.y).ContractedBy(10f);
             GUI.BeginGroup(rect);
             Rect rect1 = new Rect(0f, 0f, rect.width, rect.height - 5f - 10f);
-            Dialog_ManageOutfitsAutoEquip.DoStatsInput(rect1, ref scrollPositionStats, stats);
+            Dialog_ManageOutfitsAutoEquip.DoStatsInput(rect1, ref _scrollPositionStats, _stats);
             GUI.EndGroup();
         }
     }

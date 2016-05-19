@@ -8,8 +8,8 @@ namespace AutoEquip
 {
     public class Dialog_PawnApparelComparer : Window
     {
-        private Pawn pawn;
-        private Apparel apparel;
+        private readonly Pawn _pawn;
+        private readonly Apparel _apparel;
 
         public Dialog_PawnApparelComparer(Pawn pawn, Apparel apparel)
         {
@@ -17,8 +17,8 @@ namespace AutoEquip
             closeOnEscapeKey = true;
             doCloseButton = true;
 
-            this.pawn = pawn;
-            this.apparel = apparel;
+            this._pawn = pawn;
+            this._apparel = apparel;
         }
 
         public override Vector2 InitialWindowSize
@@ -34,7 +34,7 @@ namespace AutoEquip
         public override void DoWindowContents(Rect windowRect)
         {
             MapComponent_AutoEquip mapComponent = MapComponent_AutoEquip.Get;
-            PawnCalcForApparel pawnAutoEquip = new PawnCalcForApparel(mapComponent.GetCache(this.pawn));
+            PawnCalcForApparel pawnAutoEquip = new PawnCalcForApparel(mapComponent.GetCache(this._pawn));
             List<Apparel> allApparels = new List<Apparel>(Find.ListerThings.ThingsInGroup(ThingRequestGroup.Apparel).OfType<Apparel>());
             foreach (Pawn pawn in Find.Map.mapPawns.FreeColonists)
             {
@@ -43,7 +43,7 @@ namespace AutoEquip
                         allApparels.Add(pawnApparel);
             }
 
-            allApparels = allApparels.Where(i => !ApparelUtility.CanWearTogether(apparel.def, i.def)).ToList();
+            allApparels = allApparels.Where(i => !ApparelUtility.CanWearTogether(_apparel.def, i.def)).ToList();
 
             Rect groupRect = windowRect.ContractedBy(10f);
             groupRect.height -= 100;
@@ -70,7 +70,7 @@ namespace AutoEquip
             groupRect.height -= 4f;
             groupRect.height -= Text.LineHeight * 1.2f * 3f;
 
-            Rect viewRect = new Rect(groupRect.xMin, groupRect.yMin, groupRect.width - 16f, allApparels.Count() * 28f + 16f);
+            Rect viewRect = new Rect(groupRect.xMin, groupRect.yMin, groupRect.width - 16f, allApparels.Count * 28f + 16f);
             if (viewRect.height < groupRect.height)
                 groupRect.height = viewRect.height;
 
@@ -260,7 +260,7 @@ namespace AutoEquip
                 {
                     Close(true);
                     Find.MainTabsRoot.EscapeCurrentTab(true);
-                    Find.WindowStack.Add(new Dialog_PawnApparelDetail(pawn, apparelThing));
+                    Find.WindowStack.Add(new DialogPawnApparelDetail(_pawn, apparelThing));
                     return;
                 }
             }

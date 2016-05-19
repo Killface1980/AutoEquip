@@ -156,7 +156,7 @@ namespace AutoEquip
             CheckSelectedOutfitHasName();
         }
 
-        public static void DoNameInputRect(Rect rect, ref string name, int maxLength)
+        private static void DoNameInputRect(Rect rect, ref string name, int maxLength)
         {
             var text = Widgets.TextField(rect, name);
             if (text.Length <= maxLength && ValidNameRegex.IsMatch(text))

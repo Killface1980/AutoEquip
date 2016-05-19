@@ -8,14 +8,14 @@ namespace AutoEquip
 {
     public class PawnCalcForApparel
     {
-        private Saveable_Pawn saveablePawn;
-        private Pawn pawn;
+        private readonly Saveable_Pawn saveablePawn;
+        private readonly Pawn pawn;
         private readonly Outfit _outfit;
         private bool _optimized;
         private List<Apparel> _fixedApparels;
         private float? _totalStats;
 
-        private static Saveable_Outfit_StatDef[] stats;
+        private static Saveable_Outfit_StatDef[] _stats;
 
         private static NeededWarmth _neededWarmth;
 
@@ -58,7 +58,7 @@ namespace AutoEquip
             this.saveablePawn = saveablePawn;
             pawn = saveablePawn.pawn;
             _outfit = pawn.outfits.CurrentOutfit;
-            stats = saveablePawn.NormalizeCalculedStatDef().ToArray();
+            _stats = saveablePawn.NormalizeCalculedStatDef().ToArray();
             
             _neededWarmth = CalculateNeededWarmth(pawn, GenDate.CurrentMonth);
 
@@ -66,7 +66,7 @@ namespace AutoEquip
         }
 
         public string LabelCap { get { return pawn.LabelCap; } }
-        public static IEnumerable<Saveable_Outfit_StatDef> Stats { get { return stats; } }
+        public static IEnumerable<Saveable_Outfit_StatDef> Stats { get { return _stats; } }
 
         public IEnumerable<Apparel> CalculedApparel { get { return _calculedApparelItems; } }
 
@@ -209,50 +209,120 @@ namespace AutoEquip
         }
 
 
-        public static float ApparelScoreRawStats(Pawn pawn, Saveable_Outfit outfit, Apparel ap)
+        public static IEnumerable<KeyValuePair<StatDef, float>> GetStatsOfWorkType(WorkTypeDef worktype)
+        {
+            switch (worktype.defName)
+            {
+                case "Research":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ResearchSpeed"), 1f);
+                    yield break;
+                case "Cleaning":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.25f);
+                    yield break;
+                case "Hauling":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.5f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryingCapacity"), 0.5f);
+                    yield break;
+                case "Crafting":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.25f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("StonecuttingSpeed"), 0.5f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SmeltingSpeed"), 0.5f);
+                    yield break;
+                case "Art":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.25f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SculptingSpeed"), 1f);
+                    yield break;
+                case "Tailoring":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.25f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("TailoringSpeed"), 1f);
+                    yield break;
+                case "Smithing":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.25f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SmithingSpeed"), 1f);
+                    yield break;
+                case "PlantCutting":
+                    yield break;
+                case "Growing":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.15f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.15f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("PlantWorkSpeed"), 1f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("HarvestFailChance"), -0.75f);
+                    yield break;
+                case "Mining":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.15f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.2f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MiningSpeed"), 1f);
+                //yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryingCapacity"), 0.3f);
+                    yield break;
+                case "Repair":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("FixBrokenDownBuildingFailChance"), -0.75f);
+                    yield break;
+                case "Construction":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.2f);
+                //yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.25f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ConstructionSpeed"), 0.75f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SmoothingSpeed"), 0.35f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryingCapacity"), 0.5f);
+                    yield break;
+                case "Hunting":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.2f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("AimingDelayFactor"), 0.75f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ShootingAccuracy"), 1f);
+                    yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0015f);
+                    yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0002f);
+                    yield break;
+                case "Cooking":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 1.0f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.15f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CookSpeed"), 0.75f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("FoodPoisonChance"), -0.5f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("BrewingSpeed"), 0.5f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ButcheryFleshSpeed"), 0.25f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ButcheryFleshEfficiency"), 0.5f);
+                    yield break;
+                case "Handling":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.15f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryingCapacity"), 0.2f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("TameAnimalChance"), 0.75f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("TrainAnimalChance"), 0.75f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MeleeDPS"), 1.0f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MeleeHitChance"), 1.0f);
+                    yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0015f);
+                    yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0002f);
+                    yield break;
+                case "Warden":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SocialImpact"), 1f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("RecruitPrisonerChance"), 1f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("GiftImpact"), 0.25f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("TradePriceImprovement"), 0.25f);
+                    yield break;
+                case "Flicker":
+                    yield break;
+                case "Patient":
+                    yield break;
+                case "Firefighter":
+                    yield break;
+                case "Doctor":
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MedicalOperationSpeed"), 0.75f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SurgerySuccessChance"), 0.75f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("BaseHealingQuality"), 1f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("HealingSpeed"), 0.5f);
+                    yield break;
+                default:
+                    yield break;
+            }
+        }
+
+
+        private static float ApparelScoreRawStats(Pawn pawn, Saveable_Outfit outfit, Apparel ap)
         {
             float num = 0.1f;
 
-            if (outfit.AddWorkStats)
-            {
-                foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
-                {
-                    int priority = pawn.workSettings.GetPriority(wType);
-
-                    float priorityAdjust;
-                    switch (priority)
-                    {
-                        case 1:
-                            priorityAdjust = 1.0f;
-                            break;
-                        case 2:
-                            priorityAdjust = 0.2f;
-                            break;
-                        case 3:
-                            priorityAdjust = 0.1f;
-                            break;
-                        case 4:
-                            priorityAdjust = 0.05f;
-                            break;
-                        default:
-                            continue;
-                    }
-
-                    foreach (KeyValuePair<StatDef, float> workStat in AutoEquip_JobGiver_OptimizeApparel.GetStatsOfWorkType(wType))
-                    {
-                        if (!outfit.Stats.Select(i => i.StatDef).Contains(workStat.Key))
-                        {
-                            float nint = AutoEquip_JobGiver_OptimizeApparel.RawStat(pawn, ap, workStat.Key);
-
-                            num += nint * workStat.Value * priorityAdjust;
-                        }
-                    }
-                }
-            }
+            
 
             foreach (Saveable_Outfit_StatDef stat in outfit.Stats)
             {
-                float nint = AutoEquip_JobGiver_OptimizeApparel.RawStat(pawn, ap, stat.StatDef);
+                float nint = RawStat(pawn, ap, stat.StatDef);
 
                 num += nint * stat.Strength;
             }
@@ -373,8 +443,7 @@ namespace AutoEquip
 
         #endregion
 
-        public delegate void ApparelScoreRawStatsHandler(Pawn pawn, Apparel apparel, StatDef StatDef, ref float num);
-        public static event ApparelScoreRawStatsHandler ApparelScoreRawStatsHandlers;
+
 
         public static void DoApparelScoreRawStatsHandlers(Pawn pawn, Apparel apparel, StatDef StatDef, ref float num)
         {
@@ -437,13 +506,14 @@ namespace AutoEquip
         private static bool CheckForConflicts(IEnumerable<PawnCalcForApparel> pawns)
         {
             bool any = false;
-            foreach (PawnCalcForApparel pawnCalc in pawns)
+            var pawnCalcForApparels = pawns as PawnCalcForApparel[] ?? pawns.ToArray();
+            foreach (PawnCalcForApparel pawnCalc in pawnCalcForApparels)
             {
                 foreach (Apparel apprel in pawnCalc.CalculedApparel)
                 {
                     float? apparalGainPercentual = null;
 
-                    foreach (PawnCalcForApparel otherPawnCalc in pawns)
+                    foreach (PawnCalcForApparel otherPawnCalc in pawnCalcForApparels)
                     {
                         if (otherPawnCalc == pawnCalc)
                             continue;
@@ -475,40 +545,43 @@ namespace AutoEquip
             return any;
         }
 
-        private static void DoConflict(Apparel apprel, PawnCalcForApparel x, PawnCalcForApparel y, ref float? xPercentual)
+        private static void DoConflict(Apparel apparel, PawnCalcForApparel x, PawnCalcForApparel y, ref float? xPercentual)
         {
             if (!xPercentual.HasValue)
             {
                 if (x._totalStats == null)
                     x._totalStats = x.OLD_CalculateTotalStats(null);
-                float xNoStats = x.OLD_CalculateTotalStats(apprel);
+                float xNoStats = x.OLD_CalculateTotalStats(apparel);
                 xPercentual = x._totalStats / xNoStats;
-                if (x.saveablePawn.pawn.apparel.WornApparel.Contains(apprel))
+                if (x.saveablePawn.pawn.apparel.WornApparel.Contains(apparel))
                     xPercentual *= 1.1f;
             }
 
             if (y._totalStats == null)
                 y._totalStats = y.OLD_CalculateTotalStats(null);
 
-            float yNoStats = y.OLD_CalculateTotalStats(apprel);
-            float yPercentual = y._totalStats.Value / yNoStats;
-
-            if (y.saveablePawn.pawn.apparel.WornApparel.Contains(apprel))
-                yPercentual *= 1.1f;
-
-            if (xPercentual.Value > yPercentual)
+            float yNoStats = y.OLD_CalculateTotalStats(apparel);
+            if (y._totalStats != null)
             {
+                float yPercentual = y._totalStats.Value / yNoStats;
+
+                if (y.saveablePawn.pawn.apparel.WornApparel.Contains(apparel))
+                    yPercentual *= 1.1f;
+
+                if (xPercentual.Value > yPercentual)
+                {
 #if LOG && CONFLICT
-                MapComponent_AutoEquip.logMessage.AppendLine("Conflict: " + apprel.LabelCap + "   Winner: " + x.pawn.LabelCap + " Looser: " + y.pawn.LabelCap);
+                MapComponent_AutoEquip.logMessage.AppendLine("Conflict: " + apparel.LabelCap + "   Winner: " + x.pawn.LabelCap + " Looser: " + y.pawn.LabelCap);
 #endif
-                y.LooseConflict(apprel);
-            }
-            else
-            {
+                    y.LooseConflict(apparel);
+                }
+                else
+                {
 #if LOG && CONFLICT
-                MapComponent_AutoEquip.logMessage.AppendLine("Conflict: " + apprel.LabelCap + "   Winner: " + y.pawn.LabelCap + " Looser: " + x.pawn.LabelCap);
+                MapComponent_AutoEquip.logMessage.AppendLine("Conflict: " + apparel.LabelCap + "   Winner: " + y.pawn.LabelCap + " Looser: " + x.pawn.LabelCap);
 #endif
-                x.LooseConflict(apprel);
+                    x.LooseConflict(apparel);
+                }
             }
         }
 
@@ -574,7 +647,7 @@ namespace AutoEquip
         private float OLD_CalculateTotalStats(Apparel ignore)
         {
             float num = 1.0f;
-            foreach (Saveable_Outfit_StatDef stat in stats)
+            foreach (Saveable_Outfit_StatDef stat in _stats)
             {
                 float nint = stat.StatDef.defaultBaseValue;
 
@@ -680,5 +753,41 @@ namespace AutoEquip
         }
 
         #endregion
+
+
+        public static bool HandleOutfitFilter(Outfit currentOutfit, Apparel apparel)
+        {
+            return (currentOutfit.filter.Allows(apparel));
+        }
+
+
+
+
+
+
+        public static float RawStat(Pawn pawn, Apparel ap, StatDef stat)
+        {
+            float nint = ap.GetStatValue(stat, true);
+
+            nint += ap.def.equippedStatOffsets.GetStatOffsetFromList(stat);
+
+            if (ApparelScoreRawStatsHandlers != null)
+                ApparelScoreRawStatsHandlers(pawn, ap, stat, ref nint);
+
+            return nint;
+        }
+
+        private static float RawStatAdjust(Pawn pawn, Apparel ap, StatDef stat)
+        {
+            float nint = ap.def.equippedStatOffsets.GetStatOffsetFromList(stat);
+
+            if (ApparelScoreRawStatsHandlers != null)
+                ApparelScoreRawStatsHandlers(pawn, ap, stat, ref nint);
+
+            return nint;
+        }
+
+        public delegate void ApparelScoreRawStatsHandler(Pawn pawn, Apparel apparel, StatDef statDef, ref float num);
+        public static event ApparelScoreRawStatsHandler ApparelScoreRawStatsHandlers;
     }
 }

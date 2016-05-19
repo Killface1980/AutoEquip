@@ -12,7 +12,7 @@ namespace AutoEquip
         public List<Saveable_Outfit> OutfitCache = new List<Saveable_Outfit>();
         public List<Saveable_Pawn> PawnCache = new List<Saveable_Pawn>();
 
-        public int nextOptimization;
+        private int _nextOptimization;
 
         public static MapComponent_AutoEquip Get
         {
@@ -75,7 +75,7 @@ namespace AutoEquip
         {
             base.MapComponentTick();
 
-            if (Find.TickManager.TicksGame < nextOptimization)
+            if (Find.TickManager.TicksGame < _nextOptimization)
                 return;
 
 #if LOG
@@ -105,12 +105,12 @@ namespace AutoEquip
 #if LOG
             this.nextOptimization = Find.TickManager.TicksGame + 500;
 #else
-            nextOptimization = Find.TickManager.TicksGame + 500;
+            _nextOptimization = Find.TickManager.TicksGame + 500;
             //this.nextOptimization = Find.TickManager.TicksGame + 5000;
 #endif
         }
 
-        public static void InjectTab(ThingDef thingDef)
+        private static void InjectTab(ThingDef thingDef)
         {
             Debug.Log("Inject Tab");
             if (thingDef.inspectorTabsResolved == null)

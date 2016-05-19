@@ -8,13 +8,13 @@ namespace AutoEquip
 {
     public class ModInitializer : ITab
     {
-        protected GameObject modInitializerControllerObject;
+        private readonly GameObject _modInitializerControllerObject;
 
         public ModInitializer()
         {
-            modInitializerControllerObject = new GameObject("ModInitializer");
-            modInitializerControllerObject.AddComponent<ModInitializerBehaviour>();
-            Object.DontDestroyOnLoad(modInitializerControllerObject);
+            _modInitializerControllerObject = new GameObject("ModInitializer");
+            _modInitializerControllerObject.AddComponent<ModInitializerBehaviour>();
+            Object.DontDestroyOnLoad(_modInitializerControllerObject);
         }
 
         protected override void FillTab() { }
@@ -23,8 +23,8 @@ namespace AutoEquip
     class ModInitializerBehaviour : MonoBehaviour
     {
         protected GameObject ModObject;
-        protected bool ReinjectNeeded;
-        protected float ReinjectTime;
+        private bool ReinjectNeeded;
+        private float ReinjectTime;
 
         public void OnLevelWasLoaded(int level)
         {

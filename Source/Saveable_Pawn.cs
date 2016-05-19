@@ -24,10 +24,10 @@ namespace AutoEquip
 
         public IEnumerable<Saveable_Outfit_StatDef> NormalizeCalculedStatDef()
         {
-            Saveable_Outfit outFit = MapComponent_AutoEquip.Get.GetOutfit(pawn);
-            List<Saveable_Outfit_StatDef> calculedStatDef = new List<Saveable_Outfit_StatDef>(outFit.Stats);
+            Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(pawn);
+            List<Saveable_Outfit_StatDef> calculedStatDef = new List<Saveable_Outfit_StatDef>(outfit.Stats);
 
-            if ((outFit.AppendIndividualPawnStatus) &&
+            if ((outfit.AppendIndividualPawnStatus) &&
                 (Stats != null))
             {
                 foreach (Saveable_Outfit_StatDef stat in Stats)
@@ -49,52 +49,58 @@ namespace AutoEquip
                 }
             }
 
-            //foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
-            //{
-            //    int priority = this.pawn.workSettings.GetPriority(wType);
+            if (outfit.AddWorkStats)
+            {
+                foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
+                {
+                    int priority = pawn.workSettings.GetPriority(wType);
 
-            //    float priorityAjust;
-            //    switch (priority)
-            //    {                        
-            //        case 1:
-            //            priorityAjust = 0.5f;
-            //            break;
-            //        case 2:
-            //            priorityAjust = 0.25f;
-            //            break;
-            //        case 3:
-            //            priorityAjust = 0.125f;
-            //            break;
-            //        case 4:
-            //            priorityAjust = 0.0625f;
-            //            break;
-            //        default:
-            //            continue;
-            //    }
+                    float priorityAdjust;
+                    switch (priority)
+                    {
+                        case 1:
+                            priorityAdjust = 0.8f;
+                            break;
+                        case 2:
+                            priorityAdjust = 0.4f;
+                            break;
+                        case 3:
+                            priorityAdjust = 0.2f;
+                            break;
+                        case 4:
+                            priorityAdjust = 0.1f;
+                            break;
+                        default:
+                            continue;
+                    }
 
-            //    foreach (KeyValuePair<StatDef, float> stat in MapComponent_AutoEquip.GetStatsOfWorkType(wType))
-            //    {
-            //        Saveable_Outfit_StatDef StatDef = null;
-            //        foreach (Saveable_Outfit_StatDef s in calculedStatDef)
-            //        {
-            //            if (s.StatDef == stat.Key)
-            //            {
-            //                StatDef = s;
-            //                break;
-            //            }
-            //        }
+                    foreach (KeyValuePair<StatDef, float> stat in PawnCalcForApparel.GetStatsOfWorkType(wType))
+                    {
+                        Saveable_Outfit_StatDef statdef = null;
+                                foreach (Saveable_Outfit_StatDef s in calculedStatDef)
+                                {
+                                    if (s.StatDef == stat.Key)
+                                    {
+                                        statdef = s;
+                                        break;
+                                    }
+                                }
 
-            //        if (StatDef == null)
-            //        {
-            //            StatDef = new Saveable_Outfit_StatDef();
-            //            StatDef.StatDef = stat.Key;
-            //            StatDef.strength = stat.Value * priorityAjust;
-            //            calculedStatDef.Add(StatDef);
-            //        }
-            //        else
-            //            StatDef.strength = Math.Max(StatDef.strength, stat.Value * priorityAjust);
-            //    }
-            //}
+                                if (statdef == null)
+                                {
+                                    statdef = new Saveable_Outfit_StatDef();
+                                    statdef.StatDef = stat.Key;
+                                    statdef.Strength = stat.Value * priorityAdjust;
+                                    calculedStatDef.Add(statdef);
+                                }
+                                else
+                                    statdef.Strength = Math.Max(statdef.Strength, stat.Value * priorityAdjust);
+                            }
+                        }
+                    }
+                
+
+         
 
             //Log.Message(" ");
             //Log.Message("Stats of Pawn " + this.pawn);
