@@ -27,8 +27,7 @@ namespace AutoEquip
             Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(pawn);
             List<Saveable_Outfit_StatDef> calculedStatDef = new List<Saveable_Outfit_StatDef>(outfit.Stats);
 
-            if ((outfit.AppendIndividualPawnStatus) &&
-                (Stats != null))
+            if ((outfit.AppendIndividualPawnStatus) && (Stats != null))
             {
                 foreach (Saveable_Outfit_StatDef stat in Stats)
                 {
@@ -49,7 +48,7 @@ namespace AutoEquip
                 }
             }
 
-            if (outfit.AddWorkStats)
+            if ((outfit.AddWorkStats) && (Stats != null))
             {
                 foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
                 {
@@ -59,27 +58,27 @@ namespace AutoEquip
                     switch (priority)
                     {
                         case 1:
-                            priorityAdjust = 0.8f;
+                            priorityAdjust = 1.0f;
                             break;
                         case 2:
-                            priorityAdjust = 0.4f;
+                            priorityAdjust = 0.5f;
                             break;
                         case 3:
-                            priorityAdjust = 0.2f;
+                            priorityAdjust = 0.25f;
                             break;
                         case 4:
-                            priorityAdjust = 0.1f;
+                            priorityAdjust = 0.15f;
                             break;
                         default:
                             continue;
                     }
 
-                    foreach (KeyValuePair<StatDef, float> stat in PawnCalcForApparel.GetStatsOfWorkType(wType))
+                    foreach (KeyValuePair<StatDef, float> workStat in PawnCalcForApparel.GetStatsOfWorkType(wType))
                     {
                         Saveable_Outfit_StatDef statdef = null;
                                 foreach (Saveable_Outfit_StatDef s in calculedStatDef)
                                 {
-                                    if (s.StatDef == stat.Key)
+                                    if (s.StatDef == workStat.Key)
                                     {
                                         statdef = s;
                                         break;
@@ -89,12 +88,12 @@ namespace AutoEquip
                                 if (statdef == null)
                                 {
                                     statdef = new Saveable_Outfit_StatDef();
-                                    statdef.StatDef = stat.Key;
-                                    statdef.Strength = stat.Value * priorityAdjust;
+                                    statdef.StatDef = workStat.Key;
+                                    statdef.Strength = workStat.Value * priorityAdjust;
                                     calculedStatDef.Add(statdef);
                                 }
                                 else
-                                    statdef.Strength = Math.Max(statdef.Strength, stat.Value * priorityAdjust);
+                                    statdef.Strength = Math.Max(statdef.Strength, workStat.Value * priorityAdjust);
                             }
                         }
                     }

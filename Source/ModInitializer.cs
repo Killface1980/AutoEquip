@@ -14,7 +14,7 @@ namespace AutoEquip
         {
             _modInitializerControllerObject = new GameObject("ModInitializer");
             _modInitializerControllerObject.AddComponent<ModInitializerBehaviour>();
-            Object.DontDestroyOnLoad(_modInitializerControllerObject);
+            UnityEngine.Object.DontDestroyOnLoad(_modInitializerControllerObject);
         }
 
         protected override void FillTab() { }
@@ -22,8 +22,8 @@ namespace AutoEquip
 
     class ModInitializerBehaviour : MonoBehaviour
     {
-        private bool _reinjectNeeded;
-        private float _reinjectTime;
+        protected bool _reinjectNeeded = false;
+        protected float _reinjectTime = 0;
 
         public void OnLevelWasLoaded(int level)
         {
@@ -56,9 +56,9 @@ namespace AutoEquip
         public void Start()
         {
             MethodInfo coreMethod = typeof(JobGiver_OptimizeApparel).GetMethod("TryGiveTerminalJob", BindingFlags.Instance | BindingFlags.NonPublic);
-            MethodInfo autoEquipMethod = typeof(AutoEquip_JobGiver_OptimizeApparel).GetMethod("_TryGiveTerminalJob", BindingFlags.Static | BindingFlags.NonPublic);
+            MethodInfo autoEquipMethod = typeof(AutoEquip_JobGiver_OptimizeApparel).GetMethod("_TryGiveTerminalJob", BindingFlags.Instance | BindingFlags.NonPublic);
 
-            if (!Detours.TryDetourFromTo(coreMethod, autoEquipMethod))
+            if (!CommunityCoreLibrary.Detours.TryDetourFromTo(coreMethod, autoEquipMethod))
                 Log.Error("Could not Detour AutoEquip.");
 
             OnLevelWasLoaded(-1);            

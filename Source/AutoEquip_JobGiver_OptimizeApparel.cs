@@ -5,20 +5,9 @@ using Verse.AI;
 
 namespace AutoEquip
 {
-    public static class AutoEquip_JobGiver_OptimizeApparel
+    public class AutoEquip_JobGiver_OptimizeApparel
     {
         private const int ApparelOptimizeCheckInterval = 3000;
-        private const float MinScoreGainToCare = 0.05f;
-        private const float ScoreFactorIfNotReplacing = 10f;
-
-
-
-
-
-
-#if LOG
-        private static StringBuilder debugSb;
-#endif
 
         private static void SetNextOptimizeTick(Pawn pawn)
         {
@@ -26,7 +15,7 @@ namespace AutoEquip
 //            pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 3000;
         }
 
-        internal static Job _TryGiveTerminalJob(this JobGiver_OptimizeApparel obj, Pawn pawn)
+        internal Job _TryGiveTerminalJob(Pawn pawn)
         {
             if (pawn.outfits == null)
             {
@@ -94,9 +83,7 @@ namespace AutoEquip
                         if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
 //                                if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
                         {
-#if LOG && JOBS
-                                Log.Message("Pawn " + pawn + " wear apparel: " + ap);
-#endif
+
                             configurarion.ToWearApparel.Remove(ap);
                             return new Job(JobDefOf.Wear, ap);
                         }
@@ -105,42 +92,6 @@ namespace AutoEquip
             }
 
             #endregion
-
-
-
-
-            //  foreach (Thing t in list)
-            //  {
-            //      Apparel apparel = (Apparel)t;
-            //
-            //
-            //      if (HandleOutfitFilter(currentOutfit, apparel))
-            //      {
-            //          if (Find.SlotGroupManager.SlotGroupAt(apparel.Position) != null)
-            //          {
-            //              if (!apparel.IsForbidden(pawn))
-            //              {
-            //                  float num2 = PawnCalcForApparel.ApparelScoreGain(pawn, apparel);
-            //                  if (num2 >= MinScoreGainToCare && num2 >= num)
-            //                  {
-            //                      if (ApparelUtility.HasPartsToWear(pawn, apparel.def))
-            //                      {
-            //                          if (pawn.CanReserveAndReach(apparel, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
-            //                          {
-            //                              thing = apparel;
-            //                              num = num2;
-            //                          }
-            //
-            //                      }
-            //                  }
-            //              }
-            //
-            //          }
-            //
-            //      }
-            //
-            //  }
-
 
             //  #region [  If no Apparel is Selected to Wear, Delays the next search  ]
             //
