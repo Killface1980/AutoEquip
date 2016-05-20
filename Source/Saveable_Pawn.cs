@@ -9,7 +9,7 @@ namespace AutoEquip
     public class Saveable_Pawn : IExposable
     {
         // Exposed members
-        public Pawn pawn;
+        public Pawn Pawn;
         public List<Saveable_Outfit_StatDef> Stats = new List<Saveable_Outfit_StatDef>();
 
         public List<Apparel> ToWearApparel = new List<Apparel>();
@@ -18,23 +18,23 @@ namespace AutoEquip
 
         public void ExposeData()
         {
-            Scribe_References.LookReference(ref pawn, "pawn");
+            Scribe_References.LookReference(ref Pawn, "pawn");
             Scribe_Collections.LookList(ref Stats, "stats", LookMode.Deep);
         }
 
         public IEnumerable<Saveable_Outfit_StatDef> NormalizeCalculedStatDef()
         {
-            Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(pawn);
-            List<Saveable_Outfit_StatDef> calculedStatDef = new List<Saveable_Outfit_StatDef>(outfit.Stats);
+            Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(Pawn);
+            List<Saveable_Outfit_StatDef> calculatedStatDef = new List<Saveable_Outfit_StatDef>(outfit.Stats);
 
             if ((outfit.AppendIndividualPawnStatus) && (Stats != null))
             {
                 foreach (Saveable_Outfit_StatDef stat in Stats)
                 {
                     int index = -1;
-                    for (int i = 0; i < calculedStatDef.Count; i++)
+                    for (int i = 0; i < calculatedStatDef.Count; i++)
                     {
-                        if (calculedStatDef[i].StatDef == stat.StatDef)
+                        if (calculatedStatDef[i].StatDef == stat.StatDef)
                         {
                             index = i;
                             break;
@@ -42,32 +42,43 @@ namespace AutoEquip
                     }
 
                     if (index == -1)
-                        calculedStatDef.Add(stat);
+                        calculatedStatDef.Add(stat);
                     else
-                        calculedStatDef[index] = stat;
+                        calculatedStatDef[index] = stat;
                 }
             }
 
-            if ((outfit.AddWorkStats) && (Stats != null))
+         
+            return calculatedStatDef.OrderByDescending(i => Math.Abs(i.Strength));
+        }
+
+        public IEnumerable<Saveable_Outfit_StatDef> NormalizeCalculedWorkStatDef()
+        {
+            Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(Pawn);
+            List<Saveable_Outfit_StatDef> calculatedStatDef = new List<Saveable_Outfit_StatDef>(outfit.Stats);
+
+
+            if (outfit.AddWorkStats && (Stats != null))
             {
                 foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
                 {
-                    int priority = pawn.workSettings.GetPriority(wType);
+
+                    int priority = Pawn.workSettings.GetPriority(wType);
 
                     float priorityAdjust;
                     switch (priority)
                     {
                         case 1:
-                            priorityAdjust = 1.0f;
+                            priorityAdjust = 1f;
                             break;
                         case 2:
-                            priorityAdjust = 0.5f;
+                            priorityAdjust = 0.4f;
                             break;
                         case 3:
-                            priorityAdjust = 0.25f;
+                            priorityAdjust = 0.2f;
                             break;
                         case 4:
-                            priorityAdjust = 0.15f;
+                            priorityAdjust = 0.1f;
                             break;
                         default:
                             continue;
@@ -76,37 +87,29 @@ namespace AutoEquip
                     foreach (KeyValuePair<StatDef, float> workStat in PawnCalcForApparel.GetStatsOfWorkType(wType))
                     {
                         Saveable_Outfit_StatDef statdef = null;
-                                foreach (Saveable_Outfit_StatDef s in calculedStatDef)
-                                {
-                                    if (s.StatDef == workStat.Key)
-                                    {
-                                        statdef = s;
-                                        break;
-                                    }
-                                }
-
-                                if (statdef == null)
-                                {
-                                    statdef = new Saveable_Outfit_StatDef();
-                                    statdef.StatDef = workStat.Key;
-                                    statdef.Strength = workStat.Value * priorityAdjust;
-                                    calculedStatDef.Add(statdef);
-                                }
-                                else
-                                    statdef.Strength = Math.Max(statdef.Strength, workStat.Value * priorityAdjust);
+                        foreach (Saveable_Outfit_StatDef s in calculatedStatDef)
+                        {
+                            if (s.StatDef == workStat.Key)
+                            {
+                                statdef = s;
+                                break;
                             }
                         }
+                        if (statdef == null)
+                        {
+                            statdef = new Saveable_Outfit_StatDef();
+                            statdef.StatDef = workStat.Key;
+                            statdef.Strength = workStat.Value * priorityAdjust;
+                            calculatedStatDef.Add(statdef);
+                        }
+                        else statdef.Strength = Math.Max(statdef.Strength, workStat.Value * priorityAdjust);
                     }
-                
 
-         
+                }
 
-            //Log.Message(" ");
-            //Log.Message("Stats of Pawn " + this.pawn);
-            //foreach (Saveable_Outfit_StatDef s in List<Saveable_Outfit_StatDef>)
-            //    Log.Message("  * " + s.strength.ToString("N5") + " - " + s.StatDef.label);
-
-            return calculedStatDef.OrderByDescending(i => Math.Abs(i.Strength));
+            }
+            return calculatedStatDef.OrderByDescending(i => Math.Abs(i.Strength));
         }
+
     }
 }

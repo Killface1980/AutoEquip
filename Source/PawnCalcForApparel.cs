@@ -10,13 +10,14 @@ namespace AutoEquip
     public class PawnCalcForApparel
     {
         private readonly Saveable_Pawn _saveablePawn;
-        private readonly Pawn _pawn;
+        private static Pawn _pawn;
         private readonly Outfit _outfit;
         private bool _optimized;
         private List<Apparel> _fixedApparels;
         private float? _totalStats;
 
         private static Saveable_Outfit_StatDef[] _stats;
+        private static Saveable_Outfit_StatDef[] _workstats;
 
         private static NeededWarmth _neededWarmth;
 
@@ -43,7 +44,7 @@ namespace AutoEquip
         private List<Apparel> _allApparelsItems;
         private List<float> _allApparelsScore;
 
-        private List<Apparel> _calculedApparelItems;
+        private List<Apparel> _calculatedApparelItems;
         private List<float> _calculedApparelScore;
 
         public PawnCalcForApparel(Pawn pawn)
@@ -54,17 +55,20 @@ namespace AutoEquip
         public PawnCalcForApparel(Saveable_Pawn saveablePawn)
         {
             this._saveablePawn = saveablePawn;
-            _pawn = saveablePawn.pawn;
+            _pawn = saveablePawn.Pawn;
             _outfit = _pawn.outfits.CurrentOutfit;
             _stats = saveablePawn.NormalizeCalculedStatDef().ToArray();
-            
+            _workstats = saveablePawn.NormalizeCalculedWorkStatDef().ToArray();
+
             _neededWarmth = CalculateNeededWarmth(_pawn, GenDate.CurrentMonth);
 
         }
 
         public static IEnumerable<Saveable_Outfit_StatDef> Stats { get { return _stats; } }
 
-        public IEnumerable<Apparel> CalculedApparel { get { return _calculedApparelItems; } }
+        public static IEnumerable<Saveable_Outfit_StatDef> WorkStats { get { return _workstats; } }
+
+        public IEnumerable<Apparel> CalculatedApparel { get { return _calculatedApparelItems; } }
 
         public void InitializeFixedApparelsAndGetAvaliableApparels(List<Apparel> allApparels)
         {
@@ -89,11 +93,11 @@ namespace AutoEquip
 
         private void InitializeCalculedApparelScoresFromWornApparel()
         {
-            _calculedApparelItems = new List<Apparel>();
+            _calculatedApparelItems = new List<Apparel>();
             _calculedApparelScore = new List<float>();
             foreach (Apparel apparel in _pawn.apparel.WornApparel)
             {
-                _calculedApparelItems.Add(apparel);
+                _calculatedApparelItems.Add(apparel);
                 _calculedApparelScore.Add(ApparelScoreRaw(apparel))
                    ;
             }
@@ -102,11 +106,11 @@ namespace AutoEquip
 
         private void InitializeCalculedApparelScoresFromFixedApparel()
         {
-            _calculedApparelItems = new List<Apparel>();
+            _calculatedApparelItems = new List<Apparel>();
             _calculedApparelScore = new List<float>();
             foreach (Apparel apparel in _fixedApparels)
             {
-                _calculedApparelItems.Add(apparel);
+                _calculatedApparelItems.Add(apparel);
                 _calculedApparelScore.Add(ApparelScoreRaw(apparel));
             }
             _optimized = false;
@@ -117,49 +121,49 @@ namespace AutoEquip
 
         public float ApparelScoreRaw(Apparel ap)
         {
-            return this.ApparelScoreRawStats(ap)
-    * this.ApparelModifierRaw(ap);
+            Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(_pawn);
+            return ApparelScoreRawStats(ap) * this.ApparelModifierRaw(ap);
         }
 
 
-   //   public static float ApparelScoreRawWorkStats(Pawn pawn, Apparel ap)
-   //   {
-   //       Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(pawn.outfits.CurrentOutfit);
-   //       float score = 1.0f;
-   //
-   //       //base score
-   //       //      float score = 0.1f;
-   //
-   //       //calculating protection, no buff
-   //       float protectionScore =
-   //           ap.GetStatValue(StatDefOf.ArmorRating_Sharp) +
-   //           ap.GetStatValue(StatDefOf.ArmorRating_Blunt) * 0.75f;
-   //
-   //
-   //       if (outfit.AddWorkStats)
-   //       {
-   //           score = score + protectionScore * 0.1f;
-   //       }
-   //       else
-   //       {
-   //           score += protectionScore * 1.25f;
-   //       }
-   //
-   //       //calculating HP
-   //       if (ap.def.useHitPoints)
-   //       {
-   //           float hpPercent = ap.HitPoints / (float)ap.MaxHitPoints;
-   //           score *= HitPointsPercentScoreFactorCurve.Evaluate(hpPercent);
-   //       }
-   //
-   //       //calculating warmth
-   //       
-   //       score *= ApparelScoreRawInsulationColdAdjust(ap);
-   //
-   //       return score;
-   //   }
+        //   public static float ApparelScoreRawWorkStats(Pawn pawn, Apparel ap)
+        //   {
+        //       Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(pawn.outfits.CurrentOutfit);
+        //       float score = 1.0f;
+        //
+        //       //base score
+        //       //      float score = 0.1f;
+        //
+        //       //calculating protection, no buff
+        //       float protectionScore =
+        //           ap.GetStatValue(StatDefOf.ArmorRating_Sharp) +
+        //           ap.GetStatValue(StatDefOf.ArmorRating_Blunt) * 0.75f;
+        //
+        //
+        //       if (outfit.AddWorkStats)
+        //       {
+        //           score = score + protectionScore * 0.1f;
+        //       }
+        //       else
+        //       {
+        //           score += protectionScore * 1.25f;
+        //       }
+        //
+        //       //calculating HP
+        //       if (ap.def.useHitPoints)
+        //       {
+        //           float hpPercent = ap.HitPoints / (float)ap.MaxHitPoints;
+        //           score *= HitPointsPercentScoreFactorCurve.Evaluate(hpPercent);
+        //       }
+        //
+        //       //calculating warmth
+        //       
+        //       score *= ApparelScoreRawInsulationColdAdjust(ap);
+        //
+        //       return score;
+        //   }
 
-        public float ApparelScoreRawStats(Apparel ap)
+        public static float ApparelScoreRawStats(Apparel ap)
         {
             float num = 1.0f;
             float count = 1.0f;
@@ -177,7 +181,23 @@ namespace AutoEquip
                 }
             }
 
-            return num / count;
+            foreach (Saveable_Outfit_StatDef workstat in WorkStats)
+            {
+                try
+                {
+                    float nint = GetStatValue(ap, workstat);
+                    num += nint * workstat.Strength;
+                    count++;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Error Calculation Stat: " + workstat.StatDef, e);
+                }
+            }
+
+            var score = num / count;
+
+            return score;
         }
 
 
@@ -224,14 +244,14 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.15f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.2f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MiningSpeed"), 1f);
-                //yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryingCapacity"), 0.3f);
+                    //yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryingCapacity"), 0.3f);
                     yield break;
                 case "Repair":
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("FixBrokenDownBuildingFailChance"), -0.75f);
                     yield break;
                 case "Construction":
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("WorkSpeedGlobal"), 0.2f);
-                //yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.25f);
+                    //yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.25f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ConstructionSpeed"), 0.75f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SmoothingSpeed"), 0.35f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryingCapacity"), 0.5f);
@@ -286,7 +306,7 @@ namespace AutoEquip
         }
 
 
-        public float GetStatValue(Apparel apparel, Saveable_Outfit_StatDef stat)
+        public static float GetStatValue(Apparel apparel, Saveable_Outfit_StatDef stat)
         {
             float baseStat = apparel.GetStatValue(stat.StatDef, true);
             float currentStat = baseStat;
@@ -340,7 +360,7 @@ namespace AutoEquip
 
         public bool OLD_CalculateApparelScoreGain(Apparel apparel, out float gain)
         {
-            if (_calculedApparelItems == null)
+            if (_calculatedApparelItems == null)
                 InitializeCalculedApparelScoresFromWornApparel();
 
             return NEW_CalculateApparelScoreGain(apparel, ApparelScoreRaw(apparel), out gain);
@@ -355,26 +375,18 @@ namespace AutoEquip
             }
 
             gain = score;
-            bool flag = false;
-
-            for (int i = 0; i < _calculedApparelItems.Count; i++)
+            for (int i = 0; i < _calculatedApparelItems.Count; i++)
             {
-                Apparel wornApparel = _calculedApparelItems[i];
+                Apparel wornApparel = _calculatedApparelItems[i];
 
                 if (!ApparelUtility.CanWearTogether(wornApparel.def, apparel.def))
                 {
                     if (!_pawn.outfits.forcedHandler.AllowedToAutomaticallyDrop(wornApparel))
                     {
-                        gain = -1000f;
                         return false;
                     }
                     gain -= _calculedApparelScore[i];
-                    flag = true;
                 }
-            }
-            if (!flag)
-            {
-                gain *= 10f;
             }
             return true;
         }
@@ -424,7 +436,7 @@ namespace AutoEquip
             var pawnCalcForApparels = pawns as PawnCalcForApparel[] ?? pawns.ToArray();
             foreach (PawnCalcForApparel pawnCalc in pawnCalcForApparels)
             {
-                foreach (Apparel apparel in pawnCalc.CalculedApparel)
+                foreach (Apparel apparel in pawnCalc.CalculatedApparel)
                 {
                     float? apparalGainPercentual = null;
 
@@ -433,7 +445,7 @@ namespace AutoEquip
                         if (otherPawnCalc == pawnCalc)
                             continue;
 
-                        foreach (Apparel otherApprel in otherPawnCalc.CalculedApparel)
+                        foreach (Apparel otherApprel in otherPawnCalc.CalculatedApparel)
                         {
                             if (otherApprel == apparel)
                             {
@@ -468,7 +480,7 @@ namespace AutoEquip
                     x._totalStats = x.OLD_CalculateTotalStats(null);
                 float xNoStats = x.OLD_CalculateTotalStats(apparel);
                 xPercentual = x._totalStats / xNoStats;
-                if (x._saveablePawn.pawn.apparel.WornApparel.Contains(apparel))
+                if (x._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
                     xPercentual *= 1.1f;
             }
 
@@ -480,7 +492,7 @@ namespace AutoEquip
             {
                 float yPercentual = y._totalStats.Value / yNoStats;
 
-                if (y._saveablePawn.pawn.apparel.WornApparel.Contains(apparel))
+                if (y._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
                     yPercentual *= 1.1f;
 
                 if (xPercentual.Value > yPercentual)
@@ -504,10 +516,10 @@ namespace AutoEquip
         {
             _optimized = false;
             _totalStats = null;
-            int index = _calculedApparelItems.IndexOf(apprel);
+            int index = _calculatedApparelItems.IndexOf(apprel);
             if (index == -1)
                 Log.Warning("Warning on LooseConflict loser didnt have the apparel");
-            _calculedApparelItems.RemoveAt(index);
+            _calculatedApparelItems.RemoveAt(index);
             _calculedApparelScore.RemoveAt(index);
         }
 
@@ -526,7 +538,7 @@ namespace AutoEquip
                 for (int i = 0; i < _allApparelsItems.Count; i++)
                 {
                     Apparel apparel = _allApparelsItems[i];
-                    if ((!apparel.IsForbidden(_saveablePawn.pawn)) &&
+                    if ((!apparel.IsForbidden(_saveablePawn.Pawn)) &&
                         (_outfit.filter.Allows(apparel)))
                     {
                         float apparelRawScore = _allApparelsScore[i];
@@ -534,7 +546,7 @@ namespace AutoEquip
                         if (NEW_CalculateApparelScoreGain(apparel, apparelRawScore, out apparelGainScore))
                         {
                             if ((apparelGainScore > changeApparelScoreGain) ||
-                                ((apparelGainScore == changeApparelScoreGain) && (_saveablePawn.pawn.apparel.WornApparel.Contains(apparel))))
+                                ((apparelGainScore == changeApparelScoreGain) && (_saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))))
                             {
                                 changeIndex = i;
                                 changeApparel = apparel;
@@ -554,7 +566,7 @@ namespace AutoEquip
                 _allApparelsItems.RemoveAt(changeIndex);
                 _allApparelsScore.RemoveAt(changeIndex);
 
-                _calculedApparelItems.Add(changeApparel);
+                _calculatedApparelItems.Add(changeApparel);
                 _calculedApparelScore.Add(changeApparelRawScore);
             }
         }
@@ -566,14 +578,14 @@ namespace AutoEquip
             {
                 float nint = stat.StatDef.defaultBaseValue;
 
-                foreach (Apparel a in _calculedApparelItems)
+                foreach (Apparel a in _calculatedApparelItems)
                 {
                     if (a == ignore)
                         continue;
                     nint += a.def.equippedStatOffsets.GetStatOffsetFromList(stat.StatDef);
                 }
 
-                foreach (Apparel a in _calculedApparelItems)
+                foreach (Apparel a in _calculatedApparelItems)
                 {
                     if (a == ignore)
                         continue;
@@ -584,11 +596,63 @@ namespace AutoEquip
                 num += nint * stat.Strength;
             }
 
+            foreach (Saveable_Outfit_StatDef workstat in _workstats)
+            {
+                float nint = workstat.StatDef.defaultBaseValue;
+
+                foreach (Apparel a in _calculatedApparelItems)
+                {
+                    if (a == ignore)
+                        continue;
+                    nint += a.def.equippedStatOffsets.GetStatOffsetFromList(workstat.StatDef);
+                }
+
+                foreach (Apparel a in _calculatedApparelItems)
+                {
+                    if (a == ignore)
+                        continue;
+
+                    DoApparelScoreRawStatsHandlers(_pawn, a, workstat.StatDef, ref nint);
+                }
+
+                num += nint * workstat.Strength;
+            }
             if (num == 0)
                 Log.Warning("No Stat to optimize apparel");
 
             return num;
         }
+
+        //  private float OLD_CalculateTotalStats(Apparel ignore)
+        //  {
+        //      float num = 1.0f;
+        //      foreach (Saveable_Outfit_StatDef stat in _stats)
+        //      {
+        //          float nint = stat.StatDef.defaultBaseValue;
+        //
+        //          foreach (Apparel a in _calculatedApparelItems)
+        //          {
+        //              if (a == ignore)
+        //                  continue;
+        //              nint += a.def.equippedStatOffsets.GetStatOffsetFromList(stat.StatDef);
+        //          }
+        //
+        //          foreach (Apparel a in _calculatedApparelItems)
+        //          {
+        //              if (a == ignore)
+        //                  continue;
+        //
+        //              DoApparelScoreRawStatsHandlers(_pawn, a, stat.StatDef, ref nint);
+        //          }
+        //
+        //          num += nint * stat.Strength;
+        //      }
+        //
+        //      if (num == 0)
+        //          Log.Warning("No Stat to optimize apparel");
+        //
+        //      return num;
+        //  }
 
         #endregion
 
@@ -638,10 +702,10 @@ namespace AutoEquip
         {
             _saveablePawn.ToWearApparel = new List<Apparel>();
             _saveablePawn.ToDropApparel = new List<Apparel>();
-            _saveablePawn.TargetApparel = _calculedApparelItems;
+            _saveablePawn.TargetApparel = _calculatedApparelItems;
 
-            List<Apparel> pawnApparel = new List<Apparel>(_saveablePawn.pawn.apparel.WornApparel);
-            foreach (Apparel ap in _calculedApparelItems)
+            List<Apparel> pawnApparel = new List<Apparel>(_saveablePawn.Pawn.apparel.WornApparel);
+            foreach (Apparel ap in _calculatedApparelItems)
             {
                 if (pawnApparel.Contains(ap))
                 {
@@ -659,6 +723,8 @@ namespace AutoEquip
 
         public delegate void ApparelScoreRawStatsHandler(Pawn pawn, Apparel apparel, StatDef statDef, ref float num);
         public static event ApparelScoreRawStatsHandler ApparelScoreRawStatsHandlers;
+
+
 
         public static void InfusionApparelScoreRawStatsHandlers(Pawn pawn, Apparel apparel, StatDef stat, ref float val)
         {
@@ -681,6 +747,18 @@ namespace AutoEquip
                 val *= mod.multiplier;
 
             }
+        }
+
+        public static float RawStat(Pawn pawn, Apparel ap, StatDef stat)
+        {
+            float nint = ap.GetStatValue(stat, true);
+
+            nint += ap.def.equippedStatOffsets.GetStatOffsetFromList(stat);
+
+            if (ApparelScoreRawStatsHandlers != null)
+                ApparelScoreRawStatsHandlers(pawn, ap, stat, ref nint);
+
+            return nint;
         }
 
     }

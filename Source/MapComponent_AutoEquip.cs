@@ -70,9 +70,9 @@ namespace AutoEquip
         public Saveable_Pawn GetCache(Pawn pawn)
         {
             foreach (Saveable_Pawn c in PawnCache)
-                if (c.pawn == pawn)
+                if (c.Pawn == pawn)
                     return c;
-            Saveable_Pawn n = new Saveable_Pawn {pawn = pawn};
+            Saveable_Pawn n = new Saveable_Pawn {Pawn = pawn};
             PawnCache.Add(n);
             return n;
         }

@@ -77,7 +77,7 @@ namespace AutoEquip
                     GUI.color = Color.white;
                 }
 
-                float value = conf.GetStatValue(_apparel, stat);
+                float value = PawnCalcForApparel.GetStatValue(_apparel, stat);
                 sumValue += value;
 
                 DrawLine(ref itemRect,
@@ -99,7 +99,7 @@ namespace AutoEquip
                 "AverageStat".Translate(), labelWidth,
                 (sumValue / stats.Length).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                conf.ApparelScoreRawStats(_apparel).ToString("N5"), finalValue);
+                PawnCalcForApparel.ApparelScoreRawStats(_apparel).ToString("N5"), finalValue);
 
             itemRect.yMax += 5;
 

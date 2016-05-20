@@ -76,7 +76,7 @@ namespace AutoEquip
             if (pawnSave != null)
             {
                 Rect rect3 = new Rect(outRect.xMin + 4f, outRect.yMin, 100f, 30f);
-                if (Widgets.TextButton(rect3, pawnSave.pawn.outfits.CurrentOutfit.label, true, false))
+                if (Widgets.TextButton(rect3, pawnSave.Pawn.outfits.CurrentOutfit.label, true, false))
                 {
                     List<FloatMenuOption> list = new List<FloatMenuOption>();
                     foreach (Outfit current in Find.Map.outfitDatabase.AllOutfits)
@@ -84,7 +84,7 @@ namespace AutoEquip
                         Outfit localOut = current;
                         list.Add(new FloatMenuOption(localOut.label, delegate
                         {
-                            pawnSave.pawn.outfits.CurrentOutfit = localOut;
+                            pawnSave.Pawn.outfits.CurrentOutfit = localOut;
                         }, MenuOptionPriority.Medium, null, null));
                     }
                     Find.WindowStack.Add(new FloatMenu(list, false));
@@ -238,12 +238,12 @@ namespace AutoEquip
                         }, MenuOptionPriority.Medium, null, null));
                     list.Add(new FloatMenuOption("AutoEquip Details", delegate
                     {
-                        Find.WindowStack.Add(new DialogPawnApparelDetail(pawnSave.pawn, (Apparel)thing));
+                        Find.WindowStack.Add(new DialogPawnApparelDetail(pawnSave.Pawn, (Apparel)thing));
                     }, MenuOptionPriority.Medium, null, null));
 
                     list.Add(new FloatMenuOption("AutoEquip Comparer", delegate
                     {
-                        Find.WindowStack.Add(new Dialog_PawnApparelComparer(pawnSave.pawn, (Apparel)thing));
+                        Find.WindowStack.Add(new Dialog_PawnApparelComparer(pawnSave.Pawn, (Apparel)thing));
                     }, MenuOptionPriority.Medium, null, null));
                 }
 

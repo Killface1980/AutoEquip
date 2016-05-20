@@ -67,6 +67,7 @@
     <Compile Include="Saveable_Outfit.cs" />
     <Compile Include="Saveable_Outfit_StatDef.cs" />
     <Compile Include="Saveable_Pawn.cs" />
+    <Compile Include="Saveable_Pawn_StatDef.cs" />
     <Compile Include="Tab_Pawn_AutoEquip.cs" />
   </ItemGroup>
   <ItemGroup>
