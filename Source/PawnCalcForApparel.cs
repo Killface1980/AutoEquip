@@ -121,8 +121,7 @@ namespace AutoEquip
 
         public float ApparelScoreRaw(Apparel ap)
         {
-            Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(_pawn);
-            return ApparelScoreRawStats(ap) * this.ApparelModifierRaw(ap);
+            return ApparelScoreRawStats(ap) * this.ApparelModifierRaw(ap) + ApparelScoreRawWorkStats(ap);
         }
 
 
@@ -180,6 +179,16 @@ namespace AutoEquip
                     throw new Exception("Error Calculation Stat: " + stat.StatDef, e);
                 }
             }
+
+            var score = num / count;
+
+            return score;
+        }
+
+        public static float ApparelScoreRawWorkStats(Apparel ap)
+        {
+            float num = 1.0f;
+            float count = 1.0f;
 
             foreach (Saveable_Outfit_StatDef workstat in WorkStats)
             {
@@ -332,6 +341,7 @@ namespace AutoEquip
                 return modHit * modCold * -1;
             return modHit * modCold;
         }
+
 
 
         public static float ApparelScoreRawInsulationColdAdjust(Apparel ap)

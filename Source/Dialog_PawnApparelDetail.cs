@@ -58,17 +58,25 @@ namespace AutoEquip
             groupRect.height -= Text.LineHeight * 1.2f * 3f + 5f;
 
             Saveable_Outfit_StatDef[] stats = PawnCalcForApparel.Stats.ToArray();
-            Rect viewRect = new Rect(groupRect.xMin, groupRect.yMin, groupRect.width - 16f, stats.Length * Text.LineHeight * 1.2f + 16f);
+            Saveable_Outfit_StatDef[] workstats = PawnCalcForApparel.WorkStats.ToArray();
+
+
+            Rect viewRect = new Rect(groupRect.xMin, groupRect.yMin, groupRect.width - 16f, stats.Length + workstats.Length * Text.LineHeight * 1.2f + 16f);
             if (viewRect.height < groupRect.height)
                 groupRect.height = viewRect.height;
 
             Rect listRect = viewRect.ContractedBy(4f);
 
+
+            // Detail list scrollable
+
             Widgets.BeginScrollView(groupRect, ref _scrollPosition, viewRect);
 
             float sumValue = 0;
+
             foreach (Saveable_Outfit_StatDef stat in stats)
             {
+
                 itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, Text.LineHeight * 1.2f);
                 if (Mouse.IsOver(itemRect))
                 {
@@ -76,9 +84,9 @@ namespace AutoEquip
                     GUI.DrawTexture(itemRect, TexUI.HighlightTex);
                     GUI.color = Color.white;
                 }
-
                 float value = PawnCalcForApparel.GetStatValue(_apparel, stat);
                 sumValue += value;
+
 
                 DrawLine(ref itemRect,
                     stat.StatDef.label, labelWidth,
@@ -87,6 +95,31 @@ namespace AutoEquip
                     (value * stat.Strength).ToString("N5"), finalValue);
 
                 listRect.yMin = itemRect.yMax;
+                Widgets.DrawLineHorizontal(groupRect.xMin, listRect.yMin+0.3f, groupRect.width);
+
+            }
+
+
+            foreach (Saveable_Outfit_StatDef workstat in workstats)
+            {
+                itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, Text.LineHeight * 1.2f);
+                if (Mouse.IsOver(itemRect))
+                {
+                    GUI.color = ITab_Pawn_AutoEquip.HighlightColor;
+                    GUI.DrawTexture(itemRect, TexUI.HighlightTex);
+                    GUI.color = Color.white;
+                }
+                float value = PawnCalcForApparel.GetStatValue(_apparel, workstat);
+                sumValue += value;
+
+                DrawLine(ref itemRect,
+                    workstat.StatDef.label, labelWidth,
+                    value.ToString("N3"), baseValue,
+                    workstat.Strength.ToString("N2"), multiplierWidth,
+                    (value * workstat.Strength).ToString("N5"), finalValue);
+
+                listRect.yMin = itemRect.yMax;
+
             }
 
             Widgets.EndScrollView();
@@ -97,7 +130,7 @@ namespace AutoEquip
             Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(_pawn.outfits.CurrentOutfit);
             DrawLine(ref itemRect,
                 "AverageStat".Translate(), labelWidth,
-                (sumValue / stats.Length).ToString("N3"), baseValue,
+                (sumValue / stats.Length + workstats.Length).ToString("N3"), baseValue,
                 "", multiplierWidth,
                 PawnCalcForApparel.ApparelScoreRawStats(_apparel).ToString("N5"), finalValue);
 
@@ -117,12 +150,12 @@ namespace AutoEquip
                 "", multiplierWidth,
                 "", finalValue);
 
-      //    itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
-      //    DrawLine(ref itemRect,
-      //        "AutoEquipWorkstats".Translate(), labelWidth,
-      //        PawnCalcForApparel.ApparelScoreRawWorkStats(_pawn, _apparel).ToString("N3"), baseValue,
-      //        "", multiplierWidth,
-      //        "", finalValue);
+            //    itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
+            //    DrawLine(ref itemRect,
+            //        "AutoEquipWorkstats".Translate(), labelWidth,
+            //        PawnCalcForApparel.ApparelScoreRawWorkStats(_pawn, _apparel).ToString("N3"), baseValue,
+            //        "", multiplierWidth,
+            //        "", finalValue);
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
