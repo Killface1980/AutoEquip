@@ -57,6 +57,8 @@ namespace AutoEquip
             groupRect.height -= 4f;
             groupRect.height -= Text.LineHeight * 1.2f * 3f + 5f;
 
+            groupRect.height -= 30f; // test
+
             Saveable_Outfit_StatDef[] stats = PawnCalcForApparel.Stats.ToArray();
             Saveable_Outfit_StatDef[] workstats = PawnCalcForApparel.WorkStats.ToArray();
 
@@ -72,7 +74,8 @@ namespace AutoEquip
 
             Widgets.BeginScrollView(groupRect, ref _scrollPosition, viewRect);
 
-            float sumValue = 0;
+            float sumStatsValue = 0;
+            float sumWorkStatsValue = 0;
 
             foreach (Saveable_Outfit_StatDef stat in stats)
             {
@@ -85,7 +88,7 @@ namespace AutoEquip
                     GUI.color = Color.white;
                 }
                 float value = PawnCalcForApparel.GetStatValue(_apparel, stat);
-                sumValue += value;
+                sumStatsValue += sumStatsValue;
 
 
                 DrawLine(ref itemRect,
@@ -110,7 +113,7 @@ namespace AutoEquip
                     GUI.color = Color.white;
                 }
                 float value = PawnCalcForApparel.GetStatValue(_apparel, workstat);
-                sumValue += value;
+                sumWorkStatsValue += sumWorkStatsValue;
 
                 DrawLine(ref itemRect,
                     workstat.StatDef.label, labelWidth,
@@ -126,20 +129,28 @@ namespace AutoEquip
 
             Widgets.DrawLineHorizontal(groupRect.xMin, groupRect.yMax, groupRect.width);
 
-            itemRect = new Rect(listRect.xMin, groupRect.yMax, listRect.width, Text.LineHeight * 1.2f);
-            Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(_pawn.outfits.CurrentOutfit);
+  //          itemRect.yMax += 5;
+
+            itemRect = new Rect(listRect.xMin, groupRect.yMax + 5, listRect.width, Text.LineHeight * 1.2f);
+
             DrawLine(ref itemRect,
                 "AverageStat".Translate(), labelWidth,
-                (sumValue / stats.Length + workstats.Length).ToString("N3"), baseValue,
+                (sumStatsValue / stats.Length).ToString("N3"), baseValue,
                 "", multiplierWidth,
                 PawnCalcForApparel.ApparelScoreRawStats(_apparel).ToString("N5"), finalValue);
 
-            itemRect.yMax += 5;
+            itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
+            DrawLine(ref itemRect,
+                "AverageWorkStat".Translate(), labelWidth,
+                (sumWorkStatsValue / workstats.Length).ToString("N3"), baseValue,
+                "", multiplierWidth,
+                PawnCalcForApparel.ApparelScoreRawWorkStats(_apparel).ToString("N5"), finalValue);
+
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipHitPoints".Translate(), labelWidth,
-                conf.ApparelScoreRawHitPointAdjust(_apparel).ToString("N3"), baseValue,
+                PawnCalcForApparel.ApparelScoreRawHitPointAdjust(_apparel).ToString("N3"), baseValue,
                 "", multiplierWidth,
                 "", finalValue);
 
@@ -150,19 +161,12 @@ namespace AutoEquip
                 "", multiplierWidth,
                 "", finalValue);
 
-            //    itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
-            //    DrawLine(ref itemRect,
-            //        "AutoEquipWorkstats".Translate(), labelWidth,
-            //        PawnCalcForApparel.ApparelScoreRawWorkStats(_pawn, _apparel).ToString("N3"), baseValue,
-            //        "", multiplierWidth,
-            //        "", finalValue);
-
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipTotal".Translate(), labelWidth,
                 conf.ApparelModifierRaw(_apparel).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                conf.ApparelScoreRaw(_apparel).ToString("N5"), finalValue);
+                conf.ApparelScoreTotal(_apparel).ToString("N5"), finalValue);
 
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;

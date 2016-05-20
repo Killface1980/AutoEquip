@@ -263,7 +263,7 @@ namespace AutoEquip
             {
                 if ((pawnSave != null) &&
                     (pawnSave.TargetApparel != null))
-                    text = pawnCalc.ApparelScoreRaw(apparel).ToString("N5") + "   " + text;
+                    text = pawnCalc.ApparelScoreTotal(apparel).ToString("N5") + "   " + text;
 
                 if (SelPawnForGear.outfits != null && SelPawnForGear.outfits.forcedHandler.IsForced(apparel))
                     text = text + ", " + "ApparelForcedLower".Translate();

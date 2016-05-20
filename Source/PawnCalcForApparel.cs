@@ -64,11 +64,11 @@ namespace AutoEquip
 
         }
 
-        public static IEnumerable<Saveable_Outfit_StatDef> Stats { get { return _stats; } }
+        public static IEnumerable<Saveable_Outfit_StatDef> Stats => _stats;
 
-        public static IEnumerable<Saveable_Outfit_StatDef> WorkStats { get { return _workstats; } }
+        public static IEnumerable<Saveable_Outfit_StatDef> WorkStats => _workstats;
 
-        public IEnumerable<Apparel> CalculatedApparel { get { return _calculatedApparelItems; } }
+        public IEnumerable<Apparel> CalculatedApparel => _calculatedApparelItems;
 
         public void InitializeFixedApparelsAndGetAvaliableApparels(List<Apparel> allApparels)
         {
@@ -98,7 +98,7 @@ namespace AutoEquip
             foreach (Apparel apparel in _pawn.apparel.WornApparel)
             {
                 _calculatedApparelItems.Add(apparel);
-                _calculedApparelScore.Add(ApparelScoreRaw(apparel))
+                _calculedApparelScore.Add(ApparelScoreTotal(apparel))
                    ;
             }
             _optimized = false;
@@ -111,7 +111,7 @@ namespace AutoEquip
             foreach (Apparel apparel in _fixedApparels)
             {
                 _calculatedApparelItems.Add(apparel);
-                _calculedApparelScore.Add(ApparelScoreRaw(apparel));
+                _calculedApparelScore.Add(ApparelScoreTotal(apparel));
             }
             _optimized = false;
         }
@@ -119,7 +119,7 @@ namespace AutoEquip
         #region [  ApparelScoreRawWorkStats  ]
 
 
-        public float ApparelScoreRaw(Apparel ap)
+        public float ApparelScoreTotal(Apparel ap)
         {
             return ApparelScoreRawStats(ap) * this.ApparelModifierRaw(ap) + ApparelScoreRawWorkStats(ap);
         }
@@ -161,6 +161,14 @@ namespace AutoEquip
         //
         //       return score;
         //   }
+
+        public static float ApparelScoreRaw(Apparel ap)
+        {
+            float num = ApparelScoreRawStats(ap);
+            num *= ApparelScoreRawHitPointAdjust(ap);
+            num *= ApparelScoreRawInsulationColdAdjust(ap);
+            return num;
+        }
 
         public static float ApparelScoreRawStats(Apparel ap)
         {
@@ -373,7 +381,7 @@ namespace AutoEquip
             if (_calculatedApparelItems == null)
                 InitializeCalculedApparelScoresFromWornApparel();
 
-            return NEW_CalculateApparelScoreGain(apparel, ApparelScoreRaw(apparel), out gain);
+            return NEW_CalculateApparelScoreGain(apparel, ApparelScoreTotal(apparel), out gain);
         }
 
         private bool NEW_CalculateApparelScoreGain(Apparel apparel, float score, out float gain)
@@ -666,7 +674,7 @@ namespace AutoEquip
 
         #endregion
 
-        public float ApparelScoreRawHitPointAdjust(Apparel ap)
+        public static float ApparelScoreRawHitPointAdjust(Apparel ap)
         {
             if (ap.def.useHitPoints)
             {
