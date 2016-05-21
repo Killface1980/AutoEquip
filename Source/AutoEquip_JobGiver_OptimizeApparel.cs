@@ -12,7 +12,7 @@ namespace AutoEquip
         private static void SetNextOptimizeTick(Pawn pawn)
         {
             pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 500;
-//            pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 3000;
+            //            pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 3000;
         }
 
         internal Job _TryGiveTerminalJob(Pawn pawn)
@@ -30,7 +30,6 @@ namespace AutoEquip
             }
 
             Saveable_Pawn configurarion = MapComponent_AutoEquip.Get.GetCache(pawn);
-            Outfit currentOutfit = pawn.outfits.CurrentOutfit;
 
             #region [  Wear Apparel  ]
 
@@ -41,15 +40,15 @@ namespace AutoEquip
                 {
                     foreach (var thing in listToWear)
                     {
-                        var ap = (Apparel) thing;
+                        var ap = (Apparel)thing;
                         if (!configurarion.ToWearApparel.Contains(ap)) continue;
                         if (Find.SlotGroupManager.SlotGroupAt(thing.Position) == null) continue;
                         if (thing.IsForbidden(pawn)) continue;
                         if (!ApparelUtility.HasPartsToWear(pawn, thing.def)) continue;
 
-                            if (!ap.IsInValidStorage()) continue;
+                        if (!ap.IsInValidStorage()) continue;
                         if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
-//                                if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
+                        //                                if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
                         {
 
                             configurarion.ToWearApparel.Remove(ap);

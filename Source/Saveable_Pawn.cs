@@ -48,14 +48,14 @@ namespace AutoEquip
                 }
             }
 
-         
+
             return calculatedStatDef.OrderByDescending(i => Math.Abs(i.Strength));
         }
 
-        public IEnumerable<Saveable_Outfit_StatDef> NormalizeCalculedWorkStatDef()
+        public IEnumerable<Saveable_Outfit_WorkStatDef> NormalizeCalculedWorkStatDef()
         {
             Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(Pawn);
-            List<Saveable_Outfit_StatDef> calculatedStatDef = new List<Saveable_Outfit_StatDef>(outfit.Stats);
+            List<Saveable_Outfit_WorkStatDef> calculatedWorkStatDef = new List<Saveable_Outfit_WorkStatDef>(outfit.WorkStats);
 
 
             if (outfit.AddWorkStats && (Stats != null))
@@ -69,16 +69,16 @@ namespace AutoEquip
                     switch (priority)
                     {
                         case 1:
-                            priorityAdjust = 1f;
+                            priorityAdjust = 12f;
                             break;
                         case 2:
-                            priorityAdjust = 0.4f;
+                            priorityAdjust = 4f;
                             break;
                         case 3:
-                            priorityAdjust = 0.2f;
+                            priorityAdjust = 2f;
                             break;
                         case 4:
-                            priorityAdjust = 0.1f;
+                            priorityAdjust = 1f;
                             break;
                         default:
                             continue;
@@ -86,29 +86,34 @@ namespace AutoEquip
 
                     foreach (KeyValuePair<StatDef, float> workStat in PawnCalcForApparel.GetStatsOfWorkType(wType))
                     {
-                        Saveable_Outfit_StatDef statdef = null;
-                        foreach (Saveable_Outfit_StatDef s in calculatedStatDef)
+                        Saveable_Outfit_WorkStatDef workstatdef = null;
+                        foreach (Saveable_Outfit_WorkStatDef s in calculatedWorkStatDef)
                         {
-                            if (s.StatDef == workStat.Key)
+                            if (s.WorkStatDef == workStat.Key)
                             {
-                                statdef = s;
+                                workstatdef = s;
                                 break;
                             }
                         }
-                        if (statdef == null)
+
+
+                        if (workstatdef == null)
                         {
-                            statdef = new Saveable_Outfit_StatDef();
-                            statdef.StatDef = workStat.Key;
-                            statdef.Strength = workStat.Value * priorityAdjust;
-                            calculatedStatDef.Add(statdef);
+
+                                workstatdef = new Saveable_Outfit_WorkStatDef();
+                                workstatdef.WorkStatDef = workStat.Key;
+                                workstatdef.Strength = workStat.Value * priorityAdjust;
+                                calculatedWorkStatDef.Add(workstatdef);
+                            
                         }
-                        else statdef.Strength = Math.Max(statdef.Strength, workStat.Value * priorityAdjust);
+                        else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
+
                     }
 
                 }
 
             }
-            return calculatedStatDef.OrderByDescending(i => Math.Abs(i.Strength));
+            return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
         }
 
     }

@@ -239,7 +239,7 @@ namespace AutoEquip
                 if (!stats.Contains(outfitStat))
                     stats.Add(outfitStat);
 
-                outfitStat.Strength = listingStandard.DoSlider(outfitStat.Strength, -1f, 1f);
+                outfitStat.Strength = listingStandard.DoSlider(outfitStat.Strength, -5f, 5f); //5 times
             }
             else
             {

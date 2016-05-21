@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
 using UnityEngine;
@@ -57,13 +58,24 @@ namespace AutoEquip
             groupRect.height -= 4f;
             groupRect.height -= Text.LineHeight * 1.2f * 3f + 5f;
 
-            groupRect.height -= 30f; // test
+            groupRect.height -= 60f; // test
 
             Saveable_Outfit_StatDef[] stats = PawnCalcForApparel.Stats.ToArray();
-            Saveable_Outfit_StatDef[] workstats = PawnCalcForApparel.WorkStats.ToArray();
+            Saveable_Outfit_WorkStatDef[] workstats = PawnCalcForApparel.WorkStats.ToArray();
+            List<Saveable_Outfit_WorkStatDef> filteredworkstats = new List<Saveable_Outfit_WorkStatDef>();
+
+            foreach (var workstat in workstats)
+            {
+                float value = PawnCalcForApparel.GetWorkStatValue(_apparel, workstat);
+
+                if (value <= 0.99f || value >= 1.01f)
+                {
+                    filteredworkstats.Add(workstat);
+                }
+            }
 
 
-            Rect viewRect = new Rect(groupRect.xMin, groupRect.yMin, groupRect.width - 16f, stats.Length + workstats.Length * Text.LineHeight * 1.2f + 16f);
+            Rect viewRect = new Rect(groupRect.xMin, groupRect.yMin, groupRect.width - 16f, (stats.Length + filteredworkstats.Count + 1) * Text.LineHeight * 1.2f + 16f);
             if (viewRect.height < groupRect.height)
                 groupRect.height = viewRect.height;
 
@@ -77,9 +89,10 @@ namespace AutoEquip
             float sumStatsValue = 0;
             float sumWorkStatsValue = 0;
 
+            bool check = false;
+
             foreach (Saveable_Outfit_StatDef stat in stats)
             {
-
                 itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, Text.LineHeight * 1.2f);
                 if (Mouse.IsOver(itemRect))
                 {
@@ -88,7 +101,7 @@ namespace AutoEquip
                     GUI.color = Color.white;
                 }
                 float value = PawnCalcForApparel.GetStatValue(_apparel, stat);
-                sumStatsValue += sumStatsValue;
+                sumStatsValue += value;
 
 
                 DrawLine(ref itemRect,
@@ -98,12 +111,19 @@ namespace AutoEquip
                     (value * stat.Strength).ToString("N5"), finalValue);
 
                 listRect.yMin = itemRect.yMax;
-                Widgets.DrawLineHorizontal(groupRect.xMin, listRect.yMin+0.3f, groupRect.width);
+
+                check = true;
 
             }
 
+            if (check)
+            {
+                Widgets.DrawLineHorizontal(groupRect.xMin, listRect.yMin, groupRect.width);
+                listRect.yMin = itemRect.yMax;
+            }
 
-            foreach (Saveable_Outfit_StatDef workstat in workstats)
+
+            foreach (Saveable_Outfit_WorkStatDef workstat in filteredworkstats)
             {
                 itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, Text.LineHeight * 1.2f);
                 if (Mouse.IsOver(itemRect))
@@ -112,16 +132,23 @@ namespace AutoEquip
                     GUI.DrawTexture(itemRect, TexUI.HighlightTex);
                     GUI.color = Color.white;
                 }
-                float value = PawnCalcForApparel.GetStatValue(_apparel, workstat);
-                sumWorkStatsValue += sumWorkStatsValue;
 
-                DrawLine(ref itemRect,
-                    workstat.StatDef.label, labelWidth,
-                    value.ToString("N3"), baseValue,
-                    workstat.Strength.ToString("N2"), multiplierWidth,
-                    (value * workstat.Strength).ToString("N5"), finalValue);
+                float value = PawnCalcForApparel.GetWorkStatValue(_apparel, workstat);
 
-                listRect.yMin = itemRect.yMax;
+                if (value <= 0.99f || value >= 1.01f)
+                {
+                    sumWorkStatsValue += value;
+
+                    DrawLine(ref itemRect,
+                        workstat.WorkStatDef.label, labelWidth,
+                        value.ToString("N3"), baseValue,
+                        workstat.Strength.ToString("N2"), multiplierWidth,
+                        (value * workstat.Strength).ToString("N5"), finalValue);
+
+                    listRect.yMin = itemRect.yMax;
+                }
+
+
 
             }
 
@@ -129,28 +156,31 @@ namespace AutoEquip
 
             Widgets.DrawLineHorizontal(groupRect.xMin, groupRect.yMax, groupRect.width);
 
-  //          itemRect.yMax += 5;
+            //          itemRect.yMax += 5; 
 
             itemRect = new Rect(listRect.xMin, groupRect.yMax + 5, listRect.width, Text.LineHeight * 1.2f);
 
-            DrawLine(ref itemRect,
+            if (sumStatsValue > 0)
+            {
+                DrawLine(ref itemRect,
                 "AverageStat".Translate(), labelWidth,
                 (sumStatsValue / stats.Length).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                PawnCalcForApparel.ApparelScoreRawStats(_apparel).ToString("N5"), finalValue);
-
-            itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
-            DrawLine(ref itemRect,
+                PawnCalcForApparel.clean_ApparelScoreRaw_PawnStats(_apparel).ToString("N5"), finalValue);
+                itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
+            }
+            if (sumWorkStatsValue > 0)
+            {
+                DrawLine(ref itemRect,
                 "AverageWorkStat".Translate(), labelWidth,
-                (sumWorkStatsValue / workstats.Length).ToString("N3"), baseValue,
+                (sumWorkStatsValue / filteredworkstats.Count).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                PawnCalcForApparel.ApparelScoreRawWorkStats(_apparel).ToString("N5"), finalValue);
-
-
-            itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
+                PawnCalcForApparel.clean_ApparelScore_PawnWorkStats(_apparel).ToString("N5"), finalValue);
+                itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
+            }
             DrawLine(ref itemRect,
                 "AutoEquipHitPoints".Translate(), labelWidth,
-                PawnCalcForApparel.ApparelScoreRawHitPointAdjust(_apparel).ToString("N3"), baseValue,
+                PawnCalcForApparel.clean_ApparelScoreRawHitPointAdjust(_apparel).ToString("N3"), baseValue,
                 "", multiplierWidth,
                 "", finalValue);
 
@@ -164,9 +194,9 @@ namespace AutoEquip
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipTotal".Translate(), labelWidth,
-                conf.ApparelModifierRaw(_apparel).ToString("N3"), baseValue,
+                conf.DIALOGONLY_ApparelModifierRaw(_apparel).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                conf.ApparelScoreTotal(_apparel).ToString("N5"), finalValue);
+                conf.ApparelScoreRaw(_apparel).ToString("N5"), finalValue);
 
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;

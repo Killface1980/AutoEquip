@@ -10,11 +10,11 @@ namespace AutoEquip
     public class MapComponent_AutoEquip : MapComponent
     {
 
-        static MapComponent_AutoEquip()
-        {
-            Log.Message("AutoEquip with Infusion Initialized");
-            PawnCalcForApparel.ApparelScoreRawStatsHandlers += PawnCalcForApparel.InfusionApparelScoreRawStatsHandlers;
-        }
+  //    static MapComponent_AutoEquip()
+  //    {
+  //        Log.Message("AutoEquip with Infusion Initialized");
+  //        PawnCalcForApparel.ApparelScoreRaw_PawnStatsHandlers += PawnCalcForApparel.InfusionApparelScoreRaw_PawnStatsHandlers;
+  //    }
 
         public List<Saveable_Outfit> OutfitCache = new List<Saveable_Outfit>();
         public List<Saveable_Pawn> PawnCache = new List<Saveable_Pawn>();
