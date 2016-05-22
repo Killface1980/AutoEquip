@@ -12,6 +12,10 @@ namespace AutoEquip
         private Pawn _pawn;
         private SaveablePawn _saveablePawn;
         private Outfit _outfit;
+        private Saveable_Outfit_StatDef[] _stats;
+        private Saveable_Outfit_WorkStatDef[] _workstats;
+
+
         private bool _optimized;
 
         private List<Apparel> _allApparelsItems;
@@ -22,8 +26,6 @@ namespace AutoEquip
         private List<Apparel> _fixedApparels;
         private float? _totalStats = null;
 
-        private Saveable_Outfit_StatDef[] _stats;
-        private Saveable_Outfit_WorkStatDef[] _workstats;
 
         private static NeededWarmth _neededWarmth;
 
@@ -66,20 +68,11 @@ namespace AutoEquip
             _neededWarmth = CalculateNeededWarmth(_pawn, GenDate.CurrentMonth);
         }
 
-        public IEnumerable<Saveable_Outfit_StatDef> Stats
-        {
-            get { return _stats; }
-        }
+        public IEnumerable<Saveable_Outfit_StatDef> Stats => _stats;
 
-        public IEnumerable<Saveable_Outfit_WorkStatDef> WorkStats
-        {
-            get { return _workstats; }
-        }
+        public IEnumerable<Saveable_Outfit_WorkStatDef> WorkStats => _workstats;
 
-        public IEnumerable<Apparel> CalculatedApparel
-        {
-            get { return _calculatedApparelItems; }
-        }
+        public IEnumerable<Apparel> CalculatedApparel => _calculatedApparelItems;
 
         public void InitializeFixedApparelsAndGetAvaliableApparels(List<Apparel> allApparels)
         {
@@ -555,7 +548,7 @@ namespace AutoEquip
         }
 
 
-        public void LoseConflict(Apparel apprel)
+        private void LoseConflict(Apparel apprel)
         {
             _optimized = false;
             _totalStats = null;
@@ -566,7 +559,7 @@ namespace AutoEquip
             _calculatedApparelScore.RemoveAt(index);
         }
 
-        public void OptimizeFromList(ref bool changed)
+        private void OptimizeFromList(ref bool changed)
         {
             if (_optimized)
                 return;
@@ -711,7 +704,7 @@ namespace AutoEquip
         }
 
 
-        public static NeededWarmth CalculateNeededWarmth(Pawn pawn, Month month)
+        public NeededWarmth CalculateNeededWarmth(Pawn pawn, Month month)
         {
             float num = GenTemperature.AverageTemperatureAtWorldCoordsForMonth(Find.Map.WorldCoords, month);
 
@@ -741,7 +734,7 @@ namespace AutoEquip
         }
 
 
-        public void PassToSaveable()
+        private void PassToSaveable()
         {
             _saveablePawn.ToWearApparel = new List<Apparel>();
             _saveablePawn.ToDropApparel = new List<Apparel>();

@@ -16,10 +16,10 @@ namespace AutoEquip
   //        PawnCalcForApparel.ApparelScoreRaw_PawnStatsHandlers += PawnCalcForApparel.InfusionApparelScoreRaw_PawnStatsHandlers;
   //    }
 
+        public int _nextOptimization;
         public List<Saveable_Outfit> OutfitCache = new List<Saveable_Outfit>();
         public List<SaveablePawn> PawnCache = new List<SaveablePawn>();
 
-        private int _nextOptimization;
 
         public static MapComponent_AutoEquip Get
         {
@@ -112,11 +112,11 @@ namespace AutoEquip
             PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
 
 
-            _nextOptimization = Find.TickManager.TicksGame + 5000;
+            _nextOptimization = Find.TickManager.TicksGame + 1500;
             //this.nextOptimization = Find.TickManager.TicksGame + 5000;
         }
 
-        private static void InjectTab(ThingDef thingDef)
+        private void InjectTab(ThingDef thingDef)
         {
             Debug.Log("Inject Tab");
             if (thingDef.inspectorTabsResolved == null)

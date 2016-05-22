@@ -50,22 +50,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dialog\Dialog_ManageOutfitsAutoEquip.cs" />
+    <Compile Include="Menus\Dialog_ManageOutfitsAutoEquip.cs" />
     <Compile Include="AutoEquip_JobGiver_OptimizeApparel.cs" />
-    <Compile Include="Dialog\Dialog_ManagePawnOutfit.cs" />
-    <Compile Include="Dialog\Dialog_PawnApparelComparer.cs" />
-    <Compile Include="Dialog\Dialog_PawnApparelDetail.cs" />
-    <Compile Include="MainTabWindow_AssignAutoEquip.cs" />
+    <Compile Include="Menus\Dialog_ManagePawnOutfit.cs" />
+    <Compile Include="Menus\Dialog_PawnApparelComparer.cs" />
+    <Compile Include="Menus\Dialog_PawnApparelDetail.cs" />
+    <Compile Include="Menus\MainTabWindow_AssignAutoEquip.cs" />
     <Compile Include="MapComponent_AutoEquip.cs" />
     <Compile Include="ModInitializer.cs" />
     <Compile Include="PawnCalcForApparel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Saveable_Outfit.cs" />
-    <Compile Include="Saveable_Outfit_StatDef.cs" />
-    <Compile Include="Saveable_Outfit_WorkStatDef.cs" />
-    <Compile Include="Saveable_Pawn.cs" />
-    <Compile Include="Saveable_Pawn_StatDef.cs" />
-    <Compile Include="Tab_Pawn_AutoEquip.cs" />
+    <Compile Include="Saveables\Saveable_Outfit.cs" />
+    <Compile Include="Saveables\Saveable_Outfit_StatDef.cs" />
+    <Compile Include="Saveables\Saveable_Outfit_WorkStatDef.cs" />
+    <Compile Include="Saveables\Saveable_Pawn.cs" />
+    <Compile Include="Saveables\Saveable_Pawn_StatDef.cs" />
+    <Compile Include="Menus\Tab_Pawn_AutoEquip.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\Defs\MainTabDefs\MainTabs.xml">
