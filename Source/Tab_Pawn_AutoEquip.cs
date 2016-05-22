@@ -51,7 +51,7 @@ namespace AutoEquip
 
         protected override void FillTab()
         {
-            Saveable_Pawn pawnSave;
+            SaveablePawn pawnSave;
             PawnCalcForApparel pawnCalc;
             if (SelPawnForGear.IsColonist)
             {
@@ -154,7 +154,7 @@ namespace AutoEquip
             Text.Anchor = TextAnchor.UpperLeft;
         }
 
-        private void DrawThingRow(ref float y, float width, Thing thing, bool equiped, Color thingColor, Saveable_Pawn pawnSave, PawnCalcForApparel pawnCalc)
+        private void DrawThingRow(ref float y, float width, Thing thing, bool equiped, Color thingColor, SaveablePawn pawnSave, PawnCalcForApparel pawnCalc)
         {
             Rect rect = new Rect(0f, y, width, 28f);
             if (Mouse.IsOver(rect))

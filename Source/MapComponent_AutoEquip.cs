@@ -17,7 +17,7 @@ namespace AutoEquip
   //    }
 
         public List<Saveable_Outfit> OutfitCache = new List<Saveable_Outfit>();
-        public List<Saveable_Pawn> PawnCache = new List<Saveable_Pawn>();
+        public List<SaveablePawn> PawnCache = new List<SaveablePawn>();
 
         private int _nextOptimization;
 
@@ -46,7 +46,7 @@ namespace AutoEquip
                 OutfitCache = new List<Saveable_Outfit>();
 
             if (PawnCache == null)
-                PawnCache = new List<Saveable_Pawn>();
+                PawnCache = new List<SaveablePawn>();
         }
 
         public Saveable_Outfit GetOutfit(Pawn pawn) { return GetOutfit(pawn.outfits.CurrentOutfit); }
@@ -67,12 +67,12 @@ namespace AutoEquip
             return ret;
         }
 
-        public Saveable_Pawn GetCache(Pawn pawn)
+        public SaveablePawn GetCache(Pawn pawn)
         {
-            foreach (Saveable_Pawn c in PawnCache)
+            foreach (SaveablePawn c in PawnCache)
                 if (c.Pawn == pawn)
                     return c;
-            Saveable_Pawn n = new Saveable_Pawn {Pawn = pawn};
+            SaveablePawn n = new SaveablePawn {Pawn = pawn};
             PawnCache.Add(n);
             return n;
         }
@@ -89,14 +89,14 @@ namespace AutoEquip
             MapComponent_AutoEquip.logMessage.AppendLine("Start Scaning Best Apparel");
             MapComponent_AutoEquip.logMessage.AppendLine();
 #endif
-            List<Saveable_Pawn> newSaveableList = new List<Saveable_Pawn>();
+            List<SaveablePawn> newSaveableList = new List<SaveablePawn>();
             List<PawnCalcForApparel> newCalcList = new List<PawnCalcForApparel>();
 
             List<Apparel> allApparels = new List<Apparel>(Find.ListerThings.ThingsInGroup(ThingRequestGroup.Apparel).OfType<Apparel>());
             foreach (Pawn pawn in Find.Map.mapPawns.FreeColonists)
             {
                 InjectTab(pawn.def);
-                Saveable_Pawn newPawnSaveable = GetCache(pawn);
+                SaveablePawn newPawnSaveable = GetCache(pawn);
                 PawnCalcForApparel newPawnCalc = new PawnCalcForApparel(newPawnSaveable);
 
                 newSaveableList.Add(newPawnSaveable);

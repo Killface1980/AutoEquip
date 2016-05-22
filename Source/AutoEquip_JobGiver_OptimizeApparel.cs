@@ -29,7 +29,7 @@ namespace AutoEquip
                 return null;
             }
 
-            Saveable_Pawn configurarion = MapComponent_AutoEquip.Get.GetCache(pawn);
+            SaveablePawn configurarion = MapComponent_AutoEquip.Get.GetCache(pawn);
 
             #region [  Wear Apparel  ]
 

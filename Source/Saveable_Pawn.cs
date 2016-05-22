@@ -6,11 +6,12 @@ using Verse;
 
 namespace AutoEquip
 {
-    public class Saveable_Pawn : IExposable
+    public class SaveablePawn : IExposable
     {
         // Exposed members
         public Pawn Pawn;
         public List<Saveable_Outfit_StatDef> Stats = new List<Saveable_Outfit_StatDef>();
+        private readonly List<Saveable_Outfit_WorkStatDef> _workStats = new List<Saveable_Outfit_WorkStatDef>();
 
         public List<Apparel> ToWearApparel = new List<Apparel>();
         public List<Apparel> ToDropApparel = new List<Apparel>();
@@ -36,6 +37,8 @@ namespace AutoEquip
                     {
                         if (calculatedStatDef[i].StatDef == stat.StatDef)
                         {
+                            //
+
                             index = i;
                             break;
                         }
@@ -43,11 +46,11 @@ namespace AutoEquip
 
                     if (index == -1)
                         calculatedStatDef.Add(stat);
+                    
                     else
                         calculatedStatDef[index] = stat;
                 }
             }
-
 
             return calculatedStatDef.OrderByDescending(i => Math.Abs(i.Strength));
         }
@@ -58,7 +61,7 @@ namespace AutoEquip
             List<Saveable_Outfit_WorkStatDef> calculatedWorkStatDef = new List<Saveable_Outfit_WorkStatDef>(outfit.WorkStats);
 
 
-            if (outfit.AddWorkStats && (Stats != null))
+            if (outfit.AddWorkStats && (_workStats != null))
             {
                 foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
                 {
@@ -69,16 +72,16 @@ namespace AutoEquip
                     switch (priority)
                     {
                         case 1:
-                            priorityAdjust = 12f;
+                            priorityAdjust = 1f;
                             break;
                         case 2:
-                            priorityAdjust = 4f;
+                            priorityAdjust = 0.3f;
                             break;
                         case 3:
-                            priorityAdjust = 2f;
+                            priorityAdjust = 0.2f;
                             break;
                         case 4:
-                            priorityAdjust = 1f;
+                            priorityAdjust = 0.1f;
                             break;
                         default:
                             continue;

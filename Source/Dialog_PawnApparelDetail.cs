@@ -50,7 +50,7 @@ namespace AutoEquip
                 "Status", labelWidth,
                 "Base", baseValue,
                 "Strengh", multiplierWidth,
-                "Final", finalValue);
+                "Score", finalValue);
 
             groupRect.yMin += itemRect.height;
             Widgets.DrawLineHorizontal(groupRect.xMin, groupRect.yMin, groupRect.width);
@@ -101,14 +101,23 @@ namespace AutoEquip
                     GUI.color = Color.white;
                 }
                 float value = PawnCalcForApparel.GetStatValue(_apparel, stat);
-                sumStatsValue += value;
 
+                var statStrengthDialog = stat.Strength;
+                var valueDisplay = value;
+
+                if (stat.Strength < 0) // flipped for calc + *-1
+                {
+                    statStrengthDialog = statStrengthDialog*-1;
+                    valueDisplay = 1/value;
+                    sumStatsValue += valueDisplay;
+                }
+                else sumStatsValue += value;
 
                 DrawLine(ref itemRect,
                     stat.StatDef.label, labelWidth,
                     value.ToString("N3"), baseValue,
                     stat.Strength.ToString("N2"), multiplierWidth,
-                    (value * stat.Strength).ToString("N5"), finalValue);
+                    (valueDisplay * statStrengthDialog).ToString("N5"), finalValue);
 
                 listRect.yMin = itemRect.yMax;
 
@@ -166,7 +175,7 @@ namespace AutoEquip
                 "AverageStat".Translate(), labelWidth,
                 (sumStatsValue / stats.Length).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                PawnCalcForApparel.clean_ApparelScoreRaw_PawnStats(_apparel).ToString("N5"), finalValue);
+                PawnCalcForApparel.ApparelScoreRaw_PawnStats(_apparel).ToString("N5"), finalValue);
                 itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             }
             if (sumWorkStatsValue > 0)
