@@ -38,8 +38,8 @@ namespace AutoEquip
 
         public override void ExposeData()
         {
-            Scribe_Collections.LookList(ref OutfitCache, "outfits", LookMode.Deep);
-            Scribe_Collections.LookList(ref PawnCache, "pawns", LookMode.Deep);
+            Scribe_Collections.LookList(ref OutfitCache, "Outfits", LookMode.Deep);
+            Scribe_Collections.LookList(ref PawnCache, "Pawns", LookMode.Deep);
             base.ExposeData();
 
             if (OutfitCache == null)
@@ -49,7 +49,10 @@ namespace AutoEquip
                 PawnCache = new List<SaveablePawn>();
         }
 
-        public Saveable_Outfit GetOutfit(Pawn pawn) { return GetOutfit(pawn.outfits.CurrentOutfit); }
+        public Saveable_Outfit GetOutfit(Pawn pawn)
+        {
+            return GetOutfit(pawn.outfits.CurrentOutfit);
+        }
 
         public Saveable_Outfit GetOutfit(Outfit outfit)
         {
@@ -102,18 +105,15 @@ namespace AutoEquip
                 newSaveableList.Add(newPawnSaveable);
                 newCalcList.Add(newPawnCalc);
 
-                newPawnCalc.InitializeFixedApparelsAndGetAvaliableApparels(allApparels);
+               newPawnCalc.InitializeFixedApparelsAndGetAvaliableApparels(allApparels);
             }
 
             PawnCache = newSaveableList;
             PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
 
-#if LOG
-            this.nextOptimization = Find.TickManager.TicksGame + 500;
-#else
-            _nextOptimization = Find.TickManager.TicksGame + 1000;
+
+            _nextOptimization = Find.TickManager.TicksGame + 500;
             //this.nextOptimization = Find.TickManager.TicksGame + 5000;
-#endif
         }
 
         private static void InjectTab(ThingDef thingDef)

@@ -7,7 +7,8 @@ namespace AutoEquip
 {
     public class AutoEquip_JobGiver_OptimizeApparel
     {
-        private const int ApparelOptimizeCheckInterval = 3000;
+        private const int ApparelOptimizeCheckInterval = 500;
+    //  private const int ApparelOptimizeCheckInterval = 3000;
 
         private static void SetNextOptimizeTick(Pawn pawn)
         {
@@ -29,11 +30,11 @@ namespace AutoEquip
                 return null;
             }
 
-            SaveablePawn configurarion = MapComponent_AutoEquip.Get.GetCache(pawn);
+            SaveablePawn configuration = MapComponent_AutoEquip.Get.GetCache(pawn);
 
             #region [  Wear Apparel  ]
 
-            if (configurarion.ToWearApparel.Count > 0)
+            if (configuration.ToWearApparel.Count > 0)
             {
                 List<Thing> listToWear = Find.ListerThings.ThingsInGroup(ThingRequestGroup.Apparel);
                 if (listToWear.Count > 0)
@@ -41,17 +42,17 @@ namespace AutoEquip
                     foreach (var thing in listToWear)
                     {
                         var ap = (Apparel)thing;
-                        if (!configurarion.ToWearApparel.Contains(ap)) continue;
+                        if (!configuration.ToWearApparel.Contains(ap)) continue;
                         if (Find.SlotGroupManager.SlotGroupAt(thing.Position) == null) continue;
                         if (thing.IsForbidden(pawn)) continue;
                         if (!ApparelUtility.HasPartsToWear(pawn, thing.def)) continue;
 
-                        if (!ap.IsInValidStorage()) continue;
+                  //      if (!ap.IsInValidStorage()) continue;
                         if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
                         //                                if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
                         {
 
-                            configurarion.ToWearApparel.Remove(ap);
+                            configuration.ToWearApparel.Remove(ap);
                             return new Job(JobDefOf.Wear, ap);
                         }
                     }
@@ -62,11 +63,11 @@ namespace AutoEquip
 
             #region [  Drops unequiped  ]
 
-            if (configurarion.ToDropApparel != null)
-                for (int i = configurarion.ToDropApparel.Count - 1; i >= 0; i--)
+            if (configuration.ToDropApparel != null)
+                for (int i = configuration.ToDropApparel.Count - 1; i >= 0; i--)
                 {
-                    Apparel a = configurarion.ToDropApparel[i];
-                    configurarion.ToDropApparel.Remove(a);
+                    Apparel a = configuration.ToDropApparel[i];
+                    configuration.ToDropApparel.Remove(a);
 
                     if (pawn.apparel.WornApparel.Contains(a))
                     {

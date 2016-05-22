@@ -17,8 +17,8 @@ namespace AutoEquip
             closeOnEscapeKey = true;
             doCloseButton = true;
 
-            this._pawn = pawn;
-            this._apparel = apparel;
+            _pawn = pawn;
+            _apparel = apparel;
         }
 
         public override Vector2 InitialWindowSize
@@ -62,6 +62,7 @@ namespace AutoEquip
 
             Saveable_Outfit_StatDef[] stats = PawnCalcForApparel.Stats.ToArray();
             Saveable_Outfit_WorkStatDef[] workstats = PawnCalcForApparel.WorkStats.ToArray();
+//            Saveable_Outfit_StatDef[] workstats = PawnCalcForApparel.WorkStats.ToArray();
             List<Saveable_Outfit_WorkStatDef> filteredworkstats = new List<Saveable_Outfit_WorkStatDef>();
 
             foreach (var workstat in workstats)
@@ -113,11 +114,16 @@ namespace AutoEquip
                 }
                 else sumStatsValue += value;
 
+                float statscore = valueDisplay * statStrengthDialog;
+
+                if (valueDisplay == 1)
+                    statscore = 1;
+
                 DrawLine(ref itemRect,
                     stat.StatDef.label, labelWidth,
                     value.ToString("N3"), baseValue,
                     stat.Strength.ToString("N2"), multiplierWidth,
-                    (valueDisplay * statStrengthDialog).ToString("N5"), finalValue);
+                    statscore.ToString("N5"), finalValue);
 
                 listRect.yMin = itemRect.yMax;
 
@@ -149,7 +155,7 @@ namespace AutoEquip
                     sumWorkStatsValue += value;
 
                     DrawLine(ref itemRect,
-                        workstat.WorkStatDef.label, labelWidth,
+                        workstat.StatDef.label, labelWidth,
                         value.ToString("N3"), baseValue,
                         workstat.Strength.ToString("N2"), multiplierWidth,
                         (value * workstat.Strength).ToString("N5"), finalValue);
@@ -184,7 +190,7 @@ namespace AutoEquip
                 "AverageWorkStat".Translate(), labelWidth,
                 (sumWorkStatsValue / filteredworkstats.Count).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                PawnCalcForApparel.clean_ApparelScore_PawnWorkStats(_apparel).ToString("N5"), finalValue);
+                PawnCalcForApparel.ApparelScoreRaw_PawnWorkStats(_apparel).ToString("N5"), finalValue);
                 itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             }
             DrawLine(ref itemRect,

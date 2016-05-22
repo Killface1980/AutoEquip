@@ -6,12 +6,12 @@ namespace AutoEquip
     public class Saveable_Outfit_WorkStatDef : IExposable
     {
 
-        public StatDef WorkStatDef;
+        public StatDef StatDef;
         public float Strength;
 
         public void ExposeData()
         {
-            Scribe_Defs.LookDef(ref WorkStatDef, "StatDef");
+            Scribe_Defs.LookDef(ref StatDef, "StatDef");
             Scribe_Values.LookValue(ref Strength, "Strength");
         }
     }

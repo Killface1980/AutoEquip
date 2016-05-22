@@ -11,7 +11,7 @@ namespace AutoEquip
         // Exposed members
         public Pawn Pawn;
         public List<Saveable_Outfit_StatDef> Stats = new List<Saveable_Outfit_StatDef>();
-        private readonly List<Saveable_Outfit_WorkStatDef> _workStats = new List<Saveable_Outfit_WorkStatDef>();
+        public List<Saveable_Outfit_WorkStatDef> WorkStats = new List<Saveable_Outfit_WorkStatDef>();
 
         public List<Apparel> ToWearApparel = new List<Apparel>();
         public List<Apparel> ToDropApparel = new List<Apparel>();
@@ -19,8 +19,9 @@ namespace AutoEquip
 
         public void ExposeData()
         {
-            Scribe_References.LookReference(ref Pawn, "pawn");
-            Scribe_Collections.LookList(ref Stats, "stats", LookMode.Deep);
+            Scribe_References.LookReference(ref Pawn, "Pawn");
+            Scribe_Collections.LookList(ref Stats, "Stats", LookMode.Deep);
+            Scribe_Collections.LookList(ref WorkStats, "WorkStats", LookMode.Deep);
         }
 
         public IEnumerable<Saveable_Outfit_StatDef> NormalizeCalculedStatDef()
@@ -37,8 +38,6 @@ namespace AutoEquip
                     {
                         if (calculatedStatDef[i].StatDef == stat.StatDef)
                         {
-                            //
-
                             index = i;
                             break;
                         }
@@ -60,8 +59,7 @@ namespace AutoEquip
             Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(Pawn);
             List<Saveable_Outfit_WorkStatDef> calculatedWorkStatDef = new List<Saveable_Outfit_WorkStatDef>(outfit.WorkStats);
 
-
-            if (outfit.AddWorkStats && (_workStats != null))
+            if (outfit.AddWorkStats)
             {
                 foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
                 {
@@ -86,13 +84,15 @@ namespace AutoEquip
                         default:
                             continue;
                     }
+                        Saveable_Outfit_WorkStatDef workstatdef = null;
 
                     foreach (KeyValuePair<StatDef, float> workStat in PawnCalcForApparel.GetStatsOfWorkType(wType))
                     {
-                        Saveable_Outfit_WorkStatDef workstatdef = null;
+
+
                         foreach (Saveable_Outfit_WorkStatDef s in calculatedWorkStatDef)
                         {
-                            if (s.WorkStatDef == workStat.Key)
+                            if (s.StatDef == workStat.Key)
                             {
                                 workstatdef = s;
                                 break;
@@ -102,14 +102,15 @@ namespace AutoEquip
 
                         if (workstatdef == null)
                         {
-
                                 workstatdef = new Saveable_Outfit_WorkStatDef();
-                                workstatdef.WorkStatDef = workStat.Key;
+                                workstatdef.StatDef = workStat.Key;
                                 workstatdef.Strength = workStat.Value * priorityAdjust;
                                 calculatedWorkStatDef.Add(workstatdef);
-                            
                         }
                         else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
+
+
+
 
                     }
 
