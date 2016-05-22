@@ -78,7 +78,7 @@ namespace AutoEquip
 
             Widgets.BeginScrollView(groupRect, ref scrollPosition, viewRect);
 
-            allApparels = allApparels.OrderByDescending(i => { float g; if (pawnAutoEquip.DIALOG_CalculateApparelScoreGain(i, out g)) return g; return -1000f; }).ToList();
+            allApparels = allApparels.OrderByDescending(i => { float g; if (pawnAutoEquip.CalculateApparelScoreGain(i, out g)) return g; return -1000f; }).ToList();
 
             foreach (Apparel currentAppel in allApparels)
             {
@@ -115,7 +115,7 @@ namespace AutoEquip
                 }
 
                 float gain;
-                if (pawnAutoEquip.DIALOG_CalculateApparelScoreGain(currentAppel, out gain))
+                if (pawnAutoEquip.CalculateApparelScoreGain(currentAppel, out gain))
                     DrawLine(ref itemRect,
                         currentAppel, currentAppel.LabelCap, apparelLabelWidth,
                         equiped, equiped == null ? null : equiped.LabelCap, apparelEquipedWidth,

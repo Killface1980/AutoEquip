@@ -8,12 +8,22 @@ namespace AutoEquip
 {
     public class PawnCalcForApparel
     {
-        public delegate void ApparelScoreRawStatsHandler(Pawn pawn, Apparel apparel, StatDef statDef, ref float num);
 
-        private static Pawn _pawn;
+        private Pawn _pawn;
+        private SaveablePawn _saveablePawn;
+        private Outfit _outfit;
+        private bool _optimized;
 
-        private static Saveable_Outfit_StatDef[] _stats;
-        private static Saveable_Outfit_WorkStatDef[] _workstats;
+        private List<Apparel> _allApparelsItems;
+        private List<float> _allApparelsScore;
+
+        private List<Apparel> _calculatedApparelItems;
+        private List<float> _calculatedApparelScore;
+        private List<Apparel> _fixedApparels;
+        private float? _totalStats = null;
+
+        private Saveable_Outfit_StatDef[] _stats;
+        private Saveable_Outfit_WorkStatDef[] _workstats;
 
         private static NeededWarmth _neededWarmth;
 
@@ -37,17 +47,7 @@ namespace AutoEquip
             new CurvePoint(1f, 1f)
         };
 
-        private readonly Outfit _outfit;
-        private readonly SaveablePawn _saveablePawn;
 
-        private List<Apparel> _allApparelsItems;
-        private List<float> _allApparelsScore;
-
-        public List<Apparel> _calculatedApparelItems;
-        private List<float> _calculatedApparelScore;
-        private List<Apparel> _fixedApparels;
-        private bool _optimized;
-        private float? _totalStats;
 
         public PawnCalcForApparel(Pawn pawn)
             : this(MapComponent_AutoEquip.Get.GetCache(pawn))
@@ -66,12 +66,12 @@ namespace AutoEquip
             _neededWarmth = CalculateNeededWarmth(_pawn, GenDate.CurrentMonth);
         }
 
-        public static IEnumerable<Saveable_Outfit_StatDef> Stats
+        public IEnumerable<Saveable_Outfit_StatDef> Stats
         {
             get { return _stats; }
         }
 
-        public static IEnumerable<Saveable_Outfit_WorkStatDef> WorkStats
+        public IEnumerable<Saveable_Outfit_WorkStatDef> WorkStats
         {
             get { return _workstats; }
         }
@@ -91,7 +91,7 @@ namespace AutoEquip
                     _fixedApparels.Add(pawnApparel);
         }
 
-        private void InitializeAllApparelScores(List<Apparel> allApparels)
+        public void InitializeAllApparelScores(List<Apparel> allApparels)
         {
             _allApparelsItems = new List<Apparel>();
             _allApparelsScore = new List<float>();
@@ -102,7 +102,7 @@ namespace AutoEquip
             }
         }
 
-        private void DIALOG_InitializeCalculatedApparelScoresFromWornApparel()
+        public void DIALOG_InitializeCalculatedApparelScoresFromWornApparel()
         {
             _calculatedApparelItems = new List<Apparel>();
             _calculatedApparelScore = new List<float>();
@@ -115,7 +115,7 @@ namespace AutoEquip
             _optimized = false;
         }
 
-        private void InitializeCalculatedApparelScoresFromFixedApparel()
+        public void InitializeCalculatedApparelScoresFromFixedApparel()
         {
             _calculatedApparelItems = new List<Apparel>();
             _calculatedApparelScore = new List<float>();
@@ -127,14 +127,16 @@ namespace AutoEquip
             _optimized = false;
         }
 
+        public delegate void ApparelScoreRawStatsHandler(Pawn pawn, Apparel apparel, StatDef statDef, ref float num);
 
-        private static void DoApparelScoreRaw_PawnStatsHandlers(Pawn pawn, Apparel apparel, StatDef statDef, ref float num)
+        public static event ApparelScoreRawStatsHandler ApparelScoreRaw_PawnStatsHandlers;
+
+        public static void DoApparelScoreRaw_PawnStatsHandlers(Pawn pawn, Apparel apparel, StatDef statDef, ref float num)
         {
             if (ApparelScoreRaw_PawnStatsHandlers != null)
                 ApparelScoreRaw_PawnStatsHandlers(pawn, apparel, statDef, ref num);
         }
 
-        public static event ApparelScoreRawStatsHandler ApparelScoreRaw_PawnStatsHandlers;
 
 
         #region [  ApparelScoreRaw_PawnWorkStats  ]
@@ -146,12 +148,12 @@ namespace AutoEquip
                 return num;
             num += ApparelScoreRaw_PawnStats(ap);
             num += ApparelScoreRaw_PawnWorkStats(ap);
-            num *= clean_ApparelScoreRawHitPointAdjust(ap);
+            num *= ApparelScoreRawHitPointAdjust(ap);
             num *= ApparelScoreRawInsulationColdAdjust(ap);
             return num;
         }
 
-        public static float ApparelScoreRaw_PawnStats(Apparel ap)
+        public float ApparelScoreRaw_PawnStats(Apparel ap)
         {
             float num = 0f;
         //    float count = 0f;
@@ -187,7 +189,7 @@ namespace AutoEquip
             //   return score;
         }
 
-        public static float ApparelScoreRaw_PawnWorkStats(Apparel ap)
+        public float ApparelScoreRaw_PawnWorkStats(Apparel ap)
         {
             float num = 0f;
      //       float count = 0f;
@@ -339,7 +341,7 @@ namespace AutoEquip
         }
 
 
-        public static float GetStatValue(Apparel apparel, Saveable_Outfit_StatDef stat)
+        public float GetStatValue(Apparel apparel, Saveable_Outfit_StatDef stat)
         {
             float baseStat = apparel.GetStatValue(stat.StatDef, true);
             float currentStat = baseStat;
@@ -353,7 +355,7 @@ namespace AutoEquip
             return currentStat / baseStat;
         }
 
-        public static float GetWorkStatValue(Apparel apparel, Saveable_Outfit_WorkStatDef workStat)
+        public  float GetWorkStatValue(Apparel apparel, Saveable_Outfit_WorkStatDef workStat)
         {
             float baseStat = apparel.GetStatValue(workStat.StatDef, true);
             float currentStat = baseStat;
@@ -375,7 +377,7 @@ namespace AutoEquip
         {
             float baseStats = ApparelScoreRaw_PawnStats(ap);
             float workStats = ApparelScoreRaw_PawnWorkStats(ap);
-            float modHit = clean_ApparelScoreRawHitPointAdjust(ap);
+            float modHit = ApparelScoreRawHitPointAdjust(ap);
             float modCold = ApparelScoreRawInsulationColdAdjust(ap);
 
             if ((modHit < 0) && (modCold < 0))
@@ -387,7 +389,7 @@ namespace AutoEquip
         }
 
 
-        public static float ApparelScoreRawInsulationColdAdjust(Apparel ap)
+        public float ApparelScoreRawInsulationColdAdjust(Apparel ap)
         {
             switch (_neededWarmth)
             {
@@ -410,7 +412,7 @@ namespace AutoEquip
 
         #region [  CalculateApparelScoreGain  ]
 
-        public bool DIALOG_CalculateApparelScoreGain(Apparel apparel, out float gain)
+        public bool CalculateApparelScoreGain(Apparel apparel, out float gain)
         {
             if (_calculatedApparelItems == null)
                 DIALOG_InitializeCalculatedApparelScoresFromWornApparel();
@@ -518,42 +520,42 @@ namespace AutoEquip
             return any;
         }
 
-        private static void DoConflict(Apparel apparel, PawnCalcForApparel pawn_x, PawnCalcForApparel pawn_y, ref float? xPercentual)
+        private static void DoConflict(Apparel apparel, PawnCalcForApparel pawnX, PawnCalcForApparel pawnY, ref float? xPercentual)
         {
             if (!xPercentual.HasValue)
             {
-                if (pawn_x._totalStats == null)
-                    pawn_x._totalStats = pawn_x.ApparelScoreRaw(null);
-                float xNoStats = pawn_x.ApparelScoreRaw(apparel);
-                xPercentual = pawn_x._totalStats / xNoStats;
-                if (pawn_x._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
+                if (pawnX._totalStats == null)
+                    pawnX._totalStats = pawnX.ApparelScoreRaw(null);
+                float xNoStats = pawnX.ApparelScoreRaw(apparel);
+                xPercentual = pawnX._totalStats / xNoStats;
+                if (pawnX._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
                     xPercentual *= 1.1f;
             }
 
-            if (pawn_y._totalStats == null)
-                pawn_y._totalStats = pawn_y.ApparelScoreRaw(null);
+            if (pawnY._totalStats == null)
+                pawnY._totalStats = pawnY.ApparelScoreRaw(null);
 
-            float yNoStats = pawn_y.ApparelScoreRaw(apparel);
-            if (pawn_y._totalStats != null)
+            float yNoStats = pawnY.ApparelScoreRaw(apparel);
+            if (pawnY._totalStats != null)
             {
-                float yPercentual = pawn_y._totalStats.Value / yNoStats;
+                float yPercentual = pawnY._totalStats.Value / yNoStats;
 
-                if (pawn_y._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
+                if (pawnY._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
                     yPercentual *= 1.1f;
 
                 if (xPercentual.Value > yPercentual)
                 {
-                    pawn_y.LoseConflict(apparel);
+                    pawnY.LoseConflict(apparel);
                 }
                 else
                 {
-                    pawn_x.LoseConflict(apparel);
+                    pawnX.LoseConflict(apparel);
                 }
             }
         }
 
 
-        private void LoseConflict(Apparel apprel)
+        public void LoseConflict(Apparel apprel)
         {
             _optimized = false;
             _totalStats = null;
@@ -564,7 +566,7 @@ namespace AutoEquip
             _calculatedApparelScore.RemoveAt(index);
         }
 
-        private void OptimizeFromList(ref bool changed)
+        public void OptimizeFromList(ref bool changed)
         {
             if (_optimized)
                 return;
@@ -698,7 +700,7 @@ namespace AutoEquip
 
         #endregion
 
-        public static float clean_ApparelScoreRawHitPointAdjust(Apparel ap)
+        public float ApparelScoreRawHitPointAdjust(Apparel ap)
         {
             if (ap.def.useHitPoints)
             {
@@ -709,7 +711,7 @@ namespace AutoEquip
         }
 
 
-        private static NeededWarmth CalculateNeededWarmth(Pawn pawn, Month month)
+        public static NeededWarmth CalculateNeededWarmth(Pawn pawn, Month month)
         {
             float num = GenTemperature.AverageTemperatureAtWorldCoordsForMonth(Find.Map.WorldCoords, month);
 
@@ -739,7 +741,7 @@ namespace AutoEquip
         }
 
 
-        private void PassToSaveable()
+        public void PassToSaveable()
         {
             _saveablePawn.ToWearApparel = new List<Apparel>();
             _saveablePawn.ToDropApparel = new List<Apparel>();

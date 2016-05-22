@@ -8,7 +8,7 @@ namespace AutoEquip
     public class AutoEquip_JobGiver_OptimizeApparel
     {
         private const int ApparelOptimizeCheckInterval = 500;
-    //  private const int ApparelOptimizeCheckInterval = 3000;
+        //  private const int ApparelOptimizeCheckInterval = 3000;
 
         private static void SetNextOptimizeTick(Pawn pawn)
         {
@@ -16,7 +16,7 @@ namespace AutoEquip
             //            pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 3000;
         }
 
-        internal Job _TryGiveTerminalJob(Pawn pawn)
+        internal Job TryGiveTerminalJob(Pawn pawn)
         {
             if (pawn.outfits == null)
             {

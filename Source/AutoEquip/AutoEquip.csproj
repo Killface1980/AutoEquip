@@ -50,11 +50,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dialog_ManageOutfitsAutoEquip.cs" />
+    <Compile Include="Dialog\Dialog_ManageOutfitsAutoEquip.cs" />
     <Compile Include="AutoEquip_JobGiver_OptimizeApparel.cs" />
-    <Compile Include="Dialog_ManagePawnOutfit.cs" />
-    <Compile Include="Dialog_PawnApparelComparer.cs" />
-    <Compile Include="Dialog_PawnApparelDetail.cs" />
+    <Compile Include="Dialog\Dialog_ManagePawnOutfit.cs" />
+    <Compile Include="Dialog\Dialog_PawnApparelComparer.cs" />
+    <Compile Include="Dialog\Dialog_PawnApparelDetail.cs" />
     <Compile Include="MainTabWindow_AssignAutoEquip.cs" />
     <Compile Include="MapComponent_AutoEquip.cs" />
     <Compile Include="ModInitializer.cs" />
