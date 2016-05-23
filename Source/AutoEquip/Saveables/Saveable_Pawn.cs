@@ -86,9 +86,9 @@ namespace AutoEquip
                     }
                         Saveable_Outfit_WorkStatDef workstatdef = null;
 
+
                     foreach (KeyValuePair<StatDef, float> workStat in PawnCalcForApparel.GetStatsOfWorkType(wType))
                     {
-
 
                         foreach (Saveable_Outfit_WorkStatDef s in calculatedWorkStatDef)
                         {

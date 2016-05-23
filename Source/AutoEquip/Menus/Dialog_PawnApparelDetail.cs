@@ -113,8 +113,8 @@ namespace AutoEquip
                         valueDisplay = 1 / value;
                         sumStatsValue += valueDisplay;
                     }
-                    else
-                        sumStatsValue += value; 
+                    if (value != 1)
+                        sumStatsValue += value;
                 }
 
                 float statscore = valueDisplay * statStrengthDialog;
@@ -137,8 +137,8 @@ namespace AutoEquip
             if (check)
             {
                 itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, Text.LineHeight * 0.5f);
-                Widgets.DrawLineHorizontal(itemRect.xMin, (itemRect.yMin + itemRect.yMax)/2, labelWidth);
-                DrawLine(ref itemRect,"", labelWidth,"", baseValue,"", multiplierWidth,"", finalValue);
+                Widgets.DrawLineHorizontal(itemRect.xMin, (itemRect.yMin + itemRect.yMax) / 2, labelWidth);
+                DrawLine(ref itemRect, "", labelWidth, "", baseValue, "", multiplierWidth, "", finalValue);
                 listRect.yMin = itemRect.yMax;
 
             }
@@ -163,10 +163,10 @@ namespace AutoEquip
                 {
                     workstatStrengthDialog = workstatStrengthDialog * -1;
                     workvalueDisplay = 1 / value;
-                    sumStatsValue += workvalueDisplay;
+                    sumWorkStatsValue += workvalueDisplay;
                 }
                 else
-                    sumStatsValue += value;
+                    sumWorkStatsValue += value;
 
 
                 if (value <= 0.999f || value >= 1.001f)
@@ -201,13 +201,13 @@ namespace AutoEquip
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
-                "Status", labelWidth,
+                "", labelWidth,
                 "", baseValue,
                 "Status Offset", multiplierWidth,
                 "Subtotal", finalValue);
 
-   //       itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 0.6f);
-   //       Widgets.DrawLineHorizontal(itemRect.xMin, itemRect.yMax, itemRect.width);
+            //       itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 0.6f);
+            //       Widgets.DrawLineHorizontal(itemRect.xMin, itemRect.yMax, itemRect.width);
 
             float subtotal = 1;
 
@@ -220,7 +220,7 @@ namespace AutoEquip
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
 
-            if (sumStatsValue > 0)
+            if (sumStatsValue > 0 && stats.Length > 0)
             {
                 subtotal += conf.ApparelScoreRaw_PawnStats(_apparel);
 
