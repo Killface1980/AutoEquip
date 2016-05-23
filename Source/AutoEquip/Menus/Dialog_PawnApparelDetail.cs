@@ -102,16 +102,17 @@ namespace AutoEquip
                 }
                 float value = conf.GetStatValue(_apparel, stat);
 
-                var statStrengthDialog = stat.Strength;
                 var valueDisplay = value;
+                var statStrengthDialog = stat.Strength;
 
-                if (stat.Strength < 0) // flipped for calc + *-1
+                if (value < 1) // flipped for calc + *-1
                 {
                     statStrengthDialog = statStrengthDialog*-1;
                     valueDisplay = 1/value;
                     sumStatsValue += valueDisplay;
                 }
-                else sumStatsValue += value;
+                else
+                    sumStatsValue += value;
 
                 float statscore = valueDisplay * statStrengthDialog;
 
@@ -148,6 +149,19 @@ namespace AutoEquip
                 }
 
                 float value = conf.GetWorkStatValue(_apparel, workstat);
+                var workvalueDisplay = value;
+                var workstatStrengthDialog = workstat.Strength;
+
+
+                if (value < 1) // flipped for calc + *-1
+                {
+                    workstatStrengthDialog = workstatStrengthDialog * -1;
+                    workvalueDisplay = 1 / value;
+                    sumStatsValue += workvalueDisplay;
+                }
+                else
+                    sumStatsValue += value;
+
 
                 if (value <= 0.99f || value >= 1.01f)
                 {
@@ -156,8 +170,8 @@ namespace AutoEquip
                     DrawLine(ref itemRect,
                         workstat.StatDef.label, labelWidth,
                         value.ToString("N3"), baseValue,
-                        workstat.Strength.ToString("N2"), multiplierWidth,
-                        (value * workstat.Strength).ToString("N5"), finalValue);
+                        workstatStrengthDialog.ToString("N2"), multiplierWidth,
+                        (value * workstatStrengthDialog).ToString("N5"), finalValue);
 
                     listRect.yMin = itemRect.yMax;
                 }

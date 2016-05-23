@@ -160,20 +160,26 @@ namespace AutoEquip
                     var statStrength = stat.Strength;
 
             //        if (nint == 1) continue;
-                    if (statStrength < 0)
+                  if (nint < 1)
+                  {
+                      nint = 1 / nint;  // inverts negative values and 1:x
+                      statStrength = statStrength * -1;
+                  }
+
+                    if (nint <= 0.99f || nint >= 1.01f)
                     {
-                        nint = 1 / nint;  // inverts negative values and 1:x
-                        statStrength = statStrength * -1;
+                        num += nint * statStrength;
+                        //              count++;
                     }
 
-                    num += nint * statStrength;
-      //              count++;
                 }
                 catch (Exception e)
                 {
                     throw new Exception("Error Calculation Stat: " + stat.StatDef, e);
                 }
             }
+
+
 
 
             return num;
@@ -195,7 +201,13 @@ namespace AutoEquip
 
                     var workStatStrength = workstat.Strength;
 
-                    if (workStatStrength < 0)
+                    //         if (workStatStrength < 0)
+                    //         {
+                    //             nint = 1 / nint;  // inverts negative values and 1:x
+                    //             workStatStrength = workStatStrength * -1;
+                    //         }
+
+                    if (nint < 1)
                     {
                         nint = 1 / nint;  // inverts negative values and 1:x
                         workStatStrength = workStatStrength * -1;
