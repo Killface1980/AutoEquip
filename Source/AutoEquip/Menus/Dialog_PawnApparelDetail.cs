@@ -68,7 +68,7 @@ namespace AutoEquip
             {
                 float value = conf.GetWorkStatValue(_apparel, workstat);
 
-                if (value <= 0.99f || value >= 1.01f)
+                if (value <= 0.999f || value >= 1.001f)
                 {
                     filteredworkstats.Add(workstat);
                 }
@@ -117,7 +117,7 @@ namespace AutoEquip
                 float statscore = valueDisplay * statStrengthDialog;
 
                 if (valueDisplay == 1)
-                    statscore = 1;
+                    statscore = 0;
 
                 DrawLine(ref itemRect,
                     stat.StatDef.label, labelWidth,
@@ -163,7 +163,7 @@ namespace AutoEquip
                     sumStatsValue += value;
 
 
-                if (value <= 0.99f || value >= 1.01f)
+                if (value <= 0.999f || value >= 1.001f)
                 {
                     sumWorkStatsValue += value;
 
