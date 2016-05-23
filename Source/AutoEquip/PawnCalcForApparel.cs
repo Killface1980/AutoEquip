@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommunityCoreLibrary;
 using RimWorld;
 using Verse;
 
@@ -158,13 +159,20 @@ namespace AutoEquip
                     var statValue = GetStatValue(ap, stat);
                     var statStrength = stat.Strength;
 
-                    if (statValue < 1)
-                    {
-                        statValue = 1 / statValue;  // inverts negative values and 1:x
-                        statStrength = statStrength * -1;
-                    }
+                        if (statValue < 1 && statValue !=0)
+                        {
+                            statValue = 1 / statValue;  // inverts negative values and 1:x
+                            statStrength = statStrength * -1;
+                        }
 
-                    if (statValue <= 0.999f || statValue >= 1.001f)
+                        // check if 0, have problems with offsets
+                    if (statValue == 0 && statStrength < 0)
+                        num = statStrength/2 * -1;
+
+                    else if (statValue == 0 && statStrength > 0)
+                        num = statStrength / 2 * -1;
+
+                    else if (statValue <= 0.999f || statValue >= 1.001f)
                     {
                         num += statValue * statStrength;
                     }
@@ -201,7 +209,7 @@ namespace AutoEquip
                     //             workStatStrength = workStatStrength * -1;
                     //         }
 
-                    if (workStatValue < 1)
+                    if (workStatValue < 1 && workStatValue != 0)
                     {
                         workStatValue = 1 / workStatValue;  // inverts negative values and 1:x
                         workStatStrength = workStatStrength * -1;
@@ -372,20 +380,20 @@ namespace AutoEquip
 
         #region [  OLD_CalculateApparelModifierRaw  ]
 
-        public float DIALOGONLY_ApparelModifierRaw(Apparel ap)
-        {
-            float baseStats = ApparelScoreRaw_PawnStats(ap);
-            float workStats = ApparelScoreRaw_PawnWorkStats(ap);
-            float modHit = ApparelScoreRawHitPointAdjust(ap);
-            float modCold = ApparelScoreRawInsulationColdAdjust(ap);
-
-            if ((modHit < 0) && (modCold < 0))
-                return modHit * modCold * -1;
-
-            return ((baseStats + workStats) / 2) * modHit * modCold;
-
-            //  return modHit * modCold;
-        }
+  //    public float DIALOGONLY_ApparelModifierRaw(Apparel ap)
+  //    {
+  //        float baseStats = ApparelScoreRaw_PawnStats(ap);
+  //        float workStats = ApparelScoreRaw_PawnWorkStats(ap);
+  //        float modHit = ApparelScoreRawHitPointAdjust(ap);
+  //        float modCold = ApparelScoreRawInsulationColdAdjust(ap);
+  //
+  //        if ((modHit < 0) && (modCold < 0))
+  //            return modHit * modCold * -1;
+  //
+  //        return ((baseStats + workStats) / 2) * modHit * modCold;
+  //
+  //        //  return modHit * modCold;
+  //    }
 
 
         public float ApparelScoreRawInsulationColdAdjust(Apparel ap)

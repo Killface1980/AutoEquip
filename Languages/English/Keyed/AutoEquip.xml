@@ -3,11 +3,12 @@
   <AddWorkingStats>Add Working Stats</AddWorkingStats>
   <ToWear>To Wear</ToWear>
   <ToDrop>To Drop</ToDrop>
-  <AverageStat>Pawn Personal Values</AverageStat>
-  <AverageWorkStat>Pawn Work Values</AverageWorkStat>
+  <AverageStat>Pawn Personal Offsets</AverageStat>
+  <AverageWorkStat>Pawn Work Offsets</AverageWorkStat>
   <AutoEquipHitPoints>Hit Points Modifier</AutoEquipHitPoints>
   <AutoEquipTemperature>Outdoor Temperature Modifier</AutoEquipTemperature>
   <AutoEquipTotal>Apparel Total Stat</AutoEquipTotal>
+  <BasicStatusOfApparel>Basic Apparel Offset</BasicStatusOfApparel>
   <AutoEquipGlobalSelection>Global Selection</AutoEquipGlobalSelection>
   <AutoEquipAppendIndividualPawnStatus>Append Pawn Individual Status</AutoEquipAppendIndividualPawnStatus>
   <AutoEquipStatus>Status...</AutoEquipStatus>

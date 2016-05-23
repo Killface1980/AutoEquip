@@ -112,7 +112,7 @@ namespace AutoEquip
             PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
 
 
-            _nextOptimization = Find.TickManager.TicksGame + 1500;
+            _nextOptimization = Find.TickManager.TicksGame + 5000;
             //this.nextOptimization = Find.TickManager.TicksGame + 5000;
         }
 

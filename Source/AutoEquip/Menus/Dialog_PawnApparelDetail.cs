@@ -105,14 +105,17 @@ namespace AutoEquip
                 var valueDisplay = value;
                 var statStrengthDialog = stat.Strength;
 
-                if (value < 1) // flipped for calc + *-1
+                if (value != 0)
                 {
-                    statStrengthDialog = statStrengthDialog*-1;
-                    valueDisplay = 1/value;
-                    sumStatsValue += valueDisplay;
+                    if (value < 1) // flipped for calc + *-1
+                    {
+                        statStrengthDialog = statStrengthDialog * -1;
+                        valueDisplay = 1 / value;
+                        sumStatsValue += valueDisplay;
+                    }
+                    else
+                        sumStatsValue += value; 
                 }
-                else
-                    sumStatsValue += value;
 
                 float statscore = valueDisplay * statStrengthDialog;
 
@@ -133,8 +136,11 @@ namespace AutoEquip
 
             if (check)
             {
-                Widgets.DrawLineHorizontal(groupRect.xMin, listRect.yMin, groupRect.width);
+                itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, Text.LineHeight * 0.5f);
+                Widgets.DrawLineHorizontal(itemRect.xMin, (itemRect.yMin + itemRect.yMax)/2, labelWidth);
+                DrawLine(ref itemRect,"", labelWidth,"", baseValue,"", multiplierWidth,"", finalValue);
                 listRect.yMin = itemRect.yMax;
+
             }
 
 
@@ -186,43 +192,81 @@ namespace AutoEquip
 
             //          itemRect.yMax += 5; 
 
-            itemRect = new Rect(listRect.xMin, groupRect.yMax + 5, listRect.width, Text.LineHeight * 1.2f);
+            itemRect = new Rect(listRect.xMin, groupRect.yMax, listRect.width, Text.LineHeight * 0.6f);
+            DrawLine(ref itemRect,
+                "", labelWidth,
+                "", baseValue,
+                "", multiplierWidth,
+                "", finalValue);
+
+            itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
+            DrawLine(ref itemRect,
+                "Status", labelWidth,
+                "", baseValue,
+                "Status Offset", multiplierWidth,
+                "Subtotal", finalValue);
+
+   //       itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 0.6f);
+   //       Widgets.DrawLineHorizontal(itemRect.xMin, itemRect.yMax, itemRect.width);
+
+            float subtotal = 1;
+
+            itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
+            DrawLine(ref itemRect,
+                "BasicStatusOfApparel".Translate(), labelWidth,
+                "1.000", baseValue,
+                "", multiplierWidth,
+                subtotal.ToString("N5"), finalValue);
+
+            itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
 
             if (sumStatsValue > 0)
             {
+                subtotal += conf.ApparelScoreRaw_PawnStats(_apparel);
+
                 DrawLine(ref itemRect,
                 "AverageStat".Translate(), labelWidth,
                 (sumStatsValue / stats.Length).ToString("N3"), baseValue,
-                "", multiplierWidth,
-                conf.ApparelScoreRaw_PawnStats(_apparel).ToString("N5"), finalValue);
+                conf.ApparelScoreRaw_PawnStats(_apparel).ToString("N5"), multiplierWidth,
+                subtotal.ToString("N5"), finalValue);
+
                 itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             }
+
             if (sumWorkStatsValue > 0)
             {
+                subtotal += conf.ApparelScoreRaw_PawnWorkStats(_apparel);
+
                 DrawLine(ref itemRect,
                 "AverageWorkStat".Translate(), labelWidth,
                 (sumWorkStatsValue / filteredworkstats.Count).ToString("N3"), baseValue,
-                "", multiplierWidth,
-                conf.ApparelScoreRaw_PawnWorkStats(_apparel).ToString("N5"), finalValue);
+                conf.ApparelScoreRaw_PawnWorkStats(_apparel).ToString("N5"), multiplierWidth,
+                subtotal.ToString("N5"), finalValue);
+
                 itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             }
+
+            subtotal = subtotal * conf.ApparelScoreRawHitPointAdjust(_apparel);
+
             DrawLine(ref itemRect,
                 "AutoEquipHitPoints".Translate(), labelWidth,
                 conf.ApparelScoreRawHitPointAdjust(_apparel).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                "", finalValue);
+                subtotal.ToString("N5"), finalValue);
+
+            subtotal = subtotal * conf.ApparelScoreRawInsulationColdAdjust(_apparel);
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipTemperature".Translate(), labelWidth,
                 conf.ApparelScoreRawInsulationColdAdjust(_apparel).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                "", finalValue);
+                subtotal.ToString("N5"), finalValue);
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipTotal".Translate(), labelWidth,
-                conf.DIALOGONLY_ApparelModifierRaw(_apparel).ToString("N3"), baseValue,
+                "", baseValue,
                 "", multiplierWidth,
                 conf.ApparelScoreRaw(_apparel).ToString("N5"), finalValue);
 
