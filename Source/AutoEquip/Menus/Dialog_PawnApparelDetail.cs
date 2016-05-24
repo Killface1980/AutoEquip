@@ -165,7 +165,7 @@ namespace AutoEquip
                     workvalueDisplay = 1 / value;
                     sumWorkStatsValue += workvalueDisplay;
                 }
-                else
+                else if (value>1)
                     sumWorkStatsValue += value;
 
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using RimWorld;
@@ -12,7 +13,7 @@ namespace AutoEquip
         private const float TopAreaHeight = 40f;
         private const float TopButtonHeight = 35f;
         private const float TopButtonWidth = 150f;
-        private static StatDef[] _sortedDefs;
+        private static StatDef[] _allDefs;
 
         private static ThingFilter _apparelGlobalFilter;
 
@@ -170,7 +171,7 @@ namespace AutoEquip
             Widgets.DrawMenuSection(rect, true);
             Text.Font = GameFont.Tiny;
             var num = rect.width - 2f;
-            var rect2 = new Rect(rect.x + 1f, rect.y + 1f, num/2f, 24f);
+            var rect2 = new Rect(rect.x + 1f, rect.y + 1f, num / 2f, 24f);
             if (Widgets.TextButton(rect2, "ClearAll".Translate(), true, false))
                 stats.Clear();
 
@@ -191,14 +192,14 @@ namespace AutoEquip
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.UpperLeft;
 
-            var position = new Rect(rect2.xMin + rect2.width/2, rect.yMin + 5f, 1f, rect.height - 10f);
+            var position = new Rect(rect2.xMin + rect2.width / 2, rect.yMin + 5f, 1f, rect.height - 10f);
             GUI.DrawTexture(position, BaseContent.GreyTex);
 
             rect.width -= 2;
             rect.height -= 2;
 
             var viewRect = new Rect(rect.xMin, rect.yMin, rect.width - 16f,
-                DefDatabase<StatDef>.AllDefs.Count()*Text.LineHeight*1.2f + stats.Count*60);
+                DefDatabase<StatDef>.AllDefs.Count() * Text.LineHeight * 1.2f + stats.Count * 60);
 
             Widgets.BeginScrollView(rect, ref scrollPosition, viewRect);
 
@@ -209,11 +210,39 @@ namespace AutoEquip
             var listingStandard = new Listing_Standard(rect6);
             listingStandard.OverrideColumnWidth = rect6.width;
 
-            if (_sortedDefs == null)
-                _sortedDefs =
-                    DefDatabase<StatDef>.AllDefs.OrderBy(i => i.category.LabelCap).ThenBy(i => i.LabelCap).ToArray();
+            List<StatDef> sortedDefs = new List<StatDef>();
 
-            foreach (var stat in _sortedDefs)
+            //   if (_sortedDefs == null)
+            //   { 
+            _allDefs = DefDatabase<StatDef>.AllDefs.OrderBy(i => i.category.defName).ThenBy(i => i.defName).ToArray();
+
+            foreach (var statDef in _allDefs)
+            {
+                if (!statDef.defName.Equals("LeatherAmount")
+                    || !statDef.defName.Equals("MeatAmount")
+                    || !statDef.defName.Equals("EatingSpeed")
+                    || !statDef.defName.Equals("MinimumHandlingSkill")
+                    )
+                {
+                    if (statDef.category.defName.Equals("Basics")
+                        || statDef.category.defName.Equals("BasicsPawn")
+                        || statDef.category.defName.Equals("Apparel")
+                        || statDef.category.defName.Equals("Weapon")
+                        || statDef.category.defName.Equals("PawnCombat")
+                        || statDef.category.defName.Equals("PawnSocial")
+                        || statDef.category.defName.Equals("PawnMisc")
+                        || statDef.category.defName.Equals("PawnWork") // check
+                        )
+                        sortedDefs.Add(statDef);
+
+
+                }
+                {
+                }
+            }
+
+            //   }
+            foreach (var stat in sortedDefs)
                 DrawStat(stats, listingStandard, stat);
 
             listingStandard.End();

@@ -150,34 +150,35 @@ namespace AutoEquip
         public float ApparelScoreRaw_PawnStats(Apparel ap)
         {
             float num = 0f;
-            //    float count = 0f;
 
             foreach (Saveable_Outfit_StatDef stat in Stats)
             {
                 try
                 {
                     var statValue = GetStatValue(ap, stat);
-                    var statStrength = stat.Strength;
+                    var strength = stat.Strength;
 
-                        if (statValue < 1 && statValue !=0)
-                        {
-                            statValue = 1 / statValue;  // inverts negative values and 1:x
-                            statStrength = statStrength * -1;
-                        }
 
-                        // check if 0, have problems with offsets
-                    if (statValue == 0 && statStrength < 0)
-                        num = statStrength/2 * -1;
-
-                    else if (statValue == 0 && statStrength > 0)
-                        num = statStrength / 2 * -1;
-
-                    else if (statValue <= 0.999f || statValue >= 1.001f)
+                    if (statValue < 1 && statValue != 0)
                     {
-                        num += statValue * statStrength;
+                        statValue = 1 / statValue;  // inverts negative values and 1:x
+                        strength = strength * -1;
                     }
 
+
+                    // if (strength < 0)
+                    //     num = strength / 2 * -1;
+                    
+                    //   else if (statValue == 0 && strength > 0)
+                    //       num = strength / 2 * -1;
+
+                    if (statValue <= 0.999f || statValue >= 1.001f)
+                    {
+                        num += statValue * strength;
+                    }
                 }
+
+
                 catch (Exception e)
                 {
                     throw new Exception("Error Calculation Stat: " + stat.StatDef, e);
@@ -209,7 +210,7 @@ namespace AutoEquip
                     //             workStatStrength = workStatStrength * -1;
                     //         }
 
-                    if (workStatValue < 1 && workStatValue != 0)
+                    if (workStatValue < 1)
                     {
                         workStatValue = 1 / workStatValue;  // inverts negative values and 1:x
                         workStatStrength = workStatStrength * -1;
@@ -354,16 +355,28 @@ namespace AutoEquip
 
         public float GetStatValue(Apparel apparel, Saveable_Outfit_StatDef stat)
         {
+
             float baseStat = apparel.GetStatValue(stat.StatDef, true);
             float currentStat = baseStat;
-            currentStat += apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat.StatDef);
+
+
+            if (stat.StatDef.defName.Equals("MentalBreakThreshold"))
+            {
+                currentStat = baseStat + apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat.StatDef);
+            }
+            else
+            {
+                currentStat *= (1 + apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat.StatDef));
+            }
 
             DoApparelScoreRaw_PawnStatsHandlers(_pawn, apparel, stat.StatDef, ref currentStat);
 
-            if (baseStat == 0)
-                return currentStat;
+            if (baseStat != 0)
+            {
+                currentStat = currentStat / baseStat;
+            }
 
-            return currentStat / baseStat;
+            return currentStat;
         }
 
         public float GetWorkStatValue(Apparel apparel, Saveable_Outfit_WorkStatDef workStat)
@@ -384,20 +397,20 @@ namespace AutoEquip
 
         #region [  OLD_CalculateApparelModifierRaw  ]
 
-  //    public float DIALOGONLY_ApparelModifierRaw(Apparel ap)
-  //    {
-  //        float baseStats = ApparelScoreRaw_PawnStats(ap);
-  //        float workStats = ApparelScoreRaw_PawnWorkStats(ap);
-  //        float modHit = ApparelScoreRawHitPointAdjust(ap);
-  //        float modCold = ApparelScoreRawInsulationColdAdjust(ap);
-  //
-  //        if ((modHit < 0) && (modCold < 0))
-  //            return modHit * modCold * -1;
-  //
-  //        return ((baseStats + workStats) / 2) * modHit * modCold;
-  //
-  //        //  return modHit * modCold;
-  //    }
+        //    public float DIALOGONLY_ApparelModifierRaw(Apparel ap)
+        //    {
+        //        float baseStats = ApparelScoreRaw_PawnStats(ap);
+        //        float workStats = ApparelScoreRaw_PawnWorkStats(ap);
+        //        float modHit = ApparelScoreRawHitPointAdjust(ap);
+        //        float modCold = ApparelScoreRawInsulationColdAdjust(ap);
+        //
+        //        if ((modHit < 0) && (modCold < 0))
+        //            return modHit * modCold * -1;
+        //
+        //        return ((baseStats + workStats) / 2) * modHit * modCold;
+        //
+        //        //  return modHit * modCold;
+        //    }
 
 
         public float ApparelScoreRawInsulationColdAdjust(Apparel ap)
