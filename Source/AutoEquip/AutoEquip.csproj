@@ -62,9 +62,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Saveables\Saveable_Outfit.cs" />
     <Compile Include="Saveables\Saveable_Outfit_StatDef.cs" />
-    <Compile Include="Saveables\Saveable_Outfit_WorkStatDef.cs" />
+    <Compile Include="Saveables\Saveable_Pawn_WorkStatDef.cs" />
     <Compile Include="Saveables\Saveable_Pawn.cs" />
-    <Compile Include="Saveables\Saveable_Pawn_StatDef.cs" />
     <Compile Include="Menus\Tab_Pawn_AutoEquip.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@ namespace AutoEquip
         // Exposed members
         public Pawn Pawn;
         public List<Saveable_Outfit_StatDef> Stats = new List<Saveable_Outfit_StatDef>();
-        public List<Saveable_Outfit_WorkStatDef> WorkStats = new List<Saveable_Outfit_WorkStatDef>();
+        public List<Saveable_Pawn_WorkStatDef> WorkStats = new List<Saveable_Pawn_WorkStatDef>();
 
         public List<Apparel> ToWearApparel = new List<Apparel>();
         public List<Apparel> ToDropApparel = new List<Apparel>();
@@ -45,7 +45,7 @@ namespace AutoEquip
 
                     if (index == -1)
                         calculatedStatDef.Add(stat);
-                    
+
                     else
                         calculatedStatDef[index] = stat;
                 }
@@ -54,10 +54,10 @@ namespace AutoEquip
             return calculatedStatDef.OrderByDescending(i => Math.Abs(i.Strength));
         }
 
-        public IEnumerable<Saveable_Outfit_WorkStatDef> NormalizeCalculedWorkStatDef()
+        public IEnumerable<Saveable_Pawn_WorkStatDef> NormalizeCalculedWorkStatDef()
         {
             Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(Pawn);
-            List<Saveable_Outfit_WorkStatDef> calculatedWorkStatDef = new List<Saveable_Outfit_WorkStatDef>(outfit.WorkStats);
+            List<Saveable_Pawn_WorkStatDef> calculatedWorkStatDef = new List<Saveable_Pawn_WorkStatDef>(outfit.WorkStats);
 
             if (outfit.AddWorkStats)
             {
@@ -73,7 +73,7 @@ namespace AutoEquip
                             priorityAdjust = 1f;
                             break;
                         case 2:
-                            priorityAdjust = 0.3f;
+                            priorityAdjust = 0.4f;
                             break;
                         case 3:
                             priorityAdjust = 0.2f;
@@ -84,40 +84,36 @@ namespace AutoEquip
                         default:
                             continue;
                     }
-                        Saveable_Outfit_WorkStatDef workstatdef = null;
 
-
+                    Saveable_Pawn_WorkStatDef workstatdef = null;
                     foreach (KeyValuePair<StatDef, float> workStat in PawnCalcForApparel.GetStatsOfWorkType(wType))
                     {
-
-                        foreach (Saveable_Outfit_WorkStatDef s in calculatedWorkStatDef)
+                        foreach (Saveable_Pawn_WorkStatDef saveablePawnWorkStatDef in calculatedWorkStatDef)
                         {
-                            if (s.StatDef == workStat.Key)
+                            if (saveablePawnWorkStatDef.StatDef == workStat.Key)
                             {
-                                workstatdef = s;
+                                workstatdef = saveablePawnWorkStatDef;
                                 break;
                             }
                         }
 
 
-                        if (workstatdef == null)
-                        {
-                                workstatdef = new Saveable_Outfit_WorkStatDef();
-                                workstatdef.StatDef = workStat.Key;
-                                workstatdef.Strength = workStat.Value * priorityAdjust;
-                                calculatedWorkStatDef.Add(workstatdef);
-                        }
-                        else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
-
-
-
+                        
+                 //     if (workstatdef == null)
+                 //     {
+                            workstatdef = new Saveable_Pawn_WorkStatDef();
+                            workstatdef.StatDef = workStat.Key;
+                            workstatdef.Strength = workStat.Value * priorityAdjust;
+                            calculatedWorkStatDef.Add(workstatdef);
+                 //   }
+                 //   else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
 
                     }
-
                 }
 
             }
             return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
+          //  return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
         }
 
     }

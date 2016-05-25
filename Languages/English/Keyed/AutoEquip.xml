@@ -8,6 +8,7 @@
   <AutoEquipHitPoints>Hit Points Modifier</AutoEquipHitPoints>
   <AutoEquipTemperature>Outdoor Temperature Modifier</AutoEquipTemperature>
   <AutoEquipTotal>Apparel Total Stat</AutoEquipTotal>
+  <AutoEquipArmor>Protection Score</AutoEquipArmor>
   <BasicStatusOfApparel>Basic Apparel Offset</BasicStatusOfApparel>
   <AutoEquipGlobalSelection>Global Selection</AutoEquipGlobalSelection>
   <AutoEquipAppendIndividualPawnStatus>Append Pawn Individual Status</AutoEquipAppendIndividualPawnStatus>

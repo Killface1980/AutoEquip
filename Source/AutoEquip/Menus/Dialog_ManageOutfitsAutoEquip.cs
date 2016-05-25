@@ -198,30 +198,17 @@ namespace AutoEquip
             rect.width -= 2;
             rect.height -= 2;
 
-            var viewRect = new Rect(rect.xMin, rect.yMin, rect.width - 16f,
-                DefDatabase<StatDef>.AllDefs.Count() * Text.LineHeight * 1.2f + stats.Count * 60);
-
-            Widgets.BeginScrollView(rect, ref scrollPosition, viewRect);
-
-            var rect6 = viewRect.ContractedBy(4f);
-
-            rect6.yMin += 12f;
-
-            var listingStandard = new Listing_Standard(rect6);
-            listingStandard.OverrideColumnWidth = rect6.width;
-
             List<StatDef> sortedDefs = new List<StatDef>();
 
-            //   if (_sortedDefs == null)
-            //   { 
-            _allDefs = DefDatabase<StatDef>.AllDefs.OrderBy(i => i.category.defName).ThenBy(i => i.defName).ToArray();
+            _allDefs = DefDatabase<StatDef>.AllDefs.OrderBy(i => i.defName).ThenBy(i => i.category.defName).ToArray();
+//            _allDefs = DefDatabase<StatDef>.AllDefs.OrderBy(i => i.category.defName).ThenBy(i => i.defName).ToArray();
 
-            foreach (var statDef in _allDefs)
+            foreach (StatDef statDef in _allDefs)
             {
                 if (!statDef.defName.Equals("LeatherAmount")
-                    || !statDef.defName.Equals("MeatAmount")
-                    || !statDef.defName.Equals("EatingSpeed")
-                    || !statDef.defName.Equals("MinimumHandlingSkill")
+                    && !statDef.defName.Equals("MeatAmount")
+                    && !statDef.defName.Equals("EatingSpeed")
+                    && !statDef.defName.Equals("MinimumHandlingSkill")
                     )
                 {
                     if (statDef.category.defName.Equals("Basics")
@@ -234,14 +221,24 @@ namespace AutoEquip
                         || statDef.category.defName.Equals("PawnWork") // check
                         )
                         sortedDefs.Add(statDef);
-
-
                 }
-                {
-                }
+
             }
 
-            //   }
+            var viewRect = new Rect(rect.xMin, rect.yMin, rect.width - 16f,
+                sortedDefs.Count * Text.LineHeight * 1.2f + stats.Count * 60);
+
+            Widgets.BeginScrollView(rect, ref scrollPosition, viewRect);
+
+            var rect6 = viewRect.ContractedBy(4f);
+
+            rect6.yMin += 12f;
+
+            var listingStandard = new Listing_Standard(rect6);
+            listingStandard.OverrideColumnWidth = rect6.width;
+
+
+
             foreach (var stat in sortedDefs)
                 DrawStat(stats, listingStandard, stat);
 

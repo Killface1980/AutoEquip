@@ -61,8 +61,8 @@ namespace AutoEquip
             groupRect.height -= 60f; // test
 
             Saveable_Outfit_StatDef[] stats = conf.Stats.ToArray();
-            Saveable_Outfit_WorkStatDef[] workstats = conf.WorkStats.ToArray();
-            List<Saveable_Outfit_WorkStatDef> filteredworkstats = new List<Saveable_Outfit_WorkStatDef>();
+            Saveable_Pawn_WorkStatDef[] workstats = conf.WorkStats.ToArray();
+            List<Saveable_Pawn_WorkStatDef> filteredworkstats = new List<Saveable_Pawn_WorkStatDef>();
 
             foreach (var workstat in workstats)
             {
@@ -144,7 +144,7 @@ namespace AutoEquip
             }
 
 
-            foreach (Saveable_Outfit_WorkStatDef workstat in filteredworkstats)
+            foreach (Saveable_Pawn_WorkStatDef workstat in filteredworkstats)
             {
                 itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, Text.LineHeight * 1.2f);
                 if (Mouse.IsOver(itemRect))
@@ -163,16 +163,14 @@ namespace AutoEquip
                 {
                     workstatStrengthDialog = workstatStrengthDialog * -1;
                     workvalueDisplay = 1 / value;
-                    sumWorkStatsValue += workvalueDisplay;
+            //        sumWorkStatsValue += workvalueDisplay;
                 }
-                else if (value>1)
+           //     else if (value>1)
                     sumWorkStatsValue += value;
 
 
                 if (value <= 0.999f || value >= 1.001f)
                 {
-                    sumWorkStatsValue += value;
-
                     DrawLine(ref itemRect,
                         workstat.StatDef.label, labelWidth,
                         value.ToString("N3"), baseValue,
@@ -216,7 +214,7 @@ namespace AutoEquip
                 "BasicStatusOfApparel".Translate(), labelWidth,
                 "1.000", baseValue,
                 "", multiplierWidth,
-                subtotal.ToString("N5"), finalValue);
+                "1.000", finalValue);
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
 
@@ -246,8 +244,19 @@ namespace AutoEquip
                 itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             }
 
+            float armor = conf.ApparelScoreRaw_ProtectionBaseStat(_apparel)*0.25f;
+
+            subtotal += armor;
+
+            DrawLine(ref itemRect,
+                "AutoEquipArmor".Translate(), labelWidth,
+                "+", baseValue,
+                armor.ToString("N4"), multiplierWidth,
+                subtotal.ToString("N5"), finalValue);
+
             subtotal = subtotal * conf.ApparelScoreRawHitPointAdjust(_apparel);
 
+            itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipHitPoints".Translate(), labelWidth,
                 conf.ApparelScoreRawHitPointAdjust(_apparel).ToString("N3"), baseValue,

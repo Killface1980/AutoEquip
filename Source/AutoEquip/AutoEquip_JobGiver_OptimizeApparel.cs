@@ -32,6 +32,34 @@ namespace AutoEquip
 
             SaveablePawn configuration = MapComponent_AutoEquip.Get.GetCache(pawn);
 
+            #region [  Wear Apparel  ]
+
+            if (configuration.ToWearApparel.Count > 0)
+            {
+                List<Thing> listToWear = Find.ListerThings.ThingsInGroup(ThingRequestGroup.Apparel);
+                if (listToWear.Count > 0)
+                {
+                    foreach (var thing in listToWear)
+                    {
+                        var ap = (Apparel)thing;
+                        if (!configuration.ToWearApparel.Contains(ap)) continue;
+                        if (Find.SlotGroupManager.SlotGroupAt(thing.Position) == null) continue;
+                        if (thing.IsForbidden(pawn)) continue;
+                        if (!ApparelUtility.HasPartsToWear(pawn, thing.def)) continue;
+
+                  //      if (!ap.IsInValidStorage()) continue;
+                        if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
+                        //                                if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
+                        {
+
+                            configuration.ToWearApparel.Remove(ap);
+                            return new Job(JobDefOf.Wear, ap);
+                        }
+                    }
+                }
+            }
+
+            #endregion
 
             #region [  Drops unequiped  ]
 
@@ -63,34 +91,6 @@ namespace AutoEquip
 
             #endregion
 
-            #region [  Wear Apparel  ]
-
-            if (configuration.ToWearApparel.Count > 0)
-            {
-                List<Thing> listToWear = Find.ListerThings.ThingsInGroup(ThingRequestGroup.Apparel);
-                if (listToWear.Count > 0)
-                {
-                    foreach (var thing in listToWear)
-                    {
-                        var ap = (Apparel)thing;
-                        if (!configuration.ToWearApparel.Contains(ap)) continue;
-                        if (Find.SlotGroupManager.SlotGroupAt(thing.Position) == null) continue;
-                        if (thing.IsForbidden(pawn)) continue;
-                        if (!ApparelUtility.HasPartsToWear(pawn, thing.def)) continue;
-
-                  //      if (!ap.IsInValidStorage()) continue;
-                        if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
-                        //                                if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
-                        {
-
-                            configuration.ToWearApparel.Remove(ap);
-                            return new Job(JobDefOf.Wear, ap);
-                        }
-                    }
-                }
-            }
-
-            #endregion
 
 
             pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 350;
