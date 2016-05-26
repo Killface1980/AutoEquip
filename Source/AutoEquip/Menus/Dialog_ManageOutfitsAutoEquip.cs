@@ -200,7 +200,7 @@ namespace AutoEquip
 
             List<StatDef> sortedDefs = new List<StatDef>();
 
-            _allDefs = DefDatabase<StatDef>.AllDefs.OrderBy(i => i.defName).ThenBy(i => i.category.defName).ToArray();
+            _allDefs = DefDatabase<StatDef>.AllDefs.OrderBy(i => i.label.ToString()).ThenBy(i => i.category.defName).ToArray();
 //            _allDefs = DefDatabase<StatDef>.AllDefs.OrderBy(i => i.category.defName).ThenBy(i => i.defName).ToArray();
 
             foreach (StatDef statDef in _allDefs)

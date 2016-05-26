@@ -9,6 +9,8 @@ namespace AutoEquip
 {
     public class ITab_Pawn_AutoEquip : ITab
     {
+        #region Fields
+
         private const float TopPadding = 20f;
         private const float ThingIconSize = 28f;
         private const float ThingRowHeight = 28f;
@@ -24,6 +26,22 @@ namespace AutoEquip
         public static readonly Color HighlightColor = new Color(0.5f, 0.5f, 0.5f, 1f);
 
         public override bool IsVisible { get { return SelPawnForGear.RaceProps.ToolUser; } }
+
+
+        #endregion Fields
+
+        #region Constructors
+
+            public ITab_Pawn_AutoEquip()
+        {
+            size = new Vector2(540f, 550f);
+            labelKey = "TabGear";
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
         private bool CanEdit { get { return SelPawnForGear.IsColonistPlayerControlled; } }
 
         private Pawn SelPawnForGear
@@ -43,11 +61,10 @@ namespace AutoEquip
             }
         }
 
-        public ITab_Pawn_AutoEquip()
-        {
-            size = new Vector2(540f, 550f);
-            labelKey = "TabGear";
-        }
+        #endregion Properties
+
+        #region Methods
+
 
         protected override void FillTab()
         {
@@ -271,5 +288,6 @@ namespace AutoEquip
             Widgets.Label(rect2, text);
             y += 28f;
         }
+        #endregion Methods
     }
 }

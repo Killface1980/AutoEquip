@@ -64,7 +64,7 @@
     <Compile Include="Saveables\Saveable_Outfit_StatDef.cs" />
     <Compile Include="Saveables\Saveable_Pawn_WorkStatDef.cs" />
     <Compile Include="Saveables\Saveable_Pawn.cs" />
-    <Compile Include="Menus\Tab_Pawn_AutoEquip.cs" />
+    <Compile Include="Menus\ITab_Inventory_AutoEquip.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\Defs\MainTabDefs\MainTabs.xml">

@@ -5,6 +5,7 @@ using Verse;
 namespace AutoEquip
 {
     public class Dialog_ManagePawnOutfit : Window
+//    public class Dialog_ManagePawnOutfit : Window
     {
         private readonly List<Saveable_Outfit_StatDef> _stats;
         private Vector2 _scrollPositionStats;

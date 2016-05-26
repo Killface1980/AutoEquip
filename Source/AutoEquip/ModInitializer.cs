@@ -61,7 +61,10 @@ namespace AutoEquip
             if (!CommunityCoreLibrary.Detours.TryDetourFromTo(coreMethod, autoEquipMethod))
                 Log.Error("Could not Detour AutoEquip.");
 
+
+
             OnLevelWasLoaded(-1);            
         }
     }
+
 }
