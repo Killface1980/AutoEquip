@@ -50,6 +50,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Outfitter adapted\ApparelStatCache.cs" />
     <Compile Include="Menus\Dialog_ManageOutfitsAutoEquip.cs" />
     <Compile Include="AutoEquip_JobGiver_OptimizeApparel.cs" />
     <Compile Include="Menus\Dialog_ManagePawnOutfit.cs" />
@@ -58,6 +59,8 @@
     <Compile Include="Menus\MainTabWindow_AssignAutoEquip.cs" />
     <Compile Include="MapComponent_AutoEquip.cs" />
     <Compile Include="ModInitializer.cs" />
+    <Compile Include="Outfitter adapted\ApparelStatsHelper.cs" />
+    <Compile Include="Outfitter adapted\FloatRange.cs" />
     <Compile Include="PawnCalcForApparel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Saveables\Saveable_Outfit.cs" />

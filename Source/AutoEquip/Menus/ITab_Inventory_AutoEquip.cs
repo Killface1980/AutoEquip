@@ -27,12 +27,15 @@ namespace AutoEquip
 
         public override bool IsVisible { get { return SelPawnForGear.RaceProps.ToolUser; } }
 
+        public static Texture2D resetButton = ContentFinder<Texture2D>.Get("reset"),
+                        deleteButton = ContentFinder<Texture2D>.Get("delete"),
+                        addButton = ContentFinder<Texture2D>.Get("add");
 
         #endregion Fields
 
         #region Constructors
 
-            public ITab_Pawn_AutoEquip()
+        public ITab_Pawn_AutoEquip()
         {
             size = new Vector2(540f, 550f);
             labelKey = "TabGear";
@@ -85,6 +88,8 @@ namespace AutoEquip
             Rect rect = new Rect(0f, 20f, size.x, size.y - 20f);
             Rect rect2 = rect.ContractedBy(10f);
             Rect position = new Rect(rect2.x, rect2.y, rect2.width, rect2.height);
+
+
             GUI.BeginGroup(position);
             Text.Font = GameFont.Small;
             GUI.color = Color.white;
@@ -114,8 +119,69 @@ namespace AutoEquip
                     Find.WindowStack.Add(new Dialog_ManagePawnOutfit(pawnSave.Stats));
                 }
 
-                outRect.yMin += rect3.height + 4f;
+                #region Temperatures Slider
+
+                // main canvas
+                Rect canvas = new Rect(rect3.xMax + 4f, outRect.yMin + 45f, size.x, size.y).ContractedBy(20f);
+                Vector2 cur = Vector2.zero;
+                cur.y += 45f;
+
+                // header
+                Rect tempHeaderRect = new Rect(cur.x, cur.y, canvas.width, 30f);
+                cur.y += 30f;
+                Text.Anchor = TextAnchor.LowerLeft;
+                Widgets.Label(tempHeaderRect, "PreferedTemperature".Translate());
+                Text.Anchor = TextAnchor.UpperLeft;
+
+                // line
+                GUI.color = Color.grey;
+                Widgets.DrawLineHorizontal(cur.x, cur.y, canvas.width);
+                GUI.color = Color.white;
+
+                // some padding
+                cur.y += 10f;
+
+                // temperature slider
+                ApparelStatCache pawnStatCache = SelPawn.GetApparelStatCache();
+                FloatRange targetTemps = pawnStatCache.TargetTemperatures;
+                FloatRange minMaxTemps = ApparelStatsHelper.MinMaxTemperatureRange;
+
+                Rect sliderRect = new Rect(cur.x, cur.y, canvas.width - 20f, 40f);
+
+                Rect tempResetRect = new Rect(sliderRect.xMax + 4f, cur.y + 10f, 16f, 16f);
+                cur.y += 60f; // includes padding 
+
+                // current temperature settings
+                GUI.color = pawnStatCache.targetTemperaturesOverride ? Color.white : Color.grey;
+                Widgets_FloatRange.FloatRange(sliderRect, 123123123, ref targetTemps, minMaxTemps, ToStringStyle.Temperature);
+                GUI.color = Color.white;
+
+                if (Math.Abs(targetTemps.min - SelPawn.GetApparelStatCache().TargetTemperatures.min) > 1e-4 ||
+                     Math.Abs(targetTemps.max - SelPawn.GetApparelStatCache().TargetTemperatures.max) > 1e-4)
+                {
+                    SelPawn.GetApparelStatCache().TargetTemperatures = targetTemps;
+                }
+
+                if (pawnStatCache.targetTemperaturesOverride)
+                {
+                    if (Widgets.ImageButton(tempResetRect, resetButton))
+                    {
+                        pawnStatCache.targetTemperaturesOverride = false;
+                        pawnStatCache.UpdateTemperatureIfNecessary(true);
+                    }
+                    TooltipHandler.TipRegion(tempResetRect, "TemperatureRangeReset".Translate());
+                }
+
+
+
+
+
+                #endregion Temperatures Slider
+
+
+                outRect.yMin += rect3.height + 4f + cur.y;
             }
+            Text.Font = GameFont.Small;
 
             Rect viewRect = new Rect(0f, 0f, position.width - 16f, scrollViewHeight);
             Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
