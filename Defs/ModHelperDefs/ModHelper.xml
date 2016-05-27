@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <ModHelperDef>
+        <defName>AutoEquip</defName>
+        <ModName>AutoEquipA13</ModName>
+      <minCCLversion>0.13.2</minCCLversion>
+    </ModHelperDef>
+</Defs>

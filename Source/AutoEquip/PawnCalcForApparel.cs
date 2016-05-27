@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CommunityCoreLibrary;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace AutoEquip
@@ -437,33 +438,39 @@ namespace AutoEquip
 
         public float ApparelScoreRawInsulationColdAdjust(Apparel ap)
         {
-            switch (_neededWarmth)
-            {
-                case NeededWarmth.Warm:
-                    {
-                        float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Cold, null);
-                        return PawnCalcForApparel.InsulationColdScoreFactorCurve_NeedWarm.Evaluate(statValueAbstract);
-                    }
-                case NeededWarmth.Cool:
-                    {
-                        float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Heat, null);
-                        return PawnCalcForApparel.InsulationWarmScoreFactorCurve_NeedCold.Evaluate(statValueAbstract);
-                    }
-                default:
-                    return 1;
-            }
+       //   switch (_neededWarmth)
+       //   {
+       //       case NeededWarmth.Warm:
+       //           {
+       //               float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Cold, null);
+       //               return PawnCalcForApparel.InsulationColdScoreFactorCurve_NeedWarm.Evaluate(statValueAbstract);
+       //           }
+       //       case NeededWarmth.Cool:
+       //           {
+       //               float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Heat, null);
+       //               return PawnCalcForApparel.InsulationWarmScoreFactorCurve_NeedCold.Evaluate(statValueAbstract);
+       //           }
+       //       default:
+       //           return 1;
+       //   }
 
 
 
-            float score = 1;
+            float score = 0;
             // temperature
+            ApparelStatCache pawnStatCache = _pawn.GetApparelStatCache();
+
             FloatRange targetTemperatures = _pawn.GetApparelStatCache().TargetTemperatures;
-            float minComfyTemperature = _pawn.GetStatValue(StatDefOf.ComfyTemperatureMin);
-            float maxComfyTemperature = _pawn.GetStatValue(StatDefOf.ComfyTemperatureMax);
+            FloatRange pawnTemperatures = pawnStatCache.PawnTemperatures;
+
+            float minComfyTemperature = pawnTemperatures.min;
+            float maxComfyTemperature = pawnTemperatures.max;
+//            float minComfyTemperature = _pawn.GetStatValue(StatDefOf.ComfyTemperatureMin);
+//            float maxComfyTemperature = _pawn.GetStatValue(StatDefOf.ComfyTemperatureMax);
 
             // offsets on apparel
-            float insulationCold = _pawn.GetStatValue(StatDefOf.Insulation_Cold);
-            float insulationHeat = _pawn.GetStatValue(StatDefOf.Insulation_Heat);
+            float insulationCold = ap.GetStatValue(StatDefOf.Insulation_Cold);
+            float insulationHeat = ap.GetStatValue(StatDefOf.Insulation_Heat);
 
             // if this gear is currently worn, we need to make sure the contribution to the pawn's comfy temps is removed so the gear is properly scored
             if (_pawn.apparel.WornApparel.Contains(ap))
@@ -471,6 +478,7 @@ namespace AutoEquip
                 minComfyTemperature -= insulationCold;
                 maxComfyTemperature -= insulationHeat;
             }
+
 
             // now for the interesting bit.
             float temperatureScoreOffset = 0f;
@@ -493,6 +501,9 @@ namespace AutoEquip
                 }
             }
 
+     //       Log.Message("neededInsulationCold:  " + neededInsulationCold + "  insulationCold:  " + insulationCold + "  tempWeight:  " + tempWeight);
+
+
             // currently too warm
             if (neededInsulationWarmth > 0)
             {
@@ -507,7 +518,7 @@ namespace AutoEquip
                     temperatureScoreOffset += -(neededInsulationWarmth - insulationHeat) * tempWeight;
                 }
             }
-            score *= temperatureScoreOffset/10f;
+            score = 1 + temperatureScoreOffset/20f;
             return score;
 
 

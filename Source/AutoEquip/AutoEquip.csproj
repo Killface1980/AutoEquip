@@ -50,6 +50,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="CCL_Injectors.cs" />
     <Compile Include="Outfitter adapted\ApparelStatCache.cs" />
     <Compile Include="Menus\Dialog_ManageOutfitsAutoEquip.cs" />
     <Compile Include="AutoEquip_JobGiver_OptimizeApparel.cs" />
@@ -70,8 +71,8 @@
     <Compile Include="Menus\ITab_Inventory_AutoEquip.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\Defs\MainTabDefs\MainTabs.xml">
-      <Link>MainTabs.xml</Link>
+    <Content Include="..\..\Defs\ModHelperDefs\ModHelper.xml">
+      <Link>ModHelper.xml</Link>
     </Content>
     <Content Include="..\..\Defs\ThingDefs\Initializer.xml">
       <Link>Initializer.xml</Link>

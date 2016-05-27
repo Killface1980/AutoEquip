@@ -68,7 +68,6 @@ namespace AutoEquip
 
         #region Methods
 
-
         protected override void FillTab()
         {
             SaveablePawn pawnSave;
@@ -149,10 +148,16 @@ namespace AutoEquip
                 Rect sliderRect = new Rect(cur.x, cur.y, canvas.width - 20f, 40f);
 
                 Rect tempResetRect = new Rect(sliderRect.xMax + 4f, cur.y + 10f, 16f, 16f);
-                cur.y += 60f; // includes padding 
+                cur.y += 20f; // includes padding 
 
                 // current temperature settings
-                GUI.color = pawnStatCache.TargetTemperaturesOverride ? Color.white : Color.grey;
+                if (pawnStatCache.TargetTemperaturesOverride)
+                {
+                    GUI.color = Color.white;
+                }
+                
+                else GUI.color = Color.grey;
+                
                 Widgets_FloatRange.FloatRange(sliderRect, 123123123, ref targetTemps, minMaxTemps, ToStringStyle.Temperature);
                 GUI.color = Color.white;
 

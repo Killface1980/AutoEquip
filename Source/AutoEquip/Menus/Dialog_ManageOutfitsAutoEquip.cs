@@ -130,6 +130,18 @@ namespace AutoEquip
             var rect5 = new Rect(0f, 0f, 200f, 30f);
             DoNameInputRect(rect5, ref SelectedOutfit.label, 30);
             var rect6 = new Rect(0f, 40f, rect4.width, rect4.height - 45f - 10f);
+
+            // fix for the filter
+
+            if (_apparelGlobalFilter == null)
+            {
+                _apparelGlobalFilter = new ThingFilter();
+                _apparelGlobalFilter.SetAllow(ThingCategoryDefOf.Apparel, true);
+            }
+
+            //
+
+
             ThingFilterUI.DoThingFilterConfigWindow(rect6, ref _scrollPosition, SelectedOutfit.filter,
                 _apparelGlobalFilter, 16);
             GUI.EndGroup();
@@ -165,7 +177,7 @@ namespace AutoEquip
                 name = text;
             }
         }
-
+ 
         public static void DoStatsInput(Rect rect, ref Vector2 scrollPosition, List<Saveable_Outfit_StatDef> stats)
         {
             Widgets.DrawMenuSection(rect, true);

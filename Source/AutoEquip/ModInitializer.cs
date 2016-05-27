@@ -7,6 +7,7 @@ using Verse;
 
 namespace AutoEquip
 {
+
     public class ModInitializer : ITab
     {
         protected GameObject _modInitializerControllerObject;
@@ -58,8 +59,10 @@ namespace AutoEquip
         {
             MethodInfo coreMethod = typeof(JobGiver_OptimizeApparel).GetMethod("TryGiveTerminalJob", BindingFlags.Instance | BindingFlags.NonPublic);
             MethodInfo autoEquipMethod = typeof(AutoEquip_JobGiver_OptimizeApparel).GetMethod("TryGiveTerminalJob", BindingFlags.Instance | BindingFlags.NonPublic);
-
-
+      
+            MethodInfo coreDialogManageOutfits = typeof(Dialog_ManageOutfits).GetMethod("DoWindowContents", BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo autoEquipDialogManageOutfits = typeof(Dialog_ManageOutfitsAutoEquip).GetMethod("DoWindowContents", BindingFlags.Instance | BindingFlags.Public);
+      
             try
             {
                 Detours.TryDetourFromTo(coreMethod, autoEquipMethod);
@@ -69,22 +72,9 @@ namespace AutoEquip
                 Log.Error("Could not Detour AutoEquip.");
                 throw;
             }
-            MethodInfo coreDialogManageOutfits = typeof(Dialog_ManageOutfits).GetMethod("DoWindowContents", BindingFlags.Instance | BindingFlags.Public);
-            MethodInfo autoEquipDialogManageOutfits = typeof(Dialog_ManageOutfitsAutoEquip).GetMethod("DoWindowContents", BindingFlags.Instance | BindingFlags.Public);
-
-            try
-            {
-                Detours.TryDetourFromTo(coreDialogManageOutfits, autoEquipDialogManageOutfits);
-            }
-            catch (Exception)
-            {
-                Log.Error("Could not Detour AutoEquip Outfit Window.");
-                throw;
-            }
-
-
-
-
+      
+            Detours.TryDetourFromTo(coreDialogManageOutfits, autoEquipDialogManageOutfits);
+      
             OnLevelWasLoaded(-1);
         }
     }

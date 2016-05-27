@@ -51,7 +51,6 @@ namespace AutoEquip
             set
             {
                 _pawnCalcTemperatures = value;
-                TargetTemperaturesOverride = true;
             }
 
         }
@@ -66,7 +65,6 @@ namespace AutoEquip
             set
             {
                 _pawnTemperatures = value;
-                TargetTemperaturesOverride = true;
             }
 
         }
@@ -102,8 +100,10 @@ namespace AutoEquip
             _pawnTemperatures = PawnTemperatures;
             _mapTemperatures = MapTemperatures;
             _pawnCalcTemperatures = PawnCalcTemperatures;
+            _targetTemperatures = TargetTemperatures;
             //   _lastStatUpdate = -5000;
             _lastTempUpdate = -5000;
+
         }
 
         public void UpdateTemperatureIfNecessary(bool force = false)
@@ -111,30 +111,30 @@ namespace AutoEquip
             if (Find.TickManager.TicksGame - _lastTempUpdate > 1900 || force)
             {
                 // get desired temperatures
-                if (!TargetTemperaturesOverride)
-                {
-                    var pawnBaseTempMin = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null)-5f;
-                    var pawnBaseTempMax = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMax, null)+5f;
+          //    if (!TargetTemperaturesOverride)
+          //    {
+          //        var pawnBaseTempMin = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null)-5f;
+          //        var pawnBaseTempMax = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMax, null)+5f;
 
 
                     var baseTemperatureMonth = GenTemperature.AverageTemperatureAtWorldCoordsForMonth(Find.Map.WorldCoords,
                         GenDate.CurrentMonth);
 
-              //    var min_basetemp = baseTemperatureMonth - 15f;
-              //    var max_basetemp = baseTemperatureMonth + 15f;
-              //
-              //    if (Find.MapConditionManager.ActiveConditions.OfType<MapCondition_HeatWave>().Any())
-              //    {
-              //        min_basetemp += 20f;
-              //        max_basetemp += 20f;
-              //    }
-              //
-              //    if (Find.MapConditionManager.ActiveConditions.OfType<MapCondition_ColdSnap>().Any())
-              //    {
-              //        min_basetemp -= 20f;
-              //        max_basetemp -= 20f;
-              //    }
-              //
+                  var min_basetemp = baseTemperatureMonth - 15f;
+                  var max_basetemp = baseTemperatureMonth + 15f;
+              
+                  if (Find.MapConditionManager.ActiveConditions.OfType<MapCondition_HeatWave>().Any())
+                  {
+                      min_basetemp += 20f;
+                      max_basetemp += 20f;
+                  }
+              
+                  if (Find.MapConditionManager.ActiveConditions.OfType<MapCondition_ColdSnap>().Any())
+                  {
+                      min_basetemp -= 20f;
+                      max_basetemp -= 20f;
+                  }
+              
               //    var calcMinTemp = Math.Min(pawnBaseTempMin, min_basetemp);
               //    var calcMaxTemp = Math.Max(pawnBaseTempMax, max_basetemp);
               //
@@ -149,13 +149,13 @@ namespace AutoEquip
 
                     if (!TargetTemperaturesOverride)
                     {
-                        _targetTemperatures = new FloatRange(Math.Max(baseTemperatureMonth - 15f, ApparelStatsHelper.MinMaxTemperatureRange.min),
-                                                              Math.Min(baseTemperatureMonth + 10f, ApparelStatsHelper.MinMaxTemperatureRange.max));
+                        _targetTemperatures = new FloatRange(Math.Max(min_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.min),
+                                                              Math.Min(max_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.max));
                     }
 
                     //_pawnCalcTemperatures = new FloatRange(Math.Max(pawnBaseTempMin, ApparelStatsHelper.MinMaxTemperatureRange.min),
                     //                                       Math.Min(pawnBaseTempMax, ApparelStatsHelper.MinMaxTemperatureRange.max));
-                }
+               // }
             }
         }
     }

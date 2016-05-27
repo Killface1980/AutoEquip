@@ -16,7 +16,7 @@ namespace AutoEquip
     {
         private static readonly Dictionary<Pawn, ApparelStatCache> PawnApparelStatCaches = new Dictionary<Pawn, ApparelStatCache>();
 
-        public static FloatRange MinMaxTemperatureRange => new FloatRange(-60, 100);
+        public static FloatRange MinMaxTemperatureRange => new FloatRange(-80, 80);
 //        public static FloatRange MinMaxTemperatureRange => new FloatRange(-100, 100);
 
         public static ApparelStatCache GetApparelStatCache(this Pawn pawn)
