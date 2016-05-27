@@ -148,7 +148,7 @@ namespace AutoEquip
                 Rect sliderRect = new Rect(cur.x, cur.y, canvas.width - 20f, 40f);
 
                 Rect tempResetRect = new Rect(sliderRect.xMax + 4f, cur.y + 10f, 16f, 16f);
-                cur.y += 20f; // includes padding 
+                cur.y += 5f; // includes padding 
 
                 // current temperature settings
                 if (pawnStatCache.TargetTemperaturesOverride)
