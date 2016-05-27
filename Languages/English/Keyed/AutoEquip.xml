@@ -11,6 +11,8 @@
   <AutoEquipArmor>Protection Score</AutoEquipArmor>
   <BasicStatusOfApparel>Basic Apparel Offset</BasicStatusOfApparel>
   <AutoEquipGlobalSelection>Global Selection</AutoEquipGlobalSelection>
-  <AutoEquipAppendIndividualPawnStatus>Append Pawn Individual Status</AutoEquipAppendIndividualPawnStatus>
+  <AppendIndividualStats>Append Individual Status</AppendIndividualStats>
   <AutoEquipStatus>Status...</AutoEquipStatus>
+  <AutoEquipTab>AutoEquip</AutoEquipTab>
+  <PreferedTemperature>Prefered Temperature</PreferedTemperature>
 </LanguageData>

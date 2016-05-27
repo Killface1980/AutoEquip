@@ -139,14 +139,14 @@ namespace AutoEquip
             rect4 = new Rect(300f, 40f, inRect.width - 300f, inRect.height - 40f - CloseButSize.y).ContractedBy(10f);
             GUI.BeginGroup(rect4);
 
-            saveout.AddWorkStats = GUI.Toggle(new Rect(000f, 00f, rect4.width, 20f), saveout.AddWorkStats,
+            saveout.AddWorkStats = GUI.Toggle(new Rect(000f, 00f, rect4.width/2, 20f), saveout.AddWorkStats,
                 "AddWorkingStats".Translate());
 
-            saveout.AppendIndividualPawnStatus = GUI.Toggle(new Rect(000f, 20f, rect4.width, 20f),
+            saveout.AppendIndividualPawnStatus = GUI.Toggle(new Rect(rect4.width / 2, 00f, rect4.width/2, 20f),
                 saveout.AppendIndividualPawnStatus, "AppendIndividualStats".Translate());
 
 
-            rect6 = new Rect(0f, 60f, rect4.width, rect4.height - 45f - 10f);
+            rect6 = new Rect(0f, 40f, rect4.width, rect4.height - 45f - 10f);
             DoStatsInput(rect6, ref _scrollPositionStats, saveout.Stats);
             GUI.EndGroup();
         }

@@ -119,6 +119,7 @@ namespace AutoEquip
         private void InjectTab(ThingDef thingDef)
         {
             Debug.Log("Inject Tab");
+
             if (thingDef.inspectorTabsResolved == null)
             {
                 thingDef.inspectorTabsResolved = new List<ITab>();
