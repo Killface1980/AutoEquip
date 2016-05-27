@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using CommunityCoreLibrary;
 using RimWorld;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace AutoEquip
                 _reinjectTime = 1;
             else
                 _reinjectTime = 0;
-        }        
+        }
 
         public void FixedUpdate()
         {
@@ -58,12 +59,33 @@ namespace AutoEquip
             MethodInfo coreMethod = typeof(JobGiver_OptimizeApparel).GetMethod("TryGiveTerminalJob", BindingFlags.Instance | BindingFlags.NonPublic);
             MethodInfo autoEquipMethod = typeof(AutoEquip_JobGiver_OptimizeApparel).GetMethod("TryGiveTerminalJob", BindingFlags.Instance | BindingFlags.NonPublic);
 
-            if (!CommunityCoreLibrary.Detours.TryDetourFromTo(coreMethod, autoEquipMethod))
+
+            try
+            {
+                Detours.TryDetourFromTo(coreMethod, autoEquipMethod);
+            }
+            catch (Exception)
+            {
                 Log.Error("Could not Detour AutoEquip.");
+                throw;
+            }
+            MethodInfo coreDialogManageOutfits = typeof(Dialog_ManageOutfits).GetMethod("DoWindowContents", BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo autoEquipDialogManageOutfits = typeof(Dialog_ManageOutfitsAutoEquip).GetMethod("DoWindowContents", BindingFlags.Instance | BindingFlags.Public);
+
+            try
+            {
+                Detours.TryDetourFromTo(coreDialogManageOutfits, autoEquipDialogManageOutfits);
+            }
+            catch (Exception)
+            {
+                Log.Error("Could not Detour AutoEquip Outfit Window.");
+                throw;
+            }
 
 
 
-            OnLevelWasLoaded(-1);            
+
+            OnLevelWasLoaded(-1);
         }
     }
 

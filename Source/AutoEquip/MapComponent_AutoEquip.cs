@@ -62,8 +62,8 @@ namespace AutoEquip
 
             Saveable_Outfit ret = new Saveable_Outfit();
             ret.Outfit = outfit;
-            ret.Stats.Add(new Saveable_Outfit_StatDef { StatDef = StatDefOf.ArmorRating_Sharp, Strength = 1.00f });
-            ret.Stats.Add(new Saveable_Outfit_StatDef { StatDef = StatDefOf.ArmorRating_Blunt, Strength = 0.75f });
+            ret.Stats.Add(new Saveable_Outfit_StatDef { StatDef = StatDefOf.ArmorRating_Sharp, Strength = 0.5f });
+            ret.Stats.Add(new Saveable_Outfit_StatDef { StatDef = StatDefOf.ArmorRating_Blunt, Strength = 0.5f });
 
             OutfitCache.Add(ret);
 

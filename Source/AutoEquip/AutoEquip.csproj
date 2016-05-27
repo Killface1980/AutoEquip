@@ -56,7 +56,7 @@
     <Compile Include="Menus\Dialog_ManagePawnOutfit.cs" />
     <Compile Include="Menus\Dialog_PawnApparelComparer.cs" />
     <Compile Include="Menus\Dialog_PawnApparelDetail.cs" />
-    <Compile Include="Menus\MainTabWindow_AssignAutoEquip.cs" />
+    <None Include="Menus\MainTabWindow_AssignAutoEquip.cs" />
     <Compile Include="MapComponent_AutoEquip.cs" />
     <Compile Include="ModInitializer.cs" />
     <Compile Include="Outfitter adapted\ApparelStatsHelper.cs" />

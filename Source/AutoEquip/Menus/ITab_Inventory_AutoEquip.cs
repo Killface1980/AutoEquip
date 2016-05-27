@@ -152,7 +152,7 @@ namespace AutoEquip
                 cur.y += 60f; // includes padding 
 
                 // current temperature settings
-                GUI.color = pawnStatCache.targetTemperaturesOverride ? Color.white : Color.grey;
+                GUI.color = pawnStatCache.TargetTemperaturesOverride ? Color.white : Color.grey;
                 Widgets_FloatRange.FloatRange(sliderRect, 123123123, ref targetTemps, minMaxTemps, ToStringStyle.Temperature);
                 GUI.color = Color.white;
 
@@ -162,19 +162,20 @@ namespace AutoEquip
                     SelPawn.GetApparelStatCache().TargetTemperatures = targetTemps;
                 }
 
-                if (pawnStatCache.targetTemperaturesOverride)
+                if (pawnStatCache.TargetTemperaturesOverride)
                 {
                     if (Widgets.ImageButton(tempResetRect, resetButton))
                     {
-                        pawnStatCache.targetTemperaturesOverride = false;
+                        pawnStatCache.TargetTemperaturesOverride = false;
                         pawnStatCache.UpdateTemperatureIfNecessary(true);
                     }
                     TooltipHandler.TipRegion(tempResetRect, "TemperatureRangeReset".Translate());
                 }
 
 
+          
 
-
+                
 
                 #endregion Temperatures Slider
 
@@ -183,50 +184,50 @@ namespace AutoEquip
             }
             Text.Font = GameFont.Small;
 
-            Rect viewRect = new Rect(0f, 0f, position.width - 16f, scrollViewHeight);
-            Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
+            Rect apparelRect = new Rect(0f, 0f, position.width - 16f, scrollViewHeight);
+            Widgets.BeginScrollView(outRect, ref scrollPosition, apparelRect);
             float num = 0f;
             if (SelPawnForGear.equipment != null)
             {
-                Widgets.ListSeparator(ref num, viewRect.width, "Equipment".Translate());
+                Widgets.ListSeparator(ref num, apparelRect.width, "Equipment".Translate());
                 foreach (ThingWithComps current in SelPawnForGear.equipment.AllEquipment)
-                    DrawThingRow(ref num, viewRect.width, current, true, ThingLabelColor, pawnSave, pawnCalc);
+                    DrawThingRow(ref num, apparelRect.width, current, true, ThingLabelColor, pawnSave, pawnCalc);
             }
             if (SelPawnForGear.apparel != null)
             {
-                Widgets.ListSeparator(ref num, viewRect.width, "Apparel".Translate());
+                Widgets.ListSeparator(ref num, apparelRect.width, "Apparel".Translate());
                 foreach (Apparel current2 in from ap in SelPawnForGear.apparel.WornApparel
                                              orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                              select ap)
-                    DrawThingRow(ref num, viewRect.width, current2, true, ThingLabelColor, pawnSave, pawnCalc);
+                    DrawThingRow(ref num, apparelRect.width, current2, true, ThingLabelColor, pawnSave, pawnCalc);
             }
             if (pawnSave != null)
             {
                 if ((pawnSave.ToWearApparel != null) &&
                     (pawnSave.ToWearApparel.Any()))
                 {
-                    Widgets.ListSeparator(ref num, viewRect.width, "ToWear".Translate());
+                    Widgets.ListSeparator(ref num, apparelRect.width, "ToWear".Translate());
                     foreach (Apparel current2 in from ap in pawnSave.ToWearApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
-                        DrawThingRow(ref num, viewRect.width, current2, false, ThingToEquipLabelColor, pawnSave, pawnCalc);
+                        DrawThingRow(ref num, apparelRect.width, current2, false, ThingToEquipLabelColor, pawnSave, pawnCalc);
                 }
 
                 if ((pawnSave.ToDropApparel != null) &&
                     (pawnSave.ToDropApparel.Any()))
                 {
-                    Widgets.ListSeparator(ref num, viewRect.width, "ToDrop".Translate());
+                    Widgets.ListSeparator(ref num, apparelRect.width, "ToDrop".Translate());
                     foreach (Apparel current2 in from ap in pawnSave.ToDropApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
-                        DrawThingRow(ref num, viewRect.width, current2, SelPawnForGear.apparel != null && SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
+                        DrawThingRow(ref num, apparelRect.width, current2, SelPawnForGear.apparel != null && SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
                 }
             }
             if (SelPawnForGear.inventory != null)
             {
-                Widgets.ListSeparator(ref num, viewRect.width, "Inventory".Translate());
+                Widgets.ListSeparator(ref num, apparelRect.width, "Inventory".Translate());
                 foreach (Thing current3 in SelPawnForGear.inventory.container)
-                    DrawThingRow(ref num, viewRect.width, current3, true, ThingLabelColor, pawnSave, pawnCalc);
+                    DrawThingRow(ref num, apparelRect.width, current3, true, ThingLabelColor, pawnSave, pawnCalc);
             }
 
             if (Event.current.type == EventType.Layout)

@@ -13,31 +13,15 @@ using Verse;
 
 namespace AutoEquip
 {
-    public enum StatAssignment
-    {
-        Manual,
-        Automatic,
-        Override
-    }
 
     public class ApparelStatCache
     {
-        private int _lastStatUpdate;
         private int _lastTempUpdate;
         private readonly Pawn _pawn;
+        private FloatRange _pawnTemperatures;
+        private FloatRange _mapTemperatures;
+        private FloatRange _pawnCalcTemperatures;
         private FloatRange _targetTemperatures;
-        public bool targetTemperaturesOverride;
-        private float _temperatureWeight;
-
-        public float TemperatureWeight
-        {
-            get
-            {
-                UpdateTemperatureIfNecessary();
-                return _temperatureWeight;
-            }
-        }
-
 
         public FloatRange TargetTemperatures
         {
@@ -49,16 +33,77 @@ namespace AutoEquip
             set
             {
                 _targetTemperatures = value;
-                targetTemperaturesOverride = true;
+                TargetTemperaturesOverride = true;
             }
 
+        }
+
+
+        public bool TargetTemperaturesOverride;
+
+        public FloatRange PawnCalcTemperatures
+        {
+            get
+            {
+                UpdateTemperatureIfNecessary();
+                return _pawnCalcTemperatures;
+            }
+            set
+            {
+                _pawnCalcTemperatures = value;
+                TargetTemperaturesOverride = true;
+            }
+
+        }
+
+        public FloatRange PawnTemperatures
+        {
+            get
+            {
+                UpdateTemperatureIfNecessary();
+                return _pawnTemperatures;
+            }
+            set
+            {
+                _pawnTemperatures = value;
+                TargetTemperaturesOverride = true;
+            }
+
+        }
+
+        public FloatRange MapTemperatures
+        {
+            get
+            {
+                UpdateTemperatureIfNecessary();
+                return _mapTemperatures;
+            }
+            set
+            {
+                _mapTemperatures = value;
+            }
+
+        }
+
+        private float _temperatureWeight;
+
+        public float TemperatureWeight
+        {
+            get
+            {
+                UpdateTemperatureIfNecessary();
+                return _temperatureWeight;
+            }
         }
 
         public ApparelStatCache(Pawn pawn)
         {
           _pawn = pawn;
-       //   _lastStatUpdate = -5000;
-          _lastTempUpdate = -5000;
+            _pawnTemperatures = PawnTemperatures;
+            _mapTemperatures = MapTemperatures;
+            _pawnCalcTemperatures = PawnCalcTemperatures;
+            //   _lastStatUpdate = -5000;
+            _lastTempUpdate = -5000;
         }
 
         public void UpdateTemperatureIfNecessary(bool force = false)
@@ -66,35 +111,52 @@ namespace AutoEquip
             if (Find.TickManager.TicksGame - _lastTempUpdate > 1900 || force)
             {
                 // get desired temperatures
-                if (!targetTemperaturesOverride)
+                if (!TargetTemperaturesOverride)
                 {
-                    var baseTemperature = GenTemperature.AverageTemperatureAtWorldCoordsForMonth(Find.Map.WorldCoords,
+                    var pawnBaseTempMin = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null)-5f;
+                    var pawnBaseTempMax = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMax, null)+5f;
+
+
+                    var baseTemperatureMonth = GenTemperature.AverageTemperatureAtWorldCoordsForMonth(Find.Map.WorldCoords,
                         GenDate.CurrentMonth);
 
-                    var min_basetemp = baseTemperature;
-                    var max_basetemp = baseTemperature;
+              //    var min_basetemp = baseTemperatureMonth - 15f;
+              //    var max_basetemp = baseTemperatureMonth + 15f;
+              //
+              //    if (Find.MapConditionManager.ActiveConditions.OfType<MapCondition_HeatWave>().Any())
+              //    {
+              //        min_basetemp += 20f;
+              //        max_basetemp += 20f;
+              //    }
+              //
+              //    if (Find.MapConditionManager.ActiveConditions.OfType<MapCondition_ColdSnap>().Any())
+              //    {
+              //        min_basetemp -= 20f;
+              //        max_basetemp -= 20f;
+              //    }
+              //
+              //    var calcMinTemp = Math.Min(pawnBaseTempMin, min_basetemp);
+              //    var calcMaxTemp = Math.Max(pawnBaseTempMax, max_basetemp);
+              //
+              //    _mapTemperatures = new FloatRange(min_basetemp, max_basetemp);
+              //
+              //    _pawnTemperatures = new FloatRange(pawnBaseTempMin, pawnBaseTempMax);
+              //
+              //    _pawnCalcTemperatures = new FloatRange(calcMinTemp,calcMaxTemp);
 
-                    min_basetemp -= 15f;
-                    max_basetemp += 15f;
+                    if (GenTemperature.SeasonAcceptableFor(_pawn.def)) _temperatureWeight = 1f;
+                    else _temperatureWeight = 5f;
 
-                    if (Find.MapConditionManager.ActiveConditions.OfType<MapCondition_HeatWave>().Any())
+                    if (!TargetTemperaturesOverride)
                     {
-                        min_basetemp += 15f;
-                        max_basetemp += 20f;
+                        _targetTemperatures = new FloatRange(Math.Max(baseTemperatureMonth - 15f, ApparelStatsHelper.MinMaxTemperatureRange.min),
+                                                              Math.Min(baseTemperatureMonth + 10f, ApparelStatsHelper.MinMaxTemperatureRange.max));
                     }
 
-                    if (Find.MapConditionManager.ActiveConditions.OfType<MapCondition_ColdSnap>().Any())
-                    {
-                        min_basetemp -= 15f;
-                        max_basetemp -= 20f;
-                    }
-
-                    _targetTemperatures = new FloatRange(Math.Max(min_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.min),
-                                                          Math.Min(max_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.max));
+                    //_pawnCalcTemperatures = new FloatRange(Math.Max(pawnBaseTempMin, ApparelStatsHelper.MinMaxTemperatureRange.min),
+                    //                                       Math.Min(pawnBaseTempMax, ApparelStatsHelper.MinMaxTemperatureRange.max));
                 }
-                _temperatureWeight = GenTemperature.SeasonAcceptableFor(_pawn.def) ? 1f : 5f;
             }
         }
-
     }
 }
