@@ -77,8 +77,8 @@ namespace AutoEquip
                         if (thing.IsForbidden(pawn)) continue;
                         if (!ApparelUtility.HasPartsToWear(pawn, thing.def)) continue;
 
-                        if (!ap.IsInValidStorage()) continue;
-                  //      if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
+                   //     if (!ap.IsInValidStorage()) continue;
+                        if (pawn.CanReserveAndReach(ap, PathEndMode.InteractionCell, pawn.NormalMaxDanger(), 1))
                         //                                if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
                         {
 
