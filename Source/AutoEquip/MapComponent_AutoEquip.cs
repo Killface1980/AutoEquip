@@ -113,6 +113,7 @@ namespace AutoEquip
 
 
             _nextOptimization = Find.TickManager.TicksGame + 5000;
+
             //this.nextOptimization = Find.TickManager.TicksGame + 5000;
         }
 
@@ -127,9 +128,9 @@ namespace AutoEquip
                     thingDef.inspectorTabsResolved.Add(ITabManager.GetSharedInstance(current));
             }
 
-            if (!thingDef.inspectorTabsResolved.OfType<ITab_Pawn_AutoEquip>().Any())
+            if (!thingDef.inspectorTabsResolved.OfType<ITab_Pawn_Gear>().Any())
             {
-                thingDef.inspectorTabsResolved.Add(ITabManager.GetSharedInstance(typeof(ITab_Pawn_AutoEquip)));
+                thingDef.inspectorTabsResolved.Add(ITabManager.GetSharedInstance(typeof(ITab_Pawn_Gear)));
                 Debug.Log("Add Tab");
             }
 

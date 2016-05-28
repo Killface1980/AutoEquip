@@ -18,7 +18,7 @@ namespace AutoEquip
             doCloseButton = true;
             closeOnClickedOutside = true;
             absorbInputAroundWindow = true;
-            this._stats = stats;
+            _stats = stats;
         }
 
         public override Vector2 InitialWindowSize

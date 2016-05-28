@@ -34,6 +34,10 @@
       <HintPath>..\..\..\..\RimWorld1135Win_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="CombatRealism">
+      <HintPath>..\..\..\CombatRealism\Assemblies\CombatRealism.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Community Core Library">
       <HintPath>..\..\..\Community Core Library\Assemblies\Community Core Library.dll</HintPath>
       <Private>False</Private>
@@ -51,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CCL_Injectors.cs" />
+    <Compile Include="ITabInjector.cs" />
     <Compile Include="Outfitter adapted\ApparelStatCache.cs" />
     <Compile Include="Menus\Dialog_ManageOutfitsAutoEquip.cs" />
     <Compile Include="AutoEquip_JobGiver_OptimizeApparel.cs" />

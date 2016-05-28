@@ -4,5 +4,10 @@
         <defName>AutoEquip</defName>
         <ModName>AutoEquipA13</ModName>
       <minCCLversion>0.13.2</minCCLversion>
+      <SpecialInjectors>
+
+        <li>AutoEquip.ITabInjector</li>
+
+      </SpecialInjectors>
     </ModHelperDef>
 </Defs>

@@ -17,8 +17,8 @@ namespace AutoEquip
             closeOnEscapeKey = true;
             doCloseButton = true;
 
-            this._pawn = pawn;
-            this._apparel = apparel;
+            _pawn = pawn;
+            _apparel = apparel;
         }
 
         public override Vector2 InitialWindowSize
@@ -34,7 +34,7 @@ namespace AutoEquip
         public override void DoWindowContents(Rect windowRect)
         {
             MapComponent_AutoEquip mapComponent = MapComponent_AutoEquip.Get;
-            PawnCalcForApparel pawnAutoEquip = new PawnCalcForApparel(mapComponent.GetCache(this._pawn));
+            PawnCalcForApparel pawnAutoEquip = new PawnCalcForApparel(mapComponent.GetCache(_pawn));
             List<Apparel> allApparels = new List<Apparel>(Find.ListerThings.ThingsInGroup(ThingRequestGroup.Apparel).OfType<Apparel>());
             foreach (Pawn pawn in Find.Map.mapPawns.FreeColonists)
             {

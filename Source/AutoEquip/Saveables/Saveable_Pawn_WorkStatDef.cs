@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using RimWorld;
+﻿using RimWorld;
 using Verse;
 
 namespace AutoEquip
 {
     public class Saveable_Pawn_WorkStatDef : IExposable
     {
-
         public StatDef StatDef;
         public float Strength;
 

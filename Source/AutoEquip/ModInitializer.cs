@@ -4,6 +4,7 @@ using CommunityCoreLibrary;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using Object = UnityEngine.Object;
 
 namespace AutoEquip
 {
@@ -16,7 +17,7 @@ namespace AutoEquip
         {
             _modInitializerControllerObject = new GameObject("ModInitializer");
             _modInitializerControllerObject.AddComponent<ModInitializerBehaviour>();
-            UnityEngine.Object.DontDestroyOnLoad(_modInitializerControllerObject);
+            Object.DontDestroyOnLoad(_modInitializerControllerObject);
         }
 
         protected override void FillTab() { }
@@ -24,8 +25,8 @@ namespace AutoEquip
 
     class ModInitializerBehaviour : MonoBehaviour
     {
-        protected bool _reinjectNeeded = false;
-        protected float _reinjectTime = 0;
+        protected bool _reinjectNeeded;
+        protected float _reinjectTime;
 
         public void OnLevelWasLoaded(int level)
         {

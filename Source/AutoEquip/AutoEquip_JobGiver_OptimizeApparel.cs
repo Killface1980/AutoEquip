@@ -42,6 +42,12 @@ namespace AutoEquip
 
                     if (pawn.apparel.WornApparel.Contains(a))
                     {
+                        return new Job(JobDefOf.RemoveApparel, a)
+                        {
+                            haulDroppedApparel = true
+                        };
+                        
+
                         Apparel t;
                         if (pawn.apparel.TryDrop(a, out t))
                         {
@@ -51,12 +57,25 @@ namespace AutoEquip
 
                             if (job != null)
                                 return job;
-                            else
-                            {
-                                pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 350;
-                                return null;
-                            }
+                            pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 350;
+                            return null;
                         }
+
+             //           Apparel t;
+             //           if (pawn.apparel.TryDrop(a, out t))
+             //           {
+             //               t.SetForbidden(false, true);
+             //
+             //               Job job = HaulAIUtility.HaulToStorageJob(pawn, t);
+             //
+             //               if (job != null)
+             //                   return job;
+             //               else
+             //               {
+             //                   pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 350;
+             //                   return null;
+             //               }
+             //           }
                     }
                 }
 
@@ -78,11 +97,12 @@ namespace AutoEquip
                         if (!ApparelUtility.HasPartsToWear(pawn, thing.def)) continue;
 
                    //     if (!ap.IsInValidStorage()) continue;
-                        if (pawn.CanReserveAndReach(ap, PathEndMode.InteractionCell, pawn.NormalMaxDanger(), 1))
-                        //                                if (pawn.CanReserveAndReach(ap, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1))
+                        if (pawn.CanReserveAndReach(thing, PathEndMode.OnCell, pawn.NormalMaxDanger(), 1) 
+                            || pawn.CanReserveAndReach(thing, PathEndMode.InteractionCell, pawn.NormalMaxDanger(), 1))
                         {
 
                             configuration.ToWearApparel.Remove(ap);
+                            if (ap != null)
                             return new Job(JobDefOf.Wear, ap);
                         }
                     }

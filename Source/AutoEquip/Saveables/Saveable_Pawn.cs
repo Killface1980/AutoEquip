@@ -63,7 +63,6 @@ namespace AutoEquip
             {
                 foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
                 {
-
                     int priority = Pawn.workSettings.GetPriority(wType);
 
                     float priorityAdjust;
@@ -90,7 +89,7 @@ namespace AutoEquip
                         Saveable_Pawn_WorkStatDef workstatdef = null;
                         foreach (Saveable_Pawn_WorkStatDef saveablePawnWorkStatDef in calculatedWorkStatDef)
                         {
-                            if (saveablePawnWorkStatDef.StatDef.ToString() == workStat.Key.ToString())
+                            if (saveablePawnWorkStatDef.StatDef.defName == workStat.Key.ToString())
                             {
                                 workstatdef = saveablePawnWorkStatDef;
 
@@ -100,26 +99,24 @@ namespace AutoEquip
                         }
 
                         if (workstatdef == null)
-                            {
-                                workstatdef = new Saveable_Pawn_WorkStatDef();
-                                workstatdef.StatDef = workStat.Key;
+                        {
+                            workstatdef = new Saveable_Pawn_WorkStatDef();
 
-                         //       if (workStat.Value != 0)
-                                    workstatdef.Strength = workStat.Value * priorityAdjust;
-                       //       else
-                       //           workstatdef.Strength = 1 * priorityAdjust;
+                            workstatdef.StatDef = workStat.Key;
 
-                                calculatedWorkStatDef.Add(workstatdef);
-                            }
-                            //       else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
-                            else workstatdef.Strength = workstatdef.Strength + (workStat.Value * priorityAdjust); 
-                        
-                        WorkStats.Add(workstatdef);
+                            workstatdef.Strength = workStat.Value * priorityAdjust;
 
+                            calculatedWorkStatDef.Add(workstatdef);
+                        }
+                        //       else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
+                        else workstatdef.Strength = workstatdef.Strength + (workStat.Value * priorityAdjust);
+
+                    //    WorkStats.Add(workstatdef);
                     }
                 }
 
             }
+            WorkStats = new List<Saveable_Pawn_WorkStatDef>(calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength)).ToArray());
             return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
             //  return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
         }

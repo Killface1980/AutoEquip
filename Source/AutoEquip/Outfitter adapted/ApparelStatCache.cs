@@ -5,10 +5,8 @@
 // Created 2016-01-02 13:58
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
-using UnityEngine;
 using Verse;
 
 namespace AutoEquip
