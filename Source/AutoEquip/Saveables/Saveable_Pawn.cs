@@ -73,10 +73,10 @@ namespace AutoEquip
                             priorityAdjust = 1f;
                             break;
                         case 2:
-                            priorityAdjust = 0.4f;
+                            priorityAdjust = 0.5f;
                             break;
                         case 3:
-                            priorityAdjust = 0.2f;
+                            priorityAdjust = 0.25f;
                             break;
                         case 4:
                             priorityAdjust = 0.1f;
@@ -85,35 +85,36 @@ namespace AutoEquip
                             continue;
                     }
 
-                    Saveable_Pawn_WorkStatDef workstatdef = null;
                     foreach (KeyValuePair<StatDef, float> workStat in PawnCalcForApparel.GetStatsOfWorkType(wType))
                     {
+                        Saveable_Pawn_WorkStatDef workstatdef = null;
                         foreach (Saveable_Pawn_WorkStatDef saveablePawnWorkStatDef in calculatedWorkStatDef)
                         {
-                            if (saveablePawnWorkStatDef.StatDef == workStat.Key)
+                            if (saveablePawnWorkStatDef.StatDef.ToString() == workStat.Key.ToString())
                             {
                                 workstatdef = saveablePawnWorkStatDef;
                                 break;
                             }
+
                         }
 
-
-                        
-                 //     if (workstatdef == null)
-                 //     {
+                      if (workstatdef == null)
+                      {
                             workstatdef = new Saveable_Pawn_WorkStatDef();
                             workstatdef.StatDef = workStat.Key;
                             workstatdef.Strength = workStat.Value * priorityAdjust;
                             calculatedWorkStatDef.Add(workstatdef);
-                 //   }
-                 //   else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
+                      }
+                 //       else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
+                      else workstatdef.Strength = workstatdef.Strength + (workStat.Value * priorityAdjust);
+                        WorkStats.Add(workstatdef);
 
                     }
                 }
 
             }
             return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
-          //  return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
+            //  return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
         }
 
     }

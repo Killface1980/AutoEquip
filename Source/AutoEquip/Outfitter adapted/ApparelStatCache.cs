@@ -89,6 +89,7 @@ namespace AutoEquip
         {
             get
             {
+                return 1f; // disabled for now
                 UpdateTemperatureIfNecessary();
                 return _temperatureWeight;
             }
@@ -144,8 +145,8 @@ namespace AutoEquip
               //
               //    _pawnCalcTemperatures = new FloatRange(calcMinTemp,calcMaxTemp);
 
-                    if (GenTemperature.SeasonAcceptableFor(_pawn.def)) _temperatureWeight = 1f;
-                    else _temperatureWeight = 5f;
+                if (GenTemperature.SeasonAcceptableFor(_pawn.def)) _temperatureWeight = 1f;
+                else _temperatureWeight = 1f; // 5f;
 
                     if (!TargetTemperaturesOverride)
                     {

@@ -28,42 +28,6 @@ namespace AutoEquip
             return PawnApparelStatCaches[pawn];
         }
 
-        public static Dictionary<StatDef, float> GetWeightedApparelStats(this Pawn pawn)
-        {
-            Dictionary<StatDef, float> dict = new Dictionary<StatDef, float>();
-            dict.Add(StatDefOf.ArmorRating_Blunt, .5f);
-            dict.Add(StatDefOf.ArmorRating_Sharp, .5f);
-
-            // add weights for all worktypes, multiplied by job priority
-            foreach (
-                WorkTypeDef workType in
-                    DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(def => pawn.workSettings.WorkIsActive(def))
-                )
-            {
-                foreach (KeyValuePair<StatDef, float> stat in PawnCalcForApparel.GetStatsOfWorkType(workType))
-                {
-                    float weight = stat.Value * (5 - pawn.workSettings.GetPriority(workType));
-                    if (dict.ContainsKey(stat.Key))
-                    {
-                        dict[stat.Key] += weight;
-                    }
-                    else
-                    {
-                        dict.Add(stat.Key, weight);
-                    }
-                }
-            }
-
-            // normalize weights
-            float max = dict.Values.Select(Math.Abs).Max();
-            foreach (StatDef key in new List<StatDef>(dict.Keys))
-            {
-                // normalize max of absolute weigths to be 10
-                dict[key] /= max / 10f;
-            }
-
-            return dict;
-        }
 
         private static List<StatDef> _allApparelStats;
 
