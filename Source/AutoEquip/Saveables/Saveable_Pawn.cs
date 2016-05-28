@@ -93,20 +93,27 @@ namespace AutoEquip
                             if (saveablePawnWorkStatDef.StatDef.ToString() == workStat.Key.ToString())
                             {
                                 workstatdef = saveablePawnWorkStatDef;
+
                                 break;
                             }
 
                         }
 
-                      if (workstatdef == null)
-                      {
-                            workstatdef = new Saveable_Pawn_WorkStatDef();
-                            workstatdef.StatDef = workStat.Key;
-                            workstatdef.Strength = workStat.Value * priorityAdjust;
-                            calculatedWorkStatDef.Add(workstatdef);
-                      }
-                 //       else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
-                      else workstatdef.Strength = workstatdef.Strength + (workStat.Value * priorityAdjust);
+                        if (workstatdef == null)
+                            {
+                                workstatdef = new Saveable_Pawn_WorkStatDef();
+                                workstatdef.StatDef = workStat.Key;
+
+                         //       if (workStat.Value != 0)
+                                    workstatdef.Strength = workStat.Value * priorityAdjust;
+                       //       else
+                       //           workstatdef.Strength = 1 * priorityAdjust;
+
+                                calculatedWorkStatDef.Add(workstatdef);
+                            }
+                            //       else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
+                            else workstatdef.Strength = workstatdef.Strength + (workStat.Value * priorityAdjust); 
+                        
                         WorkStats.Add(workstatdef);
 
                     }

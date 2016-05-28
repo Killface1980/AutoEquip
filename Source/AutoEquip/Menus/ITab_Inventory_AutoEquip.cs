@@ -37,7 +37,7 @@ namespace AutoEquip
 
         public ITab_Pawn_AutoEquip()
         {
-            size = new Vector2(540f, 550f);
+            size = new Vector2(432f, 500f);
             labelKey = "AutoEquipTab";
         }
 
@@ -155,9 +155,9 @@ namespace AutoEquip
                 {
                     GUI.color = Color.white;
                 }
-                
+
                 else GUI.color = Color.grey;
-                
+
                 Widgets_FloatRange.FloatRange(sliderRect, 123123123, ref targetTemps, minMaxTemps, ToStringStyle.Temperature);
                 GUI.color = Color.white;
 
@@ -178,9 +178,9 @@ namespace AutoEquip
                 }
 
 
-          
 
-                
+
+
 
                 #endregion Temperatures Slider
 
@@ -245,7 +245,8 @@ namespace AutoEquip
 
         private void DrawThingRow(ref float y, float width, Thing thing, bool equiped, Color thingColor, SaveablePawn pawnSave, PawnCalcForApparel pawnCalc)
         {
-            Rect rect = new Rect(0f, y, width, 28f);
+            var lineheight = 40f;
+            Rect rect = new Rect(0f, y, width, lineheight);
             if (Mouse.IsOver(rect))
             {
                 GUI.color = HighlightColor;
@@ -313,16 +314,16 @@ namespace AutoEquip
                             if (apparelEquipedThing != null)
                             {
                                 Find.CameraMap.JumpTo(apparelEquipedThing.PositionHeld);
-                                Find.Selector.ClearSelection();
-                                if (apparelEquipedThing.Spawned)
-                                    Find.Selector.Select(apparelEquipedThing, true, true);
+                                //                      Find.Selector.ClearSelection();
+                                //                      if (apparelEquipedThing.Spawned)
+                                //                          Find.Selector.Select(apparelEquipedThing, true, true);
                             }
                             else
                             {
                                 Find.CameraMap.JumpTo(thing.PositionHeld);
-                                Find.Selector.ClearSelection();
-                                if (thing.Spawned)
-                                    Find.Selector.Select(thing, true, true);
+                                //                      Find.Selector.ClearSelection();
+                                //                      if (thing.Spawned)
+                                //                          Find.Selector.Select(thing, true, true);
                             }
                         }, MenuOptionPriority.Medium, null, null));
                     list.Add(new FloatMenuOption("AutoEquip Details", delegate
@@ -339,27 +340,40 @@ namespace AutoEquip
                 FloatMenu window = new FloatMenu(list, thing.LabelCap, false, false);
                 Find.WindowStack.Add(window);
             }
+
+            // draw apparel icon
             if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
             {
-                Widgets.ThingIcon(new Rect(4f, y, 28f, 28f), thing);
+                Widgets.ThingIcon(new Rect(6f, y+4f, lineheight-12f, lineheight-12f), thing);
             }
+
+            // draw apparel list
             Text.Anchor = TextAnchor.MiddleLeft;
             GUI.color = thingColor;
-            Rect rect2 = new Rect(36f, y, width - 36f, 28f);
-            string text = thing.LabelCap;
+            Rect rectScoreText = new Rect(45f, y, 70f, lineheight);
+            Rect rectApparelText = new Rect(115f, y, width - 125f, lineheight);
+            string text_Score = "";
+            string text_ApparelName = thing.LabelCap;
             var apparel = thing as Apparel;
             if (apparel != null)
             {
-                if ((pawnSave != null) &&
-                    (pawnSave.TargetApparel != null))
-                    text = pawnCalc.ApparelScoreRaw(apparel).ToString("N5") + "   " + text;
+                text_Score = pawnCalc.ApparelScoreRaw(apparel).ToString("N5");
 
+            //  if ((pawnSave != null) && (pawnSave.TargetApparel != null))
+            //  {
+            //      text_ApparelName = pawnCalc.ApparelScoreRaw(apparel).ToString("N5") + "   " + text_ApparelName;
+            //  }
                 if (SelPawnForGear.outfits != null && SelPawnForGear.outfits.forcedHandler.IsForced(apparel))
-                    text = text + ", " + "ApparelForcedLower".Translate();
+                {
+                    text_Score = "ApparelForcedLower".Translate();
+                 //   text_ApparelName = text_ApparelName + ", " + "ApparelForcedLower".Translate();
+                }
             }
-            Widgets.Label(rect2, text);
-            y += 28f;
+            Widgets.Label(rectScoreText, text_Score);
+            Widgets.Label(rectApparelText, text_ApparelName);
+            y += lineheight;
         }
+
         #endregion Methods
     }
 }
