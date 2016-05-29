@@ -14,8 +14,8 @@ namespace AutoEquip
         #region Fields
 
         private const float _barHeight = 20f;
-        private const float _margin = 6f;
-        private const float _topPadding = 20f;
+        private const float _margin = 15f;
+        private const float _topPadding = 25f;
 
 
 
@@ -43,7 +43,7 @@ namespace AutoEquip
 
         #region Constructors
 
-        public ITab_Pawn_AutoEquip():base()
+        public ITab_Pawn_AutoEquip() : base()
         {
             size = new Vector2(432f, 600f);
             labelKey = "TabGear";
@@ -78,17 +78,17 @@ namespace AutoEquip
 
         protected override void FillTab()
         {
-            #region CR Stuff
-
-            // get the inventory comp
-            CompInventory comp = SelPawn.TryGetComp<CompInventory>();
-
             // set up rects
             Rect listRect = new Rect(
                 _margin,
                 _topPadding,
                 size.x - 2 * _margin,
                 size.y - _topPadding - _margin);
+
+            #region CR Stuff
+
+            // get the inventory comp
+            CompInventory comp = SelPawn.TryGetComp<CompInventory>();
 
             if (comp != null)
             {
@@ -102,10 +102,6 @@ namespace AutoEquip
             }
 
             #endregion CR Stuff
-
-
-            //
-
 
             SaveablePawn pawnSave;
             PawnCalcForApparel pawnCalc;
@@ -121,20 +117,40 @@ namespace AutoEquip
             }
 
             Text.Font = GameFont.Small;
-            Rect mainrRect = new Rect(0f, 20f, size.x, size.y - _barHeight * 1.25f);
 
-            //       Rect position = new Rect(rect2.x, rect2.y, rect2.width, rect2.height-listRect.height);
+            Text.Font = GameFont.Small;
+            GUI.color = Color.white;
 
 
             GUI.BeginGroup(listRect);
-            Text.Font = GameFont.Small;
-            GUI.color = Color.white;
-            Rect outRect = new Rect(0f, 0f, listRect.width, listRect.height);
+
+
+            // main canvas
+            Rect header = new Rect(listRect.x, _topPadding, listRect.width, listRect.height);
+            //            Rect header = new Rect(listRect.x, listRect.yMin, listRect.width, listRect.height);
+
+            Vector2 cur = Vector2.zero;
+            cur.y += 35f;
 
             if (pawnSave != null)
             {
-                Rect rect3 = new Rect(outRect.xMin + 4f, outRect.yMin, 100f, 30f);
-                if (Widgets.TextButton(rect3, pawnSave.Pawn.outfits.CurrentOutfit.label, true, false))
+                // Outfit + Status button
+                Rect rectStatus = new Rect(header.xMax - 100f, 5f, 100f, 30f);
+
+                Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(SelPawn);
+
+                if (outfit.AppendIndividualPawnStatus)
+                {
+                    if (Widgets.TextButton(rectStatus, "AutoEquipStatus".Translate(), true, false))
+                    {
+                        if (pawnSave.Stats == null)
+                            pawnSave.Stats = new List<Saveable_Outfit_StatDef>();
+                        Find.WindowStack.Add(new Dialog_ManagePawnOutfit(pawnSave.Stats));
+                    }
+                    rectStatus = new Rect(rectStatus.xMin - rectStatus.width - _margin, rectStatus.y, rectStatus.width, rectStatus.height);
+                }
+
+                if (Widgets.TextButton(rectStatus, pawnSave.Pawn.outfits.CurrentOutfit.label, true, false))
                 {
                     List<FloatMenuOption> list = new List<FloatMenuOption>();
                     foreach (Outfit current in Find.Map.outfitDatabase.AllOutfits)
@@ -147,38 +163,46 @@ namespace AutoEquip
                     }
                     Find.WindowStack.Add(new FloatMenu(list, false));
                 }
-                rect3 = new Rect(rect3.xMax + 4f, outRect.yMin, 100f, 30f);
 
-                Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(SelPawn);
+                #region Fixed  Header
 
-                if (outfit.AppendIndividualPawnStatus)
+
+                // Equipment
+                float posX = 0f;
+                if (SelPawnForGear.equipment.AllEquipment.Any() || SelPawnForGear.inventory.container.Count > 0)
                 {
-                    if (Widgets.TextButton(rect3, "AutoEquipStatus".Translate(), true, false))
+                    Widgets.ListSeparator(ref cur.y, header.width, "EquipmentAndInventory".Translate());
+
+                    if (SelPawnForGear.equipment != null)
                     {
-                        if (pawnSave.Stats == null)
-                            pawnSave.Stats = new List<Saveable_Outfit_StatDef>();
-                        Find.WindowStack.Add(new Dialog_ManagePawnOutfit(pawnSave.Stats));
-                    } 
+
+                        foreach (ThingWithComps current in SelPawnForGear.equipment.AllEquipment)
+                            DrawWeaponIcon(ref posX, ref cur.y, 80f, current);
+                    }
+                    //Inventory
+                    if (SelPawnForGear.inventory != null)
+                    {
+                        foreach (Thing current3 in SelPawnForGear.inventory.container)
+                            DrawInventoryIcon(ref posX, ref cur.y, current3);
+
+                        if (SelPawnForGear.equipment == null)
+                            cur.y += 80f;
+                    }
                 }
+                if (cur.y < 10f)
+                    cur.y = 20f;
 
-                #region Temperatures Slider
+                if (posX > 0f)
+                    cur.y += 60f;
 
-                // main canvas
-                Rect canvas = new Rect(rect3.xMax + 4f, outRect.yMin + 45f, size.x, size.y).ContractedBy(20f);
-                Vector2 cur = Vector2.zero;
-                cur.y += 45f;
 
-                // header
-                Rect tempHeaderRect = new Rect(cur.x, cur.y, canvas.width, 30f);
-                cur.y += 30f;
-                Text.Anchor = TextAnchor.LowerLeft;
-                Widgets.Label(tempHeaderRect, "PreferedTemperature".Translate());
-                Text.Anchor = TextAnchor.UpperLeft;
+                // temeprature header
 
-                // line
-                GUI.color = Color.grey;
-                Widgets.DrawLineHorizontal(cur.x, cur.y, canvas.width);
-                GUI.color = Color.white;
+                Widgets.ListSeparator(ref cur.y, header.width, "Apparel".Translate());
+                cur.y += 5f;
+                Widgets.ListSeparator(ref cur.y, header.width - _margin, "PreferedTemperature".Translate());
+                //          Text.Anchor = TextAnchor.UpperLeft;
+
 
                 // some padding
                 cur.y += 10f;
@@ -188,9 +212,9 @@ namespace AutoEquip
                 FloatRange targetTemps = pawnStatCache.TargetTemperatures;
                 FloatRange minMaxTemps = ApparelStatsHelper.MinMaxTemperatureRange;
 
-                Rect sliderRect = new Rect(cur.x, cur.y, canvas.width - 20f, 40f);
+                Rect sliderRect = new Rect(cur.x, cur.y, header.width - 2* _margin, 40f);
 
-                Rect tempResetRect = new Rect(sliderRect.xMax + 4f, cur.y + 10f, 16f, 16f);
+                Rect tempResetRect = new Rect(sliderRect.xMax + 9f, cur.y + 10f, 16f, 16f);
                 cur.y += 5f; // includes padding 
 
                 // current temperature settings
@@ -220,80 +244,55 @@ namespace AutoEquip
                     TooltipHandler.TipRegion(tempResetRect, "TemperatureRangeReset".Translate());
                 }
 
+                Text.Font = GameFont.Small;
 
+                #endregion Fixed Header
 
-
-
-
-                #endregion Temperatures Slider
-
-
-                outRect.yMin += rect3.height + 4f + cur.y;
             }
+            cur.y += 10f;
+                     listRect.yMin +=  cur.y;
+      //      header.height += cur.y;
 
             Text.Font = GameFont.Small;
 
-            Rect apparelRect = new Rect(0f, 0f, listRect.width - 16f, scrollViewHeight);
-            Widgets.BeginScrollView(outRect, ref scrollPosition, apparelRect);
+            listRect.x = 0;
+     //       listRect.width -= _margin;
+
+            Rect apparelGroupRect = new Rect(0f, 0f, listRect.width-_margin, scrollViewHeight);
+
+            Widgets.BeginScrollView(listRect, ref scrollPosition, apparelGroupRect);
+
             float posY = 0f;
-            float posX = 10f;
-
-            // Equipment
-            if (SelPawnForGear.equipment != null || SelPawnForGear.inventory != null)
-            {
-                Widgets.ListSeparator(ref posY, apparelRect.width, "EquipmentAndInventory".Translate());
-
-                if (SelPawnForGear.equipment != null)
-                {
-
-                    foreach (ThingWithComps current in SelPawnForGear.equipment.AllEquipment)
-                        DrawWeaponIcon(ref posX, ref posY, 80f, current);
-                }
-                //Inventory
-                if (SelPawnForGear.inventory != null)
-                {
-                    foreach (Thing current3 in SelPawnForGear.inventory.container)
-                        DrawInventoryIcon(ref posX, ref posY, current3);
-
-                    if (SelPawnForGear.equipment == null)
-                        posY += 80f;
-                }
-            }
-            if (posY < 10f)
-                posY = 20f;
-
-            if (posX > 10f)
-                posY += 80f;
 
             //Apparel
             if (SelPawnForGear.apparel != null)
             {
-                Widgets.ListSeparator(ref posY, apparelRect.width, "Apparel".Translate());
+                Widgets.ListSeparator(ref posY, apparelGroupRect.width, "WornApparel".Translate());
                 foreach (Apparel current2 in from ap in SelPawnForGear.apparel.WornApparel
                                              orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                              select ap)
-                    DrawThingRow(ref posY, apparelRect.width, current2, true, ThingLabelColor, pawnSave, pawnCalc);
+                    DrawThingRow(ref posY, apparelGroupRect.width, current2, true, ThingLabelColor, pawnSave, pawnCalc);
             }
             if (pawnSave != null)
             {
                 if ((pawnSave.ToWearApparel != null) &&
                     (pawnSave.ToWearApparel.Any()))
                 {
-                    Widgets.ListSeparator(ref posY, apparelRect.width, "ToWear".Translate());
+                    Widgets.ListSeparator(ref posY, apparelGroupRect.width, "ToWear".Translate());
                     foreach (Apparel current2 in from ap in pawnSave.ToWearApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
-                        DrawThingRow(ref posY, apparelRect.width, current2, false, ThingToEquipLabelColor, pawnSave, pawnCalc);
+                        DrawThingRow(ref posY, apparelGroupRect.width, current2, false, ThingToEquipLabelColor, pawnSave, pawnCalc);
                 }
 
                 if ((pawnSave.ToDropApparel != null) &&
                     (pawnSave.ToDropApparel.Any()))
                 {
-                    Widgets.ListSeparator(ref posY, apparelRect.width, "ToDrop".Translate());
+                    Widgets.ListSeparator(ref posY, apparelGroupRect.width, "ToDrop".Translate());
                     foreach (Apparel current2 in from ap in pawnSave.ToDropApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
-                        DrawThingRow(ref posY, apparelRect.width, current2, SelPawnForGear.apparel != null && SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
+                        DrawThingRow(ref posY, apparelGroupRect.width, current2, SelPawnForGear.apparel != null && SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
                 }
             }
 
@@ -301,6 +300,7 @@ namespace AutoEquip
                 scrollViewHeight = posY + 30f;
             Widgets.EndScrollView();
             GUI.EndGroup();
+
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;
         }
@@ -532,7 +532,7 @@ namespace AutoEquip
 
         private void DrawWeaponIcon(ref float x, ref float y, float width, Thing thing)
         {
-            var lineheight = 80f;
+            var lineheight = 60f;
 
             Rect rectIconBox = new Rect(x, y, lineheight, lineheight);
             Rect rectIcon = new Rect(rectIconBox.x + 6f, rectIconBox.y + 6f, rectIconBox.width - 12f, rectIconBox.height - 12f);
@@ -562,7 +562,7 @@ namespace AutoEquip
 
         private void DrawInventoryIcon(ref float x, ref float y, Thing thing)
         {
-            var lineheight = 80f;
+            var lineheight = 60f;
             Rect rectIconBox = new Rect(x, y + 17f, lineheight * 0.5f, lineheight * 0.5f);
             Rect rectIcon = new Rect(rectIconBox.x + 6f, rectIconBox.y + 6f, rectIconBox.width - 12f, rectIconBox.height - 12f);
 
@@ -582,10 +582,10 @@ namespace AutoEquip
             }
             x += lineheight * 0.5f + 5f;
 
-            if (x > 300f)
+            if (x > 400f)
             {
                 y += lineheight;
-                x = 10f;
+                x = 0f;
             }
 
         }
