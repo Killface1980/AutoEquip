@@ -163,8 +163,13 @@ namespace AutoEquip
             num += ApparelScoreRaw_PawnStats(ap);
             num += ApparelScoreRaw_PawnWorkStats(ap);
             num += (0.25f * ApparelScoreRaw_ProtectionBaseStat(ap));
-            num *= ApparelScoreRawHitPointAdjust(ap);
-            num *= ApparelScoreRawInsulationColdAdjust(ap);
+  //          num *= ApparelScoreRawHitPointAdjust(ap);
+
+            float insulation = ApparelScoreRawInsulationColdAdjust(ap);
+            if (insulation < 1)
+                insulation/=4;
+
+            num *= insulation;
 
             // new insulation calc
 
@@ -292,10 +297,10 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ResearchSpeed"), 1f);
                     yield break;
                 case "Cleaning":
-                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 1f);
+        //            yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 1f);
                     yield break;
                 case "Hauling":
-                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 1f);
+                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.25f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryingCapacity"), 1f);
                     yield break;
                 case "Crafting":
@@ -377,7 +382,6 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("RecruitPrisonerChance"), 1f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("GiftImpact"), 0.25f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("TradePriceImprovement"), 0.5f);
-                    yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("Beauty"), 0.25f);
                     yield break;
                 case "Flicker":
                     yield break;
@@ -526,7 +530,7 @@ namespace AutoEquip
                     temperatureScoreOffset += -(neededInsulationWarmth - insulationHeat) * tempWeight;
                 }
             }
-            score = 1 + temperatureScoreOffset / 50f;
+            score = 1 + temperatureScoreOffset / 10f;
             return score;
 
 

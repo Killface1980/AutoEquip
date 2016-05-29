@@ -5,6 +5,5 @@ C:\Users\Killface\Desktop\RimWorld1135Win\Mods\AutoEquip\Source\obj\Debug\AutoEq
 C:\Users\Killface\Desktop\RimWorld1135Win\Mods\AutoEquip\Source\obj\Debug\AutoEquip.pdb
 C:\Users\Killface\Desktop\RimWorld1135Win\Mods\AutoEquip\Source\AutoEquip\bin\Debug\AutoEquip.dll
 C:\Users\Killface\Desktop\RimWorld1135Win\Mods\AutoEquip\Source\AutoEquip\bin\Debug\AutoEquip.pdb
-C:\Users\Killface\Desktop\RimWorld1135Win\Mods\AutoEquip\Source\AutoEquip\obj\Debug\AutoEquip.csprojResolveAssemblyReference.cache
 C:\Users\Killface\Desktop\RimWorld1135Win\Mods\AutoEquip\Source\AutoEquip\obj\Debug\AutoEquip.dll
 C:\Users\Killface\Desktop\RimWorld1135Win\Mods\AutoEquip\Source\AutoEquip\obj\Debug\AutoEquip.pdb
