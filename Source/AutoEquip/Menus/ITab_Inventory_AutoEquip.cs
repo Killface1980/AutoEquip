@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using Combat_Realism;
 using RimWorld;
 using UnityEngine;
@@ -42,7 +43,7 @@ namespace AutoEquip
 
         #region Constructors
 
-        public ITab_Pawn_AutoEquip()
+        public ITab_Pawn_AutoEquip():base()
         {
             size = new Vector2(432f, 600f);
             labelKey = "AutoEquipTab";
@@ -121,16 +122,14 @@ namespace AutoEquip
 
             Text.Font = GameFont.Small;
             Rect mainrRect = new Rect(0f, 20f, size.x, size.y - _barHeight * 1.25f);
-            Rect rect2 = mainrRect.ContractedBy(10f);
 
-            Rect position = listRect;
             //       Rect position = new Rect(rect2.x, rect2.y, rect2.width, rect2.height-listRect.height);
 
 
-            GUI.BeginGroup(position);
+            GUI.BeginGroup(listRect);
             Text.Font = GameFont.Small;
             GUI.color = Color.white;
-            Rect outRect = new Rect(0f, 0f, position.width, position.height);
+            Rect outRect = new Rect(0f, 0f, listRect.width, listRect.height);
 
             if (pawnSave != null)
             {
@@ -149,11 +148,17 @@ namespace AutoEquip
                     Find.WindowStack.Add(new FloatMenu(list, false));
                 }
                 rect3 = new Rect(rect3.xMax + 4f, outRect.yMin, 100f, 30f);
-                if (Widgets.TextButton(rect3, "AutoEquipStatus".Translate(), true, false))
+
+                Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(SelPawn);
+
+                if (outfit.AppendIndividualPawnStatus)
                 {
-                    if (pawnSave.Stats == null)
-                        pawnSave.Stats = new List<Saveable_Outfit_StatDef>();
-                    Find.WindowStack.Add(new Dialog_ManagePawnOutfit(pawnSave.Stats));
+                    if (Widgets.TextButton(rect3, "AutoEquipStatus".Translate(), true, false))
+                    {
+                        if (pawnSave.Stats == null)
+                            pawnSave.Stats = new List<Saveable_Outfit_StatDef>();
+                        Find.WindowStack.Add(new Dialog_ManagePawnOutfit(pawnSave.Stats));
+                    } 
                 }
 
                 #region Temperatures Slider
@@ -225,62 +230,75 @@ namespace AutoEquip
 
                 outRect.yMin += rect3.height + 4f + cur.y;
             }
+
             Text.Font = GameFont.Small;
 
-            Rect apparelRect = new Rect(0f, 0f, position.width - 16f, scrollViewHeight);
+            Rect apparelRect = new Rect(0f, 0f, listRect.width - 16f, scrollViewHeight);
             Widgets.BeginScrollView(outRect, ref scrollPosition, apparelRect);
-            float num = 0f;
+            float posY = 0f;
+            float posX = 10f;
 
             // Equipment
-            if (SelPawnForGear.equipment != null)
+            if (SelPawnForGear.equipment != null || SelPawnForGear.inventory != null)
             {
-                Widgets.ListSeparator(ref num, apparelRect.width, "Equipment".Translate());
-                foreach (ThingWithComps current in SelPawnForGear.equipment.AllEquipment)
-                    DrawThingRow(ref num, apparelRect.width, current, true, ThingLabelColor, pawnSave, pawnCalc);
-            }
+                Widgets.ListSeparator(ref posY, apparelRect.width, "EquipmentAndInventory".Translate());
 
-            //Inventory
-            if (SelPawnForGear.inventory != null)
-            {
-                Widgets.ListSeparator(ref num, apparelRect.width, "Inventory".Translate());
-                foreach (Thing current3 in SelPawnForGear.inventory.container)
-                    DrawThingRow(ref num, apparelRect.width, current3, true, ThingLabelColor, pawnSave, pawnCalc);
+                if (SelPawnForGear.equipment != null)
+                {
+
+                    foreach (ThingWithComps current in SelPawnForGear.equipment.AllEquipment)
+                        DrawWeaponIcon(ref posX, ref posY, 80f, current);
+                }
+                //Inventory
+                if (SelPawnForGear.inventory != null)
+                {
+                    foreach (Thing current3 in SelPawnForGear.inventory.container)
+                        DrawInventoryIcon(ref posX, ref posY, current3);
+
+                    if (SelPawnForGear.equipment == null)
+                        posY += 80f;
+                }
             }
+            if (posY < 10f)
+                posY = 20f;
+
+            if (posX > 10f)
+                posY += 80f;
 
             //Apparel
             if (SelPawnForGear.apparel != null)
             {
-                Widgets.ListSeparator(ref num, apparelRect.width, "Apparel".Translate());
+                Widgets.ListSeparator(ref posY, apparelRect.width, "Apparel".Translate());
                 foreach (Apparel current2 in from ap in SelPawnForGear.apparel.WornApparel
                                              orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                              select ap)
-                    DrawThingRow(ref num, apparelRect.width, current2, true, ThingLabelColor, pawnSave, pawnCalc);
+                    DrawThingRow(ref posY, apparelRect.width, current2, true, ThingLabelColor, pawnSave, pawnCalc);
             }
             if (pawnSave != null)
             {
                 if ((pawnSave.ToWearApparel != null) &&
                     (pawnSave.ToWearApparel.Any()))
                 {
-                    Widgets.ListSeparator(ref num, apparelRect.width, "ToWear".Translate());
+                    Widgets.ListSeparator(ref posY, apparelRect.width, "ToWear".Translate());
                     foreach (Apparel current2 in from ap in pawnSave.ToWearApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
-                        DrawThingRow(ref num, apparelRect.width, current2, false, ThingToEquipLabelColor, pawnSave, pawnCalc);
+                        DrawThingRow(ref posY, apparelRect.width, current2, false, ThingToEquipLabelColor, pawnSave, pawnCalc);
                 }
 
                 if ((pawnSave.ToDropApparel != null) &&
                     (pawnSave.ToDropApparel.Any()))
                 {
-                    Widgets.ListSeparator(ref num, apparelRect.width, "ToDrop".Translate());
+                    Widgets.ListSeparator(ref posY, apparelRect.width, "ToDrop".Translate());
                     foreach (Apparel current2 in from ap in pawnSave.ToDropApparel
                                                  orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
                                                  select ap)
-                        DrawThingRow(ref num, apparelRect.width, current2, SelPawnForGear.apparel != null && SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
+                        DrawThingRow(ref posY, apparelRect.width, current2, SelPawnForGear.apparel != null && SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
                 }
             }
 
             if (Event.current.type == EventType.Layout)
-                scrollViewHeight = num + 30f;
+                scrollViewHeight = posY + 30f;
             Widgets.EndScrollView();
             GUI.EndGroup();
             GUI.color = Color.white;
@@ -288,6 +306,7 @@ namespace AutoEquip
         }
 
         private float _lastClick;
+
 
         private void DrawThingRow(ref float y, float width, Thing thing, bool equiped, Color thingColor, SaveablePawn pawnSave, PawnCalcForApparel pawnCalc)
         {
@@ -298,6 +317,8 @@ namespace AutoEquip
                 GUI.color = HighlightColor;
                 GUI.DrawTexture(rect, TexUI.HighlightTex);
             }
+
+            #region Button Clikcks
 
             // LMB doubleclick
 
@@ -473,6 +494,9 @@ namespace AutoEquip
                     Find.WindowStack.Add(window);
                 }
             }
+
+            #endregion Button Clicks
+
             // draw apparel icon
             if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
             {
@@ -506,227 +530,159 @@ namespace AutoEquip
             y += lineheight;
         }
 
-        //private void DrawThingRow(ref float y, float width, Thing thing, SaveablePawn pawnSave)
-        //{
-        //    var lineheight = 40f;
-        //    Rect rect = new Rect(0f, y, width, lineheight);
-        //    if (Mouse.IsOver(rect))
-        //    {
-        //        GUI.color = HighlightColor;
-        //        GUI.DrawTexture(rect, TexUI.HighlightTex);
-        //    }
-        //
-        //    // LMB doubleclick
-        //
-        //    if (Widgets.InvisibleButton(rect))
-        //    {
-        //        if (!equiped && Event.current.button == 0)
-        //        {
-        //            Pawn apparelEquipedThing = null;
-        //
-        //            foreach (Pawn p in Find.Map.mapPawns.FreeColonists)
-        //            {
-        //                foreach (Apparel a in p.apparel.WornApparel)
-        //                    if (a == thing)
-        //                    {
-        //                        apparelEquipedThing = p;
-        //                        break;
-        //                    }
-        //                if (apparelEquipedThing != null)
-        //                    break;
-        //            }
-        //            if (Time.time - _lastClick < 0.3f)
-        //            {
-        //                if (apparelEquipedThing != null)
-        //                {
-        //                    Find.CameraMap.JumpTo(apparelEquipedThing.PositionHeld);
-        //                    return;
-        //                }
-        //                else
-        //                {
-        //                    Find.CameraMap.JumpTo(thing.PositionHeld);
-        //                    return;
-        //                }
-        //            }
-        //            _lastClick = Time.time;
-        //
-        //        }
-        //
-        //        //Middle Mouse Button Menu
-        //        else if (Event.current.button == 2)
-        //        {
-        //            Find.WindowStack.Add(new DialogPawnApparelDetail(pawnSave.Pawn, (Apparel)thing));
-        //        }
-        //
-        //        // RMB menu
-        //        else if (Event.current.button == 1)
-        //        {
-        //            List<FloatMenuOption> floatOptionList = new List<FloatMenuOption>();
-        //            floatOptionList.Add(new FloatMenuOption("ThingInfo".Translate(), delegate
-        //            {
-        //                Find.WindowStack.Add(new Dialog_InfoCard(thing));
-        //            }, MenuOptionPriority.Medium, null, null));
-        //
-        //            if (CanEdit && equiped)
-        //            {
-        //                ThingWithComps eq = thing as ThingWithComps;
-        //
-        //
-        //                #region CR Stuff #2
-        //
-        //                // Equip option
-        //                //  ThingWithComps eq = thing as ThingWithComps;
-        //                if (eq != null && eq.TryGetComp<CompEquippable>() != null)
-        //                {
-        //                    CompInventory compInventory = SelPawnForGear.TryGetComp<CompInventory>();
-        //                    if (compInventory != null)
-        //                    {
-        //                        FloatMenuOption equipOption;
-        //                        string eqLabel = GenLabel.ThingLabel(eq.def, eq.Stuff, 1);
-        //                        if (SelPawnForGear.equipment.AllEquipment.Contains(eq) && SelPawnForGear.inventory != null)
-        //                        {
-        //                            equipOption = new FloatMenuOption("CR_PutAway".Translate(new object[] { eqLabel }),
-        //                                new Action(delegate
-        //                                {
-        //                                    ThingWithComps oldEq;
-        //                                    SelPawnForGear.equipment.TryTransferEquipmentToContainer(SelPawnForGear.equipment.Primary, SelPawnForGear.inventory.container, out oldEq);
-        //                                }));
-        //                        }
-        //                        else if (!SelPawnForGear.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation))
-        //                        {
-        //                            equipOption = new FloatMenuOption("CannotEquip".Translate(new object[] { eqLabel }), null);
-        //                        }
-        //                        else
-        //                        {
-        //                            string equipOptionLabel = "Equip".Translate(new object[] { eqLabel });
-        //                            if (eq.def.IsRangedWeapon && SelPawnForGear.story != null && SelPawnForGear.story.traits.HasTrait(TraitDefOf.Brawler))
-        //                            {
-        //                                equipOptionLabel = equipOptionLabel + " " + "EquipWarningBrawler".Translate();
-        //                            }
-        //                            equipOption = new FloatMenuOption(equipOptionLabel, new Action(delegate
-        //                            {
-        //                                compInventory.TrySwitchToWeapon(eq);
-        //                            }));
-        //                        }
-        //                        floatOptionList.Add(equipOption);
-        //                    }
-        //                }
-        //
-        //                #endregion CR Stuff #2
-        //
-        //                Action action = null;
-        //                Apparel ap = thing as Apparel;
-        //                if (ap != null)
-        //                {
-        //                    Apparel unused;
-        //                    action = delegate
-        //                    {
-        //                        SelPawnForGear.apparel.TryDrop(ap, out unused, SelPawnForGear.Position, true);
-        //                    };
-        //                }
-        //                else if (eq != null && SelPawnForGear.equipment.AllEquipment.Contains(eq))
-        //                {
-        //                    ThingWithComps unused;
-        //                    action = delegate
-        //                    {
-        //                        SelPawnForGear.equipment.TryDropEquipment(eq, out unused, SelPawnForGear.Position, true);
-        //                    };
-        //                }
-        //                else if (!thing.def.destroyOnDrop)
-        //                {
-        //                    Thing unused;
-        //                    action = delegate
-        //                    {
-        //                        SelPawnForGear.inventory.container.TryDrop(thing, SelPawnForGear.Position, ThingPlaceMode.Near, out unused);
-        //                    };
-        //                }
-        //                floatOptionList.Add(new FloatMenuOption("DropThing".Translate(), action, MenuOptionPriority.Medium, null, null));
-        //            }
-        //
-        //            if ((pawnSave != null) &&
-        //                (thing is Apparel))
-        //            {
-        //                if (!equiped)
-        //                    floatOptionList.Add(new FloatMenuOption("Locate", delegate
-        //                    {
-        //                        Pawn apparelEquipedThing = null;
-        //
-        //                        foreach (Pawn p in Find.Map.mapPawns.FreeColonists)
-        //                        {
-        //                            foreach (Apparel a in p.apparel.WornApparel)
-        //                                if (a == thing)
-        //                                {
-        //                                    apparelEquipedThing = p;
-        //                                    break;
-        //                                }
-        //                            if (apparelEquipedThing != null)
-        //                                break;
-        //                        }
-        //
-        //                        if (apparelEquipedThing != null)
-        //                        {
-        //                            Find.CameraMap.JumpTo(apparelEquipedThing.PositionHeld);
-        //                            //                      Find.Selector.ClearSelection();
-        //                            //                      if (apparelEquipedThing.Spawned)
-        //                            //                          Find.Selector.Select(apparelEquipedThing, true, true);
-        //                        }
-        //                        else
-        //                        {
-        //                            Find.CameraMap.JumpTo(thing.PositionHeld);
-        //                            //                      Find.Selector.ClearSelection();
-        //                            //                      if (thing.Spawned)
-        //                            //                          Find.Selector.Select(thing, true, true);
-        //                        }
-        //                    }, MenuOptionPriority.Medium, null, null));
-        //                floatOptionList.Add(new FloatMenuOption("AutoEquip Details", delegate
-        //                {
-        //                    Find.WindowStack.Add(new DialogPawnApparelDetail(pawnSave.Pawn, (Apparel)thing));
-        //                }, MenuOptionPriority.Medium, null, null));
-        //
-        //                floatOptionList.Add(new FloatMenuOption("AutoEquip Comparer", delegate
-        //                {
-        //                    Find.WindowStack.Add(new Dialog_PawnApparelComparer(pawnSave.Pawn, (Apparel)thing));
-        //                }, MenuOptionPriority.Medium, null, null));
-        //            }
-        //
-        //            FloatMenu window = new FloatMenu(floatOptionList, thing.LabelCap, false, false);
-        //            Find.WindowStack.Add(window);
-        //        }
-        //    }
-        //    // draw apparel icon
-        //    if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
-        //    {
-        //        Widgets.ThingIcon(new Rect(6f, y + 4f, lineheight - 12f, lineheight - 12f), thing);
-        //    }
-        //
-        //    // draw apparel list
-        //    Text.Anchor = TextAnchor.MiddleLeft;
-        //    GUI.color = thingColor;
-        //    Rect rectScoreText = new Rect(45f, y, 70f, lineheight);
-        //    Rect rectApparelText = new Rect(115f, y, width - 140f, lineheight);
-        //    string text_Score = "";
-        //    string text_ApparelName = thing.LabelCap;
-        //    var apparel = thing as Apparel;
-        //    if (apparel != null)
-        //    {
-        //        text_Score = pawnCalc.ApparelScoreRaw(apparel).ToString("N5");
-        //
-        //        //  if ((pawnSave != null) && (pawnSave.TargetApparel != null))
-        //        //  {
-        //        //      text_ApparelName = pawnCalc.ApparelScoreRaw(apparel).ToString("N5") + "   " + text_ApparelName;
-        //        //  }
-        //        if (SelPawnForGear.outfits != null && SelPawnForGear.outfits.forcedHandler.IsForced(apparel))
-        //        {
-        //            text_Score = "ApparelForcedLower".Translate();
-        //            //   text_ApparelName = text_ApparelName + ", " + "ApparelForcedLower".Translate();
-        //        }
-        //    }
-        //    Widgets.Label(rectScoreText, text_Score);
-        //    Widgets.Label(rectApparelText, text_ApparelName);
-        //    y += lineheight;
-        //}
+        private void DrawWeaponIcon(ref float x, ref float y, float width, Thing thing)
+        {
+            var lineheight = 80f;
 
+            Rect rectIconBox = new Rect(x, y, lineheight, lineheight);
+            Rect rectIcon = new Rect(rectIconBox.x + 6f, rectIconBox.y + 6f, rectIconBox.width - 12f, rectIconBox.height - 12f);
+
+            if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
+            {
+                Widgets.ThingIcon(rectIcon, thing);
+            }
+
+            TooltipHandler.TipRegion(rectIconBox, thing.LabelCap);
+
+            if (Mouse.IsOver(rectIconBox))
+            {
+                GUI.color = HighlightColor;
+                GUI.DrawTexture(rectIconBox, TexUI.HighlightTex);
+            }
+
+
+            RightMouseButtonClick(thing, rectIconBox);
+
+
+            if (SelPawnForGear.inventory != null)
+                x += lineheight + 20f;
+
+
+        }
+
+        private void DrawInventoryIcon(ref float x, ref float y, Thing thing)
+        {
+            var lineheight = 80f;
+            Rect rectIconBox = new Rect(x, y + 17f, lineheight * 0.5f, lineheight * 0.5f);
+            Rect rectIcon = new Rect(rectIconBox.x + 6f, rectIconBox.y + 6f, rectIconBox.width - 12f, rectIconBox.height - 12f);
+
+            RightMouseButtonClick(thing, rectIconBox);
+
+            if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
+            {
+                Widgets.ThingIcon(rectIcon, thing);
+            }
+
+
+            TooltipHandler.TipRegion(rectIconBox, thing.LabelCap);
+            if (Mouse.IsOver(rectIconBox))
+            {
+                GUI.color = HighlightColor;
+                GUI.DrawTexture(rectIconBox, TexUI.HighlightTex);
+            }
+            x += lineheight * 0.5f + 5f;
+
+            if (x > 300f)
+            {
+                y += lineheight;
+                x = 10f;
+            }
+
+        }
+
+
+        private void RightMouseButtonClick(Thing thing, Rect rect)
+        {
+            if (Widgets.InvisibleButton(rect))
+                if (Event.current.button == 1)
+                {
+                    List<FloatMenuOption> floatOptionList = new List<FloatMenuOption>();
+                    floatOptionList.Add(new FloatMenuOption("ThingInfo".Translate(), delegate
+                    {
+                        Find.WindowStack.Add(new Dialog_InfoCard(thing));
+                    }, MenuOptionPriority.Medium, null, null));
+
+                    if (CanEdit)
+                    {
+                        ThingWithComps eq = thing as ThingWithComps;
+
+
+                        #region CR Stuff #2
+
+                        // Equip option
+                        //  ThingWithComps eq = thing as ThingWithComps;
+                        if (eq != null && eq.TryGetComp<CompEquippable>() != null)
+                        {
+                            CompInventory compInventory = SelPawnForGear.TryGetComp<CompInventory>();
+                            if (compInventory != null)
+                            {
+                                FloatMenuOption equipOption;
+                                string eqLabel = GenLabel.ThingLabel(eq.def, eq.Stuff, 1);
+                                if (SelPawnForGear.equipment.AllEquipment.Contains(eq) && SelPawnForGear.inventory != null)
+                                {
+                                    equipOption = new FloatMenuOption("CR_PutAway".Translate(eqLabel),
+                                        delegate
+                                        {
+                                            ThingWithComps oldEq;
+                                            SelPawnForGear.equipment.TryTransferEquipmentToContainer(SelPawnForGear.equipment.Primary, SelPawnForGear.inventory.container, out oldEq);
+                                        });
+                                }
+                                else if (!SelPawnForGear.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation))
+                                {
+                                    equipOption = new FloatMenuOption("CannotEquip".Translate(eqLabel), null);
+                                }
+                                else
+                                {
+                                    string equipOptionLabel = "Equip".Translate(eqLabel);
+                                    if (eq.def.IsRangedWeapon && SelPawnForGear.story != null && SelPawnForGear.story.traits.HasTrait(TraitDefOf.Brawler))
+                                    {
+                                        equipOptionLabel = equipOptionLabel + " " + "EquipWarningBrawler".Translate();
+                                    }
+                                    equipOption = new FloatMenuOption(equipOptionLabel, delegate
+                                    {
+                                        compInventory.TrySwitchToWeapon(eq);
+                                    });
+                                }
+                                floatOptionList.Add(equipOption);
+                            }
+                        }
+
+                        #endregion CR Stuff #2
+
+                        Action action = null;
+                        Apparel ap = thing as Apparel;
+                        if (ap != null)
+                        {
+                            Apparel unused;
+                            action = delegate
+                            {
+                                SelPawnForGear.apparel.TryDrop(ap, out unused, SelPawnForGear.Position, true);
+                            };
+                        }
+                        else if (eq != null && SelPawnForGear.equipment.AllEquipment.Contains(eq))
+                        {
+                            ThingWithComps unused;
+                            action = delegate
+                            {
+                                SelPawnForGear.equipment.TryDropEquipment(eq, out unused, SelPawnForGear.Position, true);
+                            };
+                        }
+                        else if (!thing.def.destroyOnDrop)
+                        {
+                            Thing unused;
+                            action = delegate
+                            {
+                                SelPawnForGear.inventory.container.TryDrop(thing, SelPawnForGear.Position, ThingPlaceMode.Near, out unused);
+                            };
+                        }
+                        floatOptionList.Add(new FloatMenuOption("DropThing".Translate(), action, MenuOptionPriority.Medium, null, null));
+                    }
+                    FloatMenu window = new FloatMenu(floatOptionList, thing.LabelCap, false, false);
+                    Find.WindowStack.Add(window);
+                }
+        }
 
         #endregion Methods
+
     }
 }

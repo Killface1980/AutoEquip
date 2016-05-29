@@ -13,6 +13,7 @@
   <AutoEquipGlobalSelection>Global Selection</AutoEquipGlobalSelection>
   <AppendIndividualStats>Append Individual Status</AppendIndividualStats>
   <AutoEquipStatus>Status...</AutoEquipStatus>
-  <AutoEquipTab>AutoEquip</AutoEquipTab>
+  <AutoEquipTab>Gear</AutoEquipTab>
   <PreferedTemperature>Prefered Temperature</PreferedTemperature>
+  <EquipmentAndInventory>Equipment And Inventory</EquipmentAndInventory>
 </LanguageData>
