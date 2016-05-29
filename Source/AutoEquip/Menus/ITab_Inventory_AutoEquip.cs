@@ -46,7 +46,7 @@ namespace AutoEquip
         public ITab_Pawn_AutoEquip():base()
         {
             size = new Vector2(432f, 600f);
-            labelKey = "AutoEquipTab";
+            labelKey = "TabGear";
         }
 
         #endregion Constructors
