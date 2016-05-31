@@ -118,7 +118,7 @@ namespace AutoEquip
             {
 
                 _allApparelsItems.Add(apparel);
-                _allApparelsScore.Add(ApparelScoreRaw(apparel));
+                _allApparelsScore.Add(ApparelScoreRaw(apparel,true));
 
             }
         }
@@ -130,7 +130,7 @@ namespace AutoEquip
             foreach (Apparel apparel in _pawn.apparel.WornApparel)
             {
                 _calculatedApparelItems.Add(apparel);
-                _calculatedApparelScore.Add(ApparelScoreRaw(apparel))
+                _calculatedApparelScore.Add(ApparelScoreRaw(apparel,true))
                     ;
             }
             _optimized = false;
@@ -143,7 +143,7 @@ namespace AutoEquip
             foreach (Apparel apparel in _fixedApparels)
             {
                 _calculatedApparelItems.Add(apparel);
-                _calculatedApparelScore.Add(ApparelScoreRaw(apparel));
+                _calculatedApparelScore.Add(ApparelScoreRaw(apparel,true));
             }
             _optimized = false;
         }
@@ -162,7 +162,7 @@ namespace AutoEquip
 
         #region [  ApparelScoreRaw_PawnWorkStats  ]
 
-        public float ApparelScoreRaw(Apparel ap)
+        public float ApparelScoreRaw(Apparel ap, bool useInsulation)
         {
             float num = 1;
             if (ap == null)
@@ -173,12 +173,14 @@ namespace AutoEquip
             num += (0.25f * ApparelScoreRaw_ProtectionBaseStat(ap));
             num *= ApparelScoreRawHitPointAdjust(ap);
 
-            float insulation = ApparelScoreRawInsulationColdAdjust(ap);
-            if (insulation < 1)
-                insulation/=4;
+            if (useInsulation)
+            {
+                float insulation = ApparelScoreRawInsulationColdAdjust(ap);
+                if (insulation < 1)
+                    insulation /= 4;
 
-            num *= insulation;
-
+                num *= insulation;
+            }
             // new insulation calc
 
 
@@ -305,7 +307,7 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ResearchSpeed"), 1f);
                     yield break;
                 case "Cleaning":
-        //            yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 1f);
+                    //            yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 1f);
                     yield break;
                 case "Hauling":
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.25f);
@@ -361,8 +363,8 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ShootingAccuracy"), 1f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("AimingAccuracy"), 1f); // CR
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ReloadSpeed"), 0.25f); // CR
-           //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0625f);
-           //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0625f);
+                                                                                                                        //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0625f);
+                                                                                                                        //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0625f);
                     yield break;
                 case "Cooking":
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.0625f);
@@ -380,8 +382,8 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("TrainAnimalChance"), 1f);
                     //      yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MeleeDPS"), 1.0f);
                     //        yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MeleeHitChance"), 0.25f);
-          //               yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0625f);
-          //                yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0625f);
+                    //               yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0625f);
+                    //                yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0625f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryWeight"), 0.25f); // CR
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryBulk"), 0.25f); // CR
                     yield break;
@@ -554,7 +556,7 @@ namespace AutoEquip
             if (_calculatedApparelItems == null)
                 DIALOG_InitializeCalculatedApparelScoresFromWornApparel();
 
-            return CalculateApparelScoreGain(apparel, ApparelScoreRaw(apparel), out gain);
+            return CalculateApparelScoreGain(apparel, ApparelScoreRaw(apparel,true), out gain);
         }
 
         private bool CalculateApparelScoreGain(Apparel apparel, float score, out float gain)
@@ -659,36 +661,50 @@ namespace AutoEquip
 
         private static void DoConflict(Apparel apparel, PawnCalcForApparel pawnX, PawnCalcForApparel pawnY, ref float? xPercentual)
         {
-            if (!xPercentual.HasValue)
-            {
-                if (pawnX._totalStats == null)
-                    pawnX._totalStats = pawnX.ApparelScoreRaw(null);
-                float xNoStats = pawnX.ApparelScoreRaw(apparel);
-                xPercentual = pawnX._totalStats / xNoStats;
-                if (pawnX._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
-                    xPercentual *= 1.25f;
-            }
 
-            if (pawnY._totalStats == null)
-                pawnY._totalStats = pawnY.ApparelScoreRaw(null);
+            if (pawnY._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
+                pawnX.LoseConflict(apparel);
+            else
+                pawnY.LoseConflict(apparel);
 
-            float yNoStats = pawnY.ApparelScoreRaw(apparel);
-            if (pawnY._totalStats != null)
-            {
-                float yPercentual = pawnY._totalStats.Value / yNoStats;
 
-                if (pawnY._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
-                    yPercentual *= 1.25f;
-
-                if (xPercentual.Value > yPercentual)
-                {
-                    pawnY.LoseConflict(apparel);
-                }
-                else
-                {
-                    pawnX.LoseConflict(apparel);
-                }
-            }
+          //if (!xPercentual.HasValue)
+          //{
+          //    if (pawnX._totalStats == null)
+          //        pawnX._totalStats = pawnX.ApparelScoreRaw(null,false);
+          //
+          //    float xNoStats = pawnX.ApparelScoreRaw(apparel, false);
+          //    xPercentual = pawnX._totalStats / xNoStats;
+          //
+          //    if (pawnX._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
+          //        xPercentual *= 1.25f;
+          //}
+          //
+          //if (pawnY._totalStats == null)
+          //    pawnY._totalStats = pawnY.ApparelScoreRaw(null,false);
+          //
+          //float yNoStats = pawnY.ApparelScoreRaw(apparel,false);
+          //
+          //if (pawnY._totalStats != null)
+          //{
+          //
+          //    float yPercentual = pawnY._totalStats.Value / yNoStats;
+          //
+          //
+          //    if (pawnY._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
+          //        pawnX.LoseConflict(apparel);
+          //    else 
+          //      yPercentual *= 1.25f;
+          //
+          //    if (xPercentual.Value > yPercentual)
+          //    {
+          //        pawnY.LoseConflict(apparel);
+          //    }
+          //    else
+          //    {
+          //        pawnX.LoseConflict(apparel);
+          //    }
+          //}
         }
 
 

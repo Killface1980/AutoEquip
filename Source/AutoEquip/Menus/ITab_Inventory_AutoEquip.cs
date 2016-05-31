@@ -17,6 +17,10 @@ namespace AutoEquip
         private const float _margin = 15f;
         private const float _topPadding = 15f;
 
+        float lineheight = 38f;
+
+        private bool useGraphicalBars = false;
+
         private static readonly Color _highlightColor = new Color(0.5f, 0.5f, 0.5f, 1f);
         private static readonly Color _thingLabelColor = new Color(0.9f, 0.9f, 0.9f, 1f);
 
@@ -86,6 +90,22 @@ namespace AutoEquip
                 size.x - 2 * _margin,
                 size.y - _topPadding - _margin);
 
+            SaveablePawn pawnSave;
+            PawnCalcForApparel pawnCalc;
+
+            if (SelPawnForGear.IsColonist)
+            {
+                pawnSave = MapComponent_AutoEquip.Get.GetCache(SelPawnForGear);
+                pawnCalc = new PawnCalcForApparel(pawnSave);
+            }
+            else
+            {
+                pawnSave = null;
+                pawnCalc = null;
+                FillTabVanilla();
+                return;
+            }
+
             #region CR Stuff
 
             // get the inventory comp
@@ -104,21 +124,6 @@ namespace AutoEquip
 
             #endregion CR Stuff
 
-            SaveablePawn pawnSave;
-            PawnCalcForApparel pawnCalc;
-
-            if (SelPawnForGear.IsColonist)
-            {
-                pawnSave = MapComponent_AutoEquip.Get.GetCache(SelPawnForGear);
-                pawnCalc = new PawnCalcForApparel(pawnSave);
-            }
-            else
-            {
-                pawnSave = null;
-                pawnCalc = null;
-                FillTabVanilla();
-                return;
-            }
 
             Text.Font = GameFont.Small;
 
@@ -213,8 +218,8 @@ namespace AutoEquip
 
                 // temeprature header
 
-                Widgets.ListSeparator(ref cur.y, header.width, "Apparel".Translate());
-                cur.y += 5f;
+                //      Widgets.ListSeparator(ref cur.y, header.width, "Apparel".Translate());
+                //       cur.y += 5f;
                 Widgets.ListSeparator(ref cur.y, header.width - _margin * 2, "PreferedTemperature".Translate());
                 //          Text.Anchor = TextAnchor.UpperLeft;
 
@@ -227,7 +232,7 @@ namespace AutoEquip
                 FloatRange targetTemps = pawnStatCache.TargetTemperatures;
                 FloatRange minMaxTemps = ApparelStatsHelper.MinMaxTemperatureRange;
 
-                Rect sliderRect = new Rect(cur.x, cur.y, header.width - _margin * 4.5f, 40f);
+                Rect sliderRect = new Rect(cur.x, cur.y, header.width - _margin * 4.25f, 40f);
 
                 Rect tempResetRect = new Rect(header.xMax - _margin * 4 - 1f, cur.y + 12f, 16f, 16f);
                 cur.y += 5f; // includes padding 
@@ -266,15 +271,15 @@ namespace AutoEquip
             }
             cur.y += 15f;
             listRect.yMin += cur.y;
-            listRect.height -= _margin/2f;
+            //      listRect.height -= _margin/2f;
             //      header.height += cur.y;
 
             Text.Font = GameFont.Small;
 
-            listRect.x = 0;
+            //  listRect.x = 0;
             //       listRect.width -= _margin;
 
-            Rect apparelGroupRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, listRect.height - _margin);
+            Rect apparelGroupRect = new Rect(0f, listRect.yMin, listRect.width, listRect.height - _margin);
             Rect apparelListRect = new Rect(0f, 0f, listRect.width - _margin * 2, _scrollViewHeight);
 
             Widgets.BeginScrollView(apparelGroupRect, ref _scrollPosition, apparelListRect);
@@ -316,14 +321,15 @@ namespace AutoEquip
 
             if (Event.current.type == EventType.Layout)
             {
-                _scrollViewHeight = posY;
+                _scrollViewHeight = posY + _margin;
             }
             Widgets.EndScrollView();
+
             GUI.EndGroup();
 
-            if (_scrollViewHeight>apparelGroupRect.height)
+            if (_scrollViewHeight > apparelGroupRect.height)
             {
-                GUI.color = Color.gray;
+                GUI.color = Color.grey;
                 Widgets.DrawLineHorizontal(_margin, listRect.yMax, apparelListRect.width);
             }
 
@@ -510,7 +516,6 @@ namespace AutoEquip
 
         private void DrawThingRow(ref float y, float width, Thing thing, bool equiped, Color thingColor, SaveablePawn pawnSave, PawnCalcForApparel pawnCalc)
         {
-            var lineheight = 40f;
             Rect rect = new Rect(0f, y, width, lineheight);
 
             TooltipHandler.TipRegion(rect, thing.GetWeightAndBulkTip());
@@ -700,23 +705,40 @@ namespace AutoEquip
 
             #endregion Button Clicks
 
-            // draw apparel icon
-            if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
-            {
-                Widgets.ThingIcon(new Rect(6f, y + 4f, lineheight - 12f, lineheight - 12f), thing);
-            }
-
             // draw apparel list
             Text.Anchor = TextAnchor.MiddleLeft;
             GUI.color = thingColor;
-            Rect rectScoreText = new Rect(45f, y, 70f, lineheight);
-            Rect rectApparelText = new Rect(115f, y, width - 140f, lineheight);
+
+            Rect iconRect = new Rect(lineheight * 0.1f, y + lineheight * 0.1f, lineheight * 0.75f, lineheight * 0.75f);
+            Rect scoreRect = new Rect(iconRect.xMax + _margin, y, 40f, lineheight);
+
+            Rect apparelText = new Rect(scoreRect.xMax + _margin / 2, y, width - scoreRect.xMax - _margin * 6.5f, lineheight); //original: 1x margin, not 4
+            Rect statusRect = new Rect(apparelText.xMax + _margin, y, width - apparelText.xMax - _margin, lineheight);
+
+
+            if (!useGraphicalBars)
+            {
+                apparelText.width = width - scoreRect.xMax - _margin;
+            }
+
+
+            // draw apparel icon
+            if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
+            {
+                Widgets.ThingIcon(iconRect, thing);
+            }
+
             string text_Score = "";
             string text_ApparelName = thing.LabelCap;
+
+            string ext = text_ApparelName.Substring(0, text_ApparelName.LastIndexOf("("));
+
+            text_ApparelName = ext;
+
             var apparel = thing as Apparel;
             if (apparel != null)
             {
-                text_Score = pawnCalc.ApparelScoreRaw(apparel).ToString("N5");
+                text_Score = Math.Round(pawnCalc.ApparelScoreRaw(apparel,false), 2).ToString("N2");
 
                 //  if ((pawnSave != null) && (pawnSave.TargetApparel != null))
                 //  {
@@ -728,26 +750,144 @@ namespace AutoEquip
                     //   text_ApparelName = text_ApparelName + ", " + "ApparelForcedLower".Translate();
                 }
             }
-            Widgets.Label(rectScoreText, text_Score);
-            Widgets.Label(rectApparelText, text_ApparelName);
+
+            GUI.color = thingColor;
+
+            Widgets.Label(scoreRect, text_Score);
+            if (useGraphicalBars)
+            {
+                Widgets.Label(apparelText, text_ApparelName);
+            }
+            else
+            {
+                Widgets.Label(apparelText, thing.LabelBaseCap);
+            }
+
+            if (useGraphicalBars)
+            {
+                // Quality label
+                string apparelQualityText = "";
+
+                QualityCategory q;
+                if (thing.TryGetQuality(out q))
+                {
+                    switch (q)
+                    {
+                        case QualityCategory.Awful: apparelQualityText = "QualityCategory_Awful".Translate(); break;
+                        case QualityCategory.Shoddy: apparelQualityText = "QualityCategory_Shoddy".Translate(); break;
+                        case QualityCategory.Poor: apparelQualityText = "QualityCategory_Poor".Translate(); break;
+                        case QualityCategory.Normal: apparelQualityText = "QualityCategory_Normal".Translate(); break;
+                        case QualityCategory.Good: apparelQualityText = "QualityCategory_Good".Translate(); break;
+                        case QualityCategory.Excellent: apparelQualityText = "QualityCategory_Excellent".Translate(); break;
+                        case QualityCategory.Superior: apparelQualityText = "QualityCategory_Superior".Translate(); break;
+                        case QualityCategory.Masterwork: apparelQualityText = "QualityCategory_Masterwork".Translate(); break;
+                        case QualityCategory.Legendary: apparelQualityText = "QualityCategory_Legendary".Translate(); break;
+                    }
+                }
+
+                Rect rectApparelQuality = statusRect;
+                rectApparelQuality.height *= 0.5f;
+                rectApparelQuality.yMin += lineheight * 0.1f;
+                rectApparelQuality.width -= lineheight * 0.1f;
+
+
+                //        Widgets.Label(rectApparelQuality, apparelQualityText);
+
+
+                Rect apparelHealthBarMax = new Rect(statusRect);
+                Text.Font = GameFont.Tiny;
+
+                float apparelFactor = thing.HitPoints / (float)thing.MaxHitPoints;
+
+                if (apparelFactor > 0)
+                {
+                    // bar for the current health
+
+
+                    Color healthbarColor = new Color(0.25f, 0.25f, 0.25f, 0.6f);
+
+                    Texture2D maxbar = new Texture2D(1, 1);
+                    maxbar.SetPixel(1, 1, healthbarColor);
+                    maxbar.wrapMode = TextureWrapMode.Repeat;
+                    maxbar.Apply();
+
+
+
+
+
+                    Texture2D fillbar = new Texture2D(1, 1);
+                    fillbar.SetPixel(1, 1, new Color(healthbarColor.r / 5, healthbarColor.g / 5, healthbarColor.b / 5, 0.6f));
+                    fillbar.Apply();
+
+                    // actual bars
+                    apparelHealthBarMax.height *= 0.33f;
+                    apparelHealthBarMax.y += lineheight * 0.5f;
+
+                    Rect apparelHealthBar = apparelHealthBarMax;
+                    apparelHealthBar.width *= apparelFactor;
+
+
+
+                    // 25, 50 & 75 percent markers
+                    float forthPercent = apparelHealthBarMax.width / 4;
+                    var marker0 = new Rect(apparelHealthBarMax.x, apparelHealthBarMax.yMin, 1f, apparelHealthBarMax.height);
+                    var marker25 = marker0;
+                    var marker50 = marker0;
+                    var marker75 = marker0;
+                    var marker100 = marker0;
+                    marker25.x += forthPercent;
+                    marker50.x += forthPercent * 2;
+                    marker75.x += forthPercent * 3;
+                    marker100.x = apparelHealthBarMax.xMax - 1f;
+
+                    GUI.DrawTexture(marker0, BaseContent.GreyTex);
+                    GUI.DrawTexture(marker25, BaseContent.GreyTex);
+                    GUI.DrawTexture(marker50, BaseContent.GreyTex);
+                    GUI.DrawTexture(marker75, BaseContent.GreyTex);
+                    GUI.DrawTexture(marker100, BaseContent.GreyTex);
+
+
+
+                    GUI.skin.box.normal.background = maxbar;
+                    GUI.Box(apparelHealthBarMax, GUIContent.none);
+
+                    GUI.skin.box.normal.background = fillbar;
+                    GUI.Box(apparelHealthBar, GUIContent.none);
+
+
+
+
+                    //        statusRect.yMin += lineheight * 0.5f;
+                    statusRect.xMin += _margin / 4;
+                    Widgets.Label(statusRect, apparelQualityText + " " + apparelFactor.ToStringPercent());
+                }
+                else
+                {
+                    Widgets.Label(statusRect, apparelQualityText);
+                }
+
+                Text.Font = GameFont.Small;
+                GUI.skin.box.normal.background = null; 
+            }
+
             y += lineheight;
         }
 
         private void DrawWeaponIcon(ref float x, ref float y, float width, Thing thing)
         {
-            var lineheight = 60f;
+            var weaponIconSize = lineheight * 1.5f;
 
-            Rect rectIconBox = new Rect(x, y, lineheight, lineheight);
+            Rect rectIconBox = new Rect(x, y, weaponIconSize, weaponIconSize);
             Rect rectIcon = new Rect(rectIconBox.x + 6f, rectIconBox.y + 6f, rectIconBox.width - 12f, rectIconBox.height - 12f);
 
             TooltipHandler.TipRegion(rectIconBox, thing.GetWeightAndBulkTip());
+            // TooltipHandler.TipRegion(rectIconBox, thing.LabelCap);
+
 
             if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
             {
                 Widgets.ThingIcon(rectIcon, thing);
             }
-
-            TooltipHandler.TipRegion(rectIconBox, thing.LabelCap);
 
             if (Mouse.IsOver(rectIconBox))
             {
@@ -755,20 +895,17 @@ namespace AutoEquip
                 GUI.DrawTexture(rectIconBox, TexUI.HighlightTex);
             }
 
-
             RightMouseButtonClick(thing, rectIconBox);
 
-
             if (SelPawnForGear.inventory != null)
-                x += lineheight + 20f;
-
-
+                x += lineheight * 2;
         }
 
         private void DrawInventoryIcon(ref float x, ref float y, Thing thing)
         {
-            var lineheight = 60f;
-            Rect rectIconBox = new Rect(x, y + 17f, lineheight * 0.5f, lineheight * 0.5f);
+            var inventoryIconSize = lineheight * 0.75f;
+
+            Rect rectIconBox = new Rect(x, y + 17f, inventoryIconSize, inventoryIconSize);
             Rect rectIcon = new Rect(rectIconBox.x + 6f, rectIconBox.y + 6f, rectIconBox.width - 12f, rectIconBox.height - 12f);
 
             TooltipHandler.TipRegion(rectIconBox, thing.GetWeightAndBulkTip());
@@ -785,7 +922,7 @@ namespace AutoEquip
                 GUI.color = HighlightColor;
                 GUI.DrawTexture(rectIconBox, TexUI.HighlightTex);
             }
-            x += lineheight * 0.5f + 5f;
+            x += inventoryIconSize + _margin / 2;
 
             if (x > 400f)
             {

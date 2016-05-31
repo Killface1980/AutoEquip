@@ -120,14 +120,14 @@ namespace AutoEquip
                         currentAppel, currentAppel.LabelCap, apparelLabelWidth,
                         equiped, equiped == null ? null : equiped.LabelCap, apparelEquipedWidth,
                         target, target == null ? null : target.LabelCap, apparelOwnerWidth,
-                        pawnAutoEquip.ApparelScoreRaw(currentAppel).ToString("N5"), apparelScoreWidth,
+                        pawnAutoEquip.ApparelScoreRaw(currentAppel,true).ToString("N5"), apparelScoreWidth,
                         gain.ToString("N5"), apparelGainWidth);
                 else
                     DrawLine(ref itemRect,
                         currentAppel, currentAppel.LabelCap, apparelLabelWidth,
                         equiped, equiped == null ? null : equiped.LabelCap, apparelEquipedWidth,
                         target, target == null ? null : target.LabelCap, apparelOwnerWidth,
-                        pawnAutoEquip.ApparelScoreRaw(currentAppel).ToString("N5"), apparelScoreWidth,
+                        pawnAutoEquip.ApparelScoreRaw(currentAppel,false).ToString("N5"), apparelScoreWidth,
                         "No Allow", apparelGainWidth);
 
                 listRect.yMin = itemRect.yMax;

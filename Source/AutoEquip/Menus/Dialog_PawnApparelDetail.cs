@@ -30,13 +30,46 @@ namespace AutoEquip
         }
 
         private Vector2 _scrollPosition;
+        private ThingDef stuff;
+        private Def def;
+
+        private Def Def
+        {
+            get
+            {
+                if (this._apparel != null)
+                    return (Def)this._apparel.def;
+                return this.def;
+            }
+        }
+
+        private string GetTitle()
+        {
+            if (this._apparel != null)
+                return this._apparel.LabelBaseCap;
+            ThingDef thingDef = this.Def as ThingDef;
+            if (thingDef != null)
+                return GenLabel.ThingLabel((BuildableDef)thingDef, this.stuff, 1).CapitalizeFirst();
+            return this.Def.LabelCap;
+        }
 
         public override void DoWindowContents(Rect windowRect)
         {
+
+            Rect rect1 = new Rect(windowRect);
+            rect1.height = 34f;
+            Text.Font = GameFont.Medium;
+            Widgets.Label(rect1, this.GetTitle());
+            Text.Font = GameFont.Small;
+
             PawnCalcForApparel conf = new PawnCalcForApparel(_pawn);
 
-            Rect groupRect = windowRect.ContractedBy(10f);
+
+
+
+            Rect groupRect = windowRect;
             groupRect.height -= 100;
+            groupRect.yMin += 30f;
             GUI.BeginGroup(groupRect);
 
             float baseValue = 100f;
@@ -126,7 +159,7 @@ namespace AutoEquip
                     stat.StatDef.label, labelWidth,
                     value.ToString("N3"), baseValue,
                     stat.Strength.ToString("N2"), multiplierWidth,
-                    statscore.ToString("N5"), finalValue);
+                    statscore.ToString("N4"), finalValue);
 
                 listRect.yMin = itemRect.yMax;
 
@@ -175,7 +208,7 @@ namespace AutoEquip
                         workstat.StatDef.label, labelWidth,
                         value.ToString("N3"), baseValue,
                         workstatStrengthDialog.ToString("N2"), multiplierWidth,
-                        (value * workstatStrengthDialog).ToString("N5"), finalValue);
+                        (value * workstatStrengthDialog).ToString("N4"), finalValue);
 
                     listRect.yMin = itemRect.yMax;
                 }
@@ -225,8 +258,8 @@ namespace AutoEquip
                 DrawLine(ref itemRect,
                 "AverageStat".Translate(), labelWidth,
                 (sumStatsValue / stats.Length).ToString("N3"), baseValue,
-                conf.ApparelScoreRaw_PawnStats(_apparel).ToString("N5"), multiplierWidth,
-                subtotal.ToString("N5"), finalValue);
+                conf.ApparelScoreRaw_PawnStats(_apparel).ToString("N4"), multiplierWidth,
+                subtotal.ToString("N4"), finalValue);
 
                 itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             }
@@ -238,8 +271,8 @@ namespace AutoEquip
                 DrawLine(ref itemRect,
                 "AverageWorkStat".Translate(), labelWidth,
                 (sumWorkStatsValue / filteredworkstats.Count).ToString("N3"), baseValue,
-                conf.ApparelScoreRaw_PawnWorkStats(_apparel).ToString("N5"), multiplierWidth,
-                subtotal.ToString("N5"), finalValue);
+                conf.ApparelScoreRaw_PawnWorkStats(_apparel).ToString("N4"), multiplierWidth,
+                subtotal.ToString("N4"), finalValue);
 
                 itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             }
@@ -252,7 +285,7 @@ namespace AutoEquip
                 "AutoEquipArmor".Translate(), labelWidth,
                 "+", baseValue,
                 armor.ToString("N4"), multiplierWidth,
-                subtotal.ToString("N5"), finalValue);
+                subtotal.ToString("N4"), finalValue);
 
             subtotal *= conf.ApparelScoreRawHitPointAdjust(_apparel);
 
@@ -261,7 +294,7 @@ namespace AutoEquip
                 "AutoEquipHitPoints".Translate(), labelWidth,
                 conf.ApparelScoreRawHitPointAdjust(_apparel).ToString("N3"), baseValue,
                 "", multiplierWidth,
-                subtotal.ToString("N5"), finalValue);
+                subtotal.ToString("N4"), finalValue);
 
             subtotal = subtotal * conf.ApparelScoreRawInsulationColdAdjust(_apparel);
 
@@ -275,14 +308,14 @@ namespace AutoEquip
                 "AutoEquipTemperature".Translate(), labelWidth,
                 insulation.ToString("N3"), baseValue,
                 "", multiplierWidth,
-                subtotal.ToString("N5"), finalValue);
+                subtotal.ToString("N4"), finalValue);
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipTotal".Translate(), labelWidth,
                 "", baseValue,
                 "", multiplierWidth,
-                conf.ApparelScoreRaw(_apparel).ToString("N5"), finalValue);
+                conf.ApparelScoreRaw(_apparel, true).ToString("N4"), finalValue);
 
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;
