@@ -48,19 +48,19 @@ namespace AutoEquip
                         };
                         
 
-                        Apparel t;
-                        if (pawn.apparel.TryDrop(a, out t))
-                        {
-                            t.SetForbidden(false, true);
-
-                            Job job = HaulAIUtility.HaulToStorageJob(pawn, t);
-
-                            if (job != null)
-                                return job;
-                            pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 350;
-                            return null;
-                        }
-
+              //        Apparel t;
+              //        if (pawn.apparel.TryDrop(a, out t))
+              //        {
+              //            t.SetForbidden(false, true);
+              //
+              //            Job job = HaulAIUtility.HaulToStorageJob(pawn, t);
+              //
+              //            if (job != null)
+              //                return job;
+              //            pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 350;
+              //            return null;
+              //        }
+              //
              //           Apparel t;
              //           if (pawn.apparel.TryDrop(a, out t))
              //           {

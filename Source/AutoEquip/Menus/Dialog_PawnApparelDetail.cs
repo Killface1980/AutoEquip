@@ -201,7 +201,7 @@ namespace AutoEquip
             DrawLine(ref itemRect,
                 "", labelWidth,
                 "", baseValue,
-                "Status Offset", multiplierWidth,
+                "Multiplier", multiplierWidth,
                 "Subtotal", finalValue);
 
             //       itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 0.6f);
@@ -254,7 +254,7 @@ namespace AutoEquip
                 armor.ToString("N4"), multiplierWidth,
                 subtotal.ToString("N5"), finalValue);
 
-            subtotal = subtotal * conf.ApparelScoreRawHitPointAdjust(_apparel);
+            subtotal *= conf.ApparelScoreRawHitPointAdjust(_apparel);
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
@@ -265,10 +265,15 @@ namespace AutoEquip
 
             subtotal = subtotal * conf.ApparelScoreRawInsulationColdAdjust(_apparel);
 
+            float insulation = conf.ApparelScoreRawInsulationColdAdjust(_apparel);
+            if (insulation < 1)
+                insulation /= 4;
+
+
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipTemperature".Translate(), labelWidth,
-                conf.ApparelScoreRawInsulationColdAdjust(_apparel).ToString("N3"), baseValue,
+                insulation.ToString("N3"), baseValue,
                 "", multiplierWidth,
                 subtotal.ToString("N5"), finalValue);
 

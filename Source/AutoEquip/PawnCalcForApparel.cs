@@ -60,10 +60,17 @@ namespace AutoEquip
 
         private static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
         {
-            new CurvePoint( 0.0f, 0.0f ),
-            new CurvePoint( 0.25f, 0.15f ),
-            new CurvePoint( 0.5f, 0.7f ),
+            new CurvePoint( 0.0f, 0.05f ),
+            new CurvePoint( 0.4f, 0.3f ),
+            new CurvePoint( 0.6f, 0.75f ),
             new CurvePoint( 1f, 1f )
+
+  //                    new CurvePoint( 0.0f, 0.0f ),
+  //        new CurvePoint( 0.25f, 0.15f ),
+  //        new CurvePoint( 0.5f, 0.7f ),
+  //        new CurvePoint( 1f, 1f )
+
+
         //  new CurvePoint(0f, 0.1f),
         //  new CurvePoint(0.6f, 0.7f),
         //  new CurvePoint(1f, 1f)
@@ -160,10 +167,11 @@ namespace AutoEquip
             float num = 1;
             if (ap == null)
                 return num;
+
             num += ApparelScoreRaw_PawnStats(ap);
             num += ApparelScoreRaw_PawnWorkStats(ap);
             num += (0.25f * ApparelScoreRaw_ProtectionBaseStat(ap));
-  //          num *= ApparelScoreRawHitPointAdjust(ap);
+            num *= ApparelScoreRawHitPointAdjust(ap);
 
             float insulation = ApparelScoreRawInsulationColdAdjust(ap);
             if (insulation < 1)
@@ -180,7 +188,7 @@ namespace AutoEquip
 
         public float ApparelScoreRaw_ProtectionBaseStat(Apparel ap)
         {
-            float score = 1;
+            float score = 1f;
             float protectionScore =
                 ap.GetStatValue(StatDefOf.ArmorRating_Sharp) +
                 ap.GetStatValue(StatDefOf.ArmorRating_Blunt) * 0.75f;
@@ -190,7 +198,7 @@ namespace AutoEquip
 
         public float ApparelScoreRaw_PawnStats(Apparel ap)
         {
-            float num = 0f;
+            float statScore = 0f;
 
             foreach (Saveable_Outfit_StatDef stat in Stats)
             {
@@ -218,7 +226,7 @@ namespace AutoEquip
 
                     if (statValue <= 0.999f || statValue >= 1.001f)
                     {
-                        num += statValue * strength;
+                        statScore += statValue * strength;
                     }
                 }
 
@@ -229,7 +237,7 @@ namespace AutoEquip
                 }
             }
 
-            return num;
+            return statScore;
             //   float score = num / count;
             //
             //   return score;
@@ -237,7 +245,7 @@ namespace AutoEquip
 
         public float ApparelScoreRaw_PawnWorkStats(Apparel ap)
         {
-            float num = 0f;
+            float workScore = 0f;
             //       float count = 0f;
 
             foreach (Saveable_Pawn_WorkStatDef workstat in WorkStats)
@@ -263,9 +271,9 @@ namespace AutoEquip
                         workStatStrength = workStatStrength * -1;
                     }
 
-                    if (workStatValue <= 0.999f || workStatValue >= 1.001f)
+                    if (workStatValue <= 0.99f || workStatValue >= 1.01f)
                     {
-                        num += workStatValue * workStatStrength;
+                        workScore += workStatValue * workStatStrength;
                         //              count++;
                     }
 
@@ -282,7 +290,7 @@ namespace AutoEquip
             //  if (count < 0.99f)
             //      count = 1f;
 
-            return num;
+            return workScore;
             //  float score = num / count;
             //
             //  return score;
@@ -353,8 +361,8 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ShootingAccuracy"), 1f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("AimingAccuracy"), 1f); // CR
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ReloadSpeed"), 0.25f); // CR
-                    yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.25f);
-                    yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.25f);
+           //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0625f);
+           //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0625f);
                     yield break;
                 case "Cooking":
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.0625f);
@@ -372,8 +380,8 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("TrainAnimalChance"), 1f);
                     //      yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MeleeDPS"), 1.0f);
                     //        yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MeleeHitChance"), 0.25f);
-                           yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.125f);
-                            yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.125f);
+          //               yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0625f);
+          //                yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0625f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryWeight"), 0.25f); // CR
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryBulk"), 0.25f); // CR
                     yield break;
