@@ -77,7 +77,7 @@ namespace AutoEquip
             float finalValue = 120f;
             float labelWidth = groupRect.width - baseValue - multiplierWidth - finalValue - 8f - 8f;
 
-            Rect itemRect = new Rect(groupRect.xMin + 4f, groupRect.yMin, groupRect.width - 8f, Text.LineHeight * 1.2f);
+            Rect itemRect = new Rect(groupRect.xMin + 4f, groupRect.yMin, groupRect.width /2, Text.LineHeight * 1.2f); //original groupRect.width -8f
 
             DrawLine(ref itemRect,
                 "Status", labelWidth,
