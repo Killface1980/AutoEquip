@@ -16,7 +16,7 @@ namespace AutoEquip
   //        PawnCalcForApparel.ApparelScoreRaw_PawnStatsHandlers += PawnCalcForApparel.InfusionApparelScoreRaw_PawnStatsHandlers;
   //    }
 
-        public int _nextOptimization;
+        public int nextOptimization;
         public List<Saveable_Outfit> OutfitCache = new List<Saveable_Outfit>();
         public List<SaveablePawn> PawnCache = new List<SaveablePawn>();
 
@@ -38,6 +38,8 @@ namespace AutoEquip
 
         public override void ExposeData()
         {
+            Scribe_Values.LookValue(ref this.nextOptimization, "nextOptimization", 0);
+
             Scribe_Collections.LookList(ref OutfitCache, "Outfits", LookMode.Deep);
             Scribe_Collections.LookList(ref PawnCache, "Pawns", LookMode.Deep);
             base.ExposeData();
@@ -84,7 +86,7 @@ namespace AutoEquip
         {
             base.MapComponentTick();
 
-            if (Find.TickManager.TicksGame < _nextOptimization)
+            if (Find.TickManager.TicksGame < nextOptimization)
                 return;
 
 #if LOG
@@ -112,7 +114,7 @@ namespace AutoEquip
             PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
 
 
-            _nextOptimization = Find.TickManager.TicksGame + 5000;
+            nextOptimization = Find.TickManager.TicksGame + 5000;
 
             //this.nextOptimization = Find.TickManager.TicksGame + 5000;
         }

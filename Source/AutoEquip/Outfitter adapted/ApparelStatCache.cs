@@ -120,8 +120,8 @@ namespace AutoEquip
                     GenDate.CurrentMonth);
                 var averageTempNow = baseTemperatureMonth;
 
-                var min_basetemp = baseTemperatureMonth - 15f;
-                var max_basetemp = baseTemperatureMonth + 15f;
+                var min_basetemp = baseTemperatureMonth - 12f;
+                var max_basetemp = baseTemperatureMonth + 12f;
 
                 if (Find.MapConditionManager.ActiveConditions.OfType<MapCondition_HeatWave>().Any())
                 {

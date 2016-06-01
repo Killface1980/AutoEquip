@@ -315,7 +315,7 @@ namespace AutoEquip
                 "AutoEquipTotal".Translate(), labelWidth,
                 "", baseValue,
                 "", multiplierWidth,
-                conf.ApparelScoreRaw(_apparel, true).ToString("N4"), finalValue);
+                conf.ApparelScoreRaw(_apparel).ToString("N4"), finalValue);
 
             GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;

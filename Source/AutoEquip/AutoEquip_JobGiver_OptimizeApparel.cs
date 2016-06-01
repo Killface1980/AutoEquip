@@ -10,6 +10,10 @@ namespace AutoEquip
         private const int ApparelOptimizeCheckInterval = 500;
         //  private const int ApparelOptimizeCheckInterval = 3000;
 
+        private const float MinScoreGainToCare = 0.09f;
+        private const float ScoreFactorIfNotReplacing = 10f;
+
+
         private static void SetNextOptimizeTick(Pawn pawn)
         {
             pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + 500;

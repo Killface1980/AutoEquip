@@ -16,8 +16,13 @@ namespace AutoEquip
             MethodInfo coreDialogManageOutfits = typeof(Dialog_ManageOutfits).GetMethod("DoWindowContents", BindingFlags.CreateInstance | BindingFlags.Public);
             MethodInfo autoEquipDialogManageOutfits = typeof(Dialog_ManageOutfitsAutoEquip).GetMethod("DoWindowContents", BindingFlags.CreateInstance | BindingFlags.Public);
 
+   //       MethodInfo source = typeof(JobGiver_OptimizeApparel).GetMethod("ApparelScoreRaw", BindingFlags.Static | BindingFlags.Public);
+   //       MethodInfo destination = typeof(ApparelStatsHelper).GetMethod("ApparelScoreRaw", BindingFlags.Static | BindingFlags.Public);
+
+
             try
             {
+     //       Detours.TryDetourFromTo(source, destination);
                 Detours.TryDetourFromTo(coreMethod, autoEquipMethod);
             }
             catch (Exception)

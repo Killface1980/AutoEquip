@@ -738,7 +738,7 @@ namespace AutoEquip
             var apparel = thing as Apparel;
             if (apparel != null)
             {
-                text_Score = Math.Round(pawnCalc.ApparelScoreRaw(apparel,true), 2).ToString("N2");
+                text_Score = Math.Round(pawnCalc.ApparelScoreRaw(apparel), 2).ToString("N2");
 
                 //  if ((pawnSave != null) && (pawnSave.TargetApparel != null))
                 //  {

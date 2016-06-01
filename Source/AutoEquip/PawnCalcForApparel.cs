@@ -118,7 +118,7 @@ namespace AutoEquip
             {
 
                 _allApparelsItems.Add(apparel);
-                _allApparelsScore.Add(ApparelScoreRaw(apparel,true));
+                _allApparelsScore.Add(ApparelScoreRaw(apparel));
 
             }
         }
@@ -130,8 +130,7 @@ namespace AutoEquip
             foreach (Apparel apparel in _pawn.apparel.WornApparel)
             {
                 _calculatedApparelItems.Add(apparel);
-                _calculatedApparelScore.Add(ApparelScoreRaw(apparel,true))
-                    ;
+                _calculatedApparelScore.Add(ApparelScoreRaw(apparel));
             }
             _optimized = false;
         }
@@ -143,7 +142,7 @@ namespace AutoEquip
             foreach (Apparel apparel in _fixedApparels)
             {
                 _calculatedApparelItems.Add(apparel);
-                _calculatedApparelScore.Add(ApparelScoreRaw(apparel,true));
+                _calculatedApparelScore.Add(ApparelScoreRaw(apparel));
             }
             _optimized = false;
         }
@@ -162,7 +161,7 @@ namespace AutoEquip
 
         #region [  ApparelScoreRaw_PawnWorkStats  ]
 
-        public float ApparelScoreRaw(Apparel ap, bool useInsulation)
+        public float ApparelScoreRaw(Apparel ap)
         {
             float num = 1;
             if (ap == null)
@@ -173,14 +172,13 @@ namespace AutoEquip
             num += (0.25f * ApparelScoreRaw_ProtectionBaseStat(ap));
             num *= ApparelScoreRawHitPointAdjust(ap);
 
-            if (useInsulation)
-            {
-                float insulation = ApparelScoreRawInsulationColdAdjust(ap);
-                if (insulation < 1)
-                    insulation /= 4;
 
-                num *= insulation;
-            }
+            float insulation = ApparelScoreRawInsulationColdAdjust(ap);
+            if (insulation < 1)
+                insulation /= 4;
+
+            num *= insulation;
+
             // new insulation calc
 
 
@@ -491,7 +489,7 @@ namespace AutoEquip
             float maxComfyTemperature = _pawn.GetStatValue(StatDefOf.ComfyTemperatureMax);
 
             // offsets on apparel
-            float insulationCold = ap.GetStatValue(StatDefOf.Insulation_Cold);
+            float insulationCold = ap.GetStatValue(StatDefOf.Insulation_Cold); 
             float insulationHeat = ap.GetStatValue(StatDefOf.Insulation_Heat);
 
             // if this gear is currently worn, we need to make sure the contribution to the pawn's comfy temps is removed so the gear is properly scored
@@ -556,7 +554,7 @@ namespace AutoEquip
             if (_calculatedApparelItems == null)
                 DIALOG_InitializeCalculatedApparelScoresFromWornApparel();
 
-            return CalculateApparelScoreGain(apparel, ApparelScoreRaw(apparel,true), out gain);
+            return CalculateApparelScoreGain(apparel, ApparelScoreRaw(apparel), out gain);
         }
 
         private bool CalculateApparelScoreGain(Apparel apparel, float score, out float gain)
@@ -569,6 +567,7 @@ namespace AutoEquip
             }
 
             gain = score;
+
             for (int i = 0; i < _calculatedApparelItems.Count; i++)
             {
                 Apparel wornApparel = _calculatedApparelItems[i];
@@ -632,9 +631,9 @@ namespace AutoEquip
                         if (otherPawnCalc == pawnCalc)
                             continue;
 
-                        foreach (Apparel otherApprel in otherPawnCalc.CalculatedApparel)
+                        foreach (Apparel otherApparel in otherPawnCalc.CalculatedApparel)
                         {
-                            if (otherApprel == apparel)
+                            if (otherApparel == apparel)
                             {
                                 any = true;
                                 DoConflict(apparel, pawnCalc, otherPawnCalc, ref apparalGainPercentual);
@@ -662,57 +661,52 @@ namespace AutoEquip
         private static void DoConflict(Apparel apparel, PawnCalcForApparel pawnX, PawnCalcForApparel pawnY, ref float? xPercentual)
         {
 
-            if (pawnY._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
-                pawnX.LoseConflict(apparel);
-            else
-                pawnY.LoseConflict(apparel);
+            //          if (pawnY._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
+            //              pawnX.LoseConflict(apparel);
+            //          else
+            //              pawnY.LoseConflict(apparel);
 
 
-          //if (!xPercentual.HasValue)
-          //{
-          //    if (pawnX._totalStats == null)
-          //        pawnX._totalStats = pawnX.ApparelScoreRaw(null,false);
-          //
-          //    float xNoStats = pawnX.ApparelScoreRaw(apparel, false);
-          //    xPercentual = pawnX._totalStats / xNoStats;
-          //
-          //    if (pawnX._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
-          //        xPercentual *= 1.25f;
-          //}
-          //
-          //if (pawnY._totalStats == null)
-          //    pawnY._totalStats = pawnY.ApparelScoreRaw(null,false);
-          //
-          //float yNoStats = pawnY.ApparelScoreRaw(apparel,false);
-          //
-          //if (pawnY._totalStats != null)
-          //{
-          //
-          //    float yPercentual = pawnY._totalStats.Value / yNoStats;
-          //
-          //
-          //    if (pawnY._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
-          //        pawnX.LoseConflict(apparel);
-          //    else 
-          //      yPercentual *= 1.25f;
-          //
-          //    if (xPercentual.Value > yPercentual)
-          //    {
-          //        pawnY.LoseConflict(apparel);
-          //    }
-          //    else
-          //    {
-          //        pawnX.LoseConflict(apparel);
-          //    }
-          //}
+            if (!xPercentual.HasValue)
+            {
+                if (pawnX._totalStats == null)
+                    pawnX._totalStats = pawnX.ApparelScoreRaw(null);
+
+                float xNoStats = pawnX.ApparelScoreRaw(apparel);
+                xPercentual = pawnX._totalStats / xNoStats;
+
+                if (pawnX._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
+                    xPercentual += 1000f;
+            }
+
+            if (pawnY._totalStats == null)
+                pawnY._totalStats = pawnY.ApparelScoreRaw(null);
+
+            float yNoStats = pawnY.ApparelScoreRaw(apparel);
+            float yPercentual = pawnY._totalStats.Value / yNoStats;
+
+            if (pawnY._totalStats != null)
+            {
+                if (pawnY._saveablePawn.Pawn.apparel.WornApparel.Contains(apparel))
+                    yPercentual += 1000f;
+
+                if (xPercentual.Value > yPercentual) // added *10 to minimize apparel switching
+                {
+                    pawnY.LoseConflict(apparel);
+                }
+                else
+                {
+                    pawnX.LoseConflict(apparel);
+                }
+            }
         }
 
 
-        private void LoseConflict(Apparel apprel)
+        private void LoseConflict(Apparel apparel)
         {
             _optimized = false;
             _totalStats = null;
-            int index = _calculatedApparelItems.IndexOf(apprel);
+            int index = _calculatedApparelItems.IndexOf(apparel);
             if (index == -1)
                 Log.Warning("Warning on LoseConflict loser didnt have the apparel");
             _calculatedApparelItems.RemoveAt(index);
@@ -729,7 +723,7 @@ namespace AutoEquip
                 int changeIndex = -1;
                 Apparel changeApparel = null;
                 float changeApparelRawScore = 0;
-                float changeApparelScoreGain = 0;
+                float changeApparelScoreGain = 0f;
 
 
                 for (int i = 0; i < _allApparelsItems.Count; i++)
@@ -741,7 +735,9 @@ namespace AutoEquip
                         float apparelGainScore;
                         if (CalculateApparelScoreGain(apparel, apparelRawScore, out apparelGainScore))
                         {
-                            if ((apparelGainScore > changeApparelScoreGain) || ((apparelGainScore == changeApparelScoreGain) && _saveablePawn.Pawn.apparel.WornApparel.Contains(apparel)))
+//                            if ((apparelGainScore > changeApparelScoreGain)
+                            if ((apparelGainScore > changeApparelScoreGain)
+                                || ((apparelGainScore == changeApparelScoreGain) && _saveablePawn.Pawn.apparel.WornApparel.Contains(apparel)))
                             {
                                 changeIndex = i;
                                 changeApparel = apparel;
@@ -835,7 +831,19 @@ namespace AutoEquip
             foreach (Apparel ap in pawnApparel)
                 _saveablePawn.ToDropApparel.Add(ap);
         }
+#if LOG && CHANGES
+            if (this.saveablePawn.toWearApparel.Any() || this.saveablePawn.toDropApparel.Any())
+            {
+                MapComponent_AutoEquip.logMessage.AppendLine();
+                MapComponent_AutoEquip.logMessage.AppendLine("Apparel Change for: " + this.pawn.LabelCap);
 
+                foreach (Apparel ap in this.saveablePawn.toDropApparel)
+                    MapComponent_AutoEquip.logMessage.AppendLine(" * Drop: " + ap);
+
+                foreach (Apparel ap in this.saveablePawn.toWearApparel)
+                    MapComponent_AutoEquip.logMessage.AppendLine(" * Wear: " + ap);
+            }
+#endif
         #endregion
     }
 }
