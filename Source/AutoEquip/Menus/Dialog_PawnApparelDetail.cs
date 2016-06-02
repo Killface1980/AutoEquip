@@ -277,7 +277,7 @@ namespace AutoEquip
                 itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             }
 
-            float armor = conf.ApparelScoreRaw_ProtectionBaseStat(_apparel)*0.25f;
+            float armor = conf.ApparelScoreRaw_ProtectionBaseStat(_apparel)*0.125f;
 
             subtotal += armor;
 
@@ -287,20 +287,20 @@ namespace AutoEquip
                 armor.ToString("N4"), multiplierWidth,
                 subtotal.ToString("N4"), finalValue);
 
-            subtotal *= conf.ApparelScoreRawHitPointAdjust(_apparel);
+            subtotal *= conf.ApparelScoreRaw_HitPointAdjust(_apparel);
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
             DrawLine(ref itemRect,
                 "AutoEquipHitPoints".Translate(), labelWidth,
-                conf.ApparelScoreRawHitPointAdjust(_apparel).ToString("N3"), baseValue,
+                conf.ApparelScoreRaw_HitPointAdjust(_apparel).ToString("N3"), baseValue,
                 "", multiplierWidth,
                 subtotal.ToString("N4"), finalValue);
 
-            subtotal = subtotal * conf.ApparelScoreRawInsulationColdAdjust(_apparel);
+            subtotal = subtotal * conf.ApparelScoreRaw_InsulationColdAdjust(_apparel);
 
-            float insulation = conf.ApparelScoreRawInsulationColdAdjust(_apparel);
+            float insulation = conf.ApparelScoreRaw_InsulationColdAdjust(_apparel);
             if (insulation < 1)
-                insulation /= 4;
+                insulation /= 8;
 
 
             itemRect = new Rect(listRect.xMin, itemRect.yMax, listRect.width, Text.LineHeight * 1.2f);
