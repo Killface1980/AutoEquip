@@ -16,6 +16,8 @@ namespace AutoEquip
         public List<Apparel> ToWearApparel = new List<Apparel>();
         public List<Apparel> ToDropApparel = new List<Apparel>();
         public List<Apparel> TargetApparel = new List<Apparel>();
+        public int _lastStatUpdate;
+        public int _lastWorkStatUpdate;
 
         public void ExposeData()
         {
@@ -31,23 +33,27 @@ namespace AutoEquip
 
             if ((outfit.AppendIndividualPawnStatus) && (Stats != null))
             {
-                foreach (Saveable_Outfit_StatDef stat in Stats)
+                if (Find.TickManager.TicksGame - _lastStatUpdate > 1900)
                 {
-                    int index = -1;
-                    for (int i = 0; i < calculatedStatDef.Count; i++)
+                    foreach (Saveable_Outfit_StatDef stat in Stats)
                     {
-                        if (calculatedStatDef[i].StatDef == stat.StatDef)
+                        int index = -1;
+                        for (int i = 0; i < calculatedStatDef.Count; i++)
                         {
-                            index = i;
-                            break;
+                            if (calculatedStatDef[i].StatDef == stat.StatDef)
+                            {
+                                index = i;
+                                break;
+                            }
                         }
+
+                        if (index == -1)
+                            calculatedStatDef.Add(stat);
+
+                        else
+                            calculatedStatDef[index] = stat;
                     }
-
-                    if (index == -1)
-                        calculatedStatDef.Add(stat);
-
-                    else
-                        calculatedStatDef[index] = stat;
+                    _lastStatUpdate = Find.TickManager.TicksGame;
                 }
             }
 
@@ -57,67 +63,73 @@ namespace AutoEquip
         public IEnumerable<Saveable_Pawn_WorkStatDef> NormalizeCalculedWorkStatDef()
         {
             Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(Pawn);
-            List<Saveable_Pawn_WorkStatDef> calculatedWorkStatDef = new List<Saveable_Pawn_WorkStatDef>(outfit.WorkStats);
-
             if (outfit.AddWorkStats)
-            {
-                foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
+                if (Find.TickManager.TicksGame - _lastWorkStatUpdate > 1900)
                 {
-                    int priority = Pawn.workSettings.GetPriority(wType);
+                    List<Saveable_Pawn_WorkStatDef> calculatedWorkStatDef = new List<Saveable_Pawn_WorkStatDef>(outfit.WorkStats);
 
-                    float priorityAdjust;
-                    switch (priority)
                     {
-                        case 1:
-                            priorityAdjust = 1f;
-                            break;
-                        case 2:
-                            priorityAdjust = 0.5f;
-                            break;
-                        case 3:
-                            priorityAdjust = 0.25f;
-                            break;
-                        case 4:
-                            priorityAdjust = 0.1f;
-                            break;
-                        default:
-                            continue;
-                    }
-
-                    foreach (KeyValuePair<StatDef, float> workStat in PawnCalcForApparel.GetStatsOfWorkType(wType))
-                    {
-                        Saveable_Pawn_WorkStatDef workstatdef = null;
-                        foreach (Saveable_Pawn_WorkStatDef saveablePawnWorkStatDef in calculatedWorkStatDef)
+                        foreach (WorkTypeDef wType in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder)
                         {
-                            if (saveablePawnWorkStatDef.StatDef.defName == workStat.Key.ToString())
-                            {
-                                workstatdef = saveablePawnWorkStatDef;
+                            int priority = Pawn.workSettings.GetPriority(wType);
 
-                                break;
+                            float priorityAdjust;
+                            switch (priority)
+                            {
+                                case 1:
+                                    priorityAdjust = 1f;
+                                    break;
+                                case 2:
+                                    priorityAdjust = 0.5f;
+                                    break;
+                                case 3:
+                                    priorityAdjust = 0.25f;
+                                    break;
+                                case 4:
+                                    priorityAdjust = 0.1f;
+                                    break;
+                                default:
+                                    continue;
                             }
 
+                            foreach (KeyValuePair<StatDef, float> workStat in PawnCalcForApparel.GetStatsOfWorkType(wType))
+                            {
+                                Saveable_Pawn_WorkStatDef workstatdef = null;
+                                foreach (Saveable_Pawn_WorkStatDef saveablePawnWorkStatDef in calculatedWorkStatDef)
+                                {
+                                    if (saveablePawnWorkStatDef.StatDef.defName == workStat.Key.ToString())
+                                    {
+                                        workstatdef = saveablePawnWorkStatDef;
+
+                                        break;
+                                    }
+
+                                }
+
+                                if (workstatdef == null)
+                                {
+                                    workstatdef = new Saveable_Pawn_WorkStatDef();
+
+                                    workstatdef.StatDef = workStat.Key;
+
+                                    workstatdef.Strength = workStat.Value * priorityAdjust;
+
+                                    calculatedWorkStatDef.Add(workstatdef);
+                                }
+                                //       else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
+                                else workstatdef.Strength = workstatdef.Strength + (workStat.Value * priorityAdjust);
+
+                                //    WorkStats.Add(workstatdef);
+                            }
                         }
-
-                        if (workstatdef == null)
-                        {
-                            workstatdef = new Saveable_Pawn_WorkStatDef();
-
-                            workstatdef.StatDef = workStat.Key;
-
-                            workstatdef.Strength = workStat.Value * priorityAdjust;
-
-                            calculatedWorkStatDef.Add(workstatdef);
-                        }
-                        //       else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
-                        else workstatdef.Strength = workstatdef.Strength + (workStat.Value * priorityAdjust);
-
-                    //    WorkStats.Add(workstatdef);
                     }
+
+                    WorkStats = new List<Saveable_Pawn_WorkStatDef>(calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength)).ToArray());
                 }
 
-            }
-            WorkStats = new List<Saveable_Pawn_WorkStatDef>(calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength)).ToArray());
-            return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
+            _lastWorkStatUpdate = Find.TickManager.TicksGame;
+
+            return WorkStats;
             //  return calculatedWorkStatDef.OrderByDescending(i => Math.Abs(i.Strength));
         }
 

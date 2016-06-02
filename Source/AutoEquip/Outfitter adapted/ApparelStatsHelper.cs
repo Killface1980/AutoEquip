@@ -16,7 +16,6 @@ namespace AutoEquip
         private static readonly Dictionary<Pawn, ApparelStatCache> PawnApparelStatCaches = new Dictionary<Pawn, ApparelStatCache>();
 
         public static FloatRange MinMaxTemperatureRange => new FloatRange(-80, 80);
-//        public static FloatRange MinMaxTemperatureRange => new FloatRange(-100, 100);
 
         public static ApparelStatCache GetApparelStatCache(this Pawn pawn)
         {
@@ -26,51 +25,6 @@ namespace AutoEquip
             }
             return PawnApparelStatCaches[pawn];
         }
-
-
-        private static List<StatDef> _allApparelStats;
-
-        public static List<StatDef> AllStatDefsModifiedByAnyApparel
-        {
-            get
-            {
-                if (_allApparelStats == null)
-                {
-                    _allApparelStats = new List<StatDef>();
-
-                    // add all stat modifiers from all apparels
-                    foreach (ThingDef apparel in DefDatabase<ThingDef>.AllDefsListForReading.Where(td => td.IsApparel))
-                    {
-                        if (apparel.equippedStatOffsets != null &&
-                             apparel.equippedStatOffsets.Count > 0)
-                        {
-                            foreach (StatModifier modifier in apparel.equippedStatOffsets)
-                            {
-                                if (!_allApparelStats.Contains(modifier.stat))
-                                {
-                                    _allApparelStats.Add(modifier.stat);
-                                }
-                            }
-                        }
-                    }
-
-                    //// add all stat modifiers from all infusions
-                    //foreach ( InfusionDef infusion in DefDatabase<InfusionDef>.AllDefsListForReading )
-                    //{
-                    //    foreach ( KeyValuePair<StatDef, StatMod> mod in infusion.stats )
-                    //    {
-                    //        if ( !_allApparelStats.Contains( mod.Key ) )
-                    //        {
-                    //            _allApparelStats.Add( mod.Key );
-                    //        }
-                    //    }
-                    //}
-                }
-                return _allApparelStats;
-            }
-        }
-
-
 
     }
 }

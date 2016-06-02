@@ -37,7 +37,6 @@ namespace AutoEquip
 
         }
 
-
         public bool TargetTemperaturesOverride;
 
         public FloatRange PawnCalcTemperatures
@@ -104,28 +103,31 @@ namespace AutoEquip
             _lastTempUpdate = -5000;
         }
 
+        private float _pawnBaseTempMin;
+        private float _pawnBaseTempMax;
+        private float _pawnBaseTempAverage = 0;
+
         public void UpdateTemperatureIfNecessary(bool force = false)
         {
             if (Find.TickManager.TicksGame - _lastTempUpdate > 1900 || force)
             {
-                // get desired temperatures
-                //    if (!TargetTemperaturesOverride)
-                //    {
 
-
-                var pawnBaseTempMin = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null);
-                var pawnBaseTempMax = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMax, null);
-                var pawnBaseAverage = (pawnBaseTempMin + pawnBaseTempMax)/2; 
-
-                foreach (var trait in _pawn.story.traits.allTraits)
+                if (_pawnBaseTempAverage.Equals(null))
                 {
-                    if (trait.OffsetOfStat(StatDef.Named("ComfyTemperatureMin")) != 0)
+                    _pawnBaseTempMin = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null);
+                    _pawnBaseTempMax = _pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMax, null);
+                    _pawnBaseTempAverage = (_pawnBaseTempMin + _pawnBaseTempMax) / 2;
+
+                    foreach (var trait in _pawn.story.traits.allTraits)
                     {
-                        pawnBaseTempMin += trait.OffsetOfStat(StatDef.Named("ComfyTemperatureMin"));
-                    }
-                    if (trait.OffsetOfStat(StatDef.Named("ComfyTemperatureMax")) != 0)
-                    {
-                        pawnBaseTempMax += trait.OffsetOfStat(StatDef.Named("ComfyTemperatureMax"));
+                        if (trait.OffsetOfStat(StatDef.Named("ComfyTemperatureMin")) != 0)
+                        {
+                            _pawnBaseTempMin += trait.OffsetOfStat(StatDef.Named("ComfyTemperatureMin"));
+                        }
+                        if (trait.OffsetOfStat(StatDef.Named("ComfyTemperatureMax")) != 0)
+                        {
+                            _pawnBaseTempMax += trait.OffsetOfStat(StatDef.Named("ComfyTemperatureMax"));
+                        }
                     }
                 }
 
@@ -150,46 +152,21 @@ namespace AutoEquip
                     averageTempNow -= 20f;
                 }
 
-                //    var calcMinTemp = Math.Min(pawnBaseTempMin, min_basetemp);
-                //    var calcMaxTemp = Math.Max(pawnBaseTempMax, max_basetemp);
-                //
-                //    _mapTemperatures = new FloatRange(min_basetemp, max_basetemp);
-                //
-                //    _pawnTemperatures = new FloatRange(pawnBaseTempMin, pawnBaseTempMax);
-                //
-                //    _pawnCalcTemperatures = new FloatRange(calcMinTemp,calcMaxTemp);
-
-                //       if (GenTemperature.SeasonAcceptableFor(_pawn.def)) _temperatureWeight = 1f;
-                //       else _temperatureWeight = 1f; // 5f;
-
-
-
-                float calcweight = 1 + Math.Abs(pawnBaseAverage - averageTempNow) / 10;
+                float calcweight = 1 + Math.Abs(_pawnBaseTempAverage - averageTempNow) / 10;
 
                 _temperatureWeight = calcweight;
 
-    //          float calcweight = (averageTempNow - 20f) / 20f;
-    //          if (calcweight == 0)
-    //              _temperatureWeight = 1f;
-    //
-    //          if (calcweight < 0)
-    //              _temperatureWeight = calcweight * -1f + 1f;
-    //          if (calcweight > 0)
-    //          {
-    //              _temperatureWeight = calcweight + 1f;
-    //          }
-
-
-
-
                 if (!TargetTemperaturesOverride)
                 {
-                         _targetTemperatures = new FloatRange(Math.Max(min_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.min),
-                                                               Math.Min(max_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.max));
+                    _targetTemperatures = new FloatRange(Math.Max(min_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.min),
+                                                          Math.Min(max_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.max));
                 }
 
-                _pawnCalcTemperatures = new FloatRange(pawnBaseTempMin, pawnBaseTempMax);
+                _pawnCalcTemperatures = new FloatRange(_pawnBaseTempMin, _pawnBaseTempMax);
+
                 // }
+                _lastTempUpdate = Find.TickManager.TicksGame;
+
             }
         }
 

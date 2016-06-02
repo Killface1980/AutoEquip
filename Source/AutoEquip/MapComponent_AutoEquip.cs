@@ -82,6 +82,11 @@ namespace AutoEquip
             return n;
         }
 
+        private bool optimized;
+
+            List<SaveablePawn> newSaveableList = new List<SaveablePawn>();
+            List<PawnCalcForApparel> newCalcList = new List<PawnCalcForApparel>();
+
         public override void MapComponentTick()
         {
             base.MapComponentTick();
@@ -89,13 +94,16 @@ namespace AutoEquip
             if (Find.TickManager.TicksGame < nextOptimization)
                 return;
 
+            if (optimized)
+            { 
+
+                return;
+            }
 #if LOG
             MapComponent_AutoEquip.logMessage = new StringBuilder();
             MapComponent_AutoEquip.logMessage.AppendLine("Start Scaning Best Apparel");
             MapComponent_AutoEquip.logMessage.AppendLine();
 #endif
-            List<SaveablePawn> newSaveableList = new List<SaveablePawn>();
-            List<PawnCalcForApparel> newCalcList = new List<PawnCalcForApparel>();
 
             List<Apparel> allApparels = new List<Apparel>(Find.ListerThings.ThingsInGroup(ThingRequestGroup.Apparel).OfType<Apparel>());
             foreach (Pawn pawn in Find.Map.mapPawns.FreeColonists)
@@ -115,7 +123,7 @@ namespace AutoEquip
 
 
             nextOptimization = Find.TickManager.TicksGame + 5000;
-
+      //      optimized = true;
             //this.nextOptimization = Find.TickManager.TicksGame + 5000;
         }
 

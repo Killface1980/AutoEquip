@@ -56,6 +56,7 @@
   <ItemGroup>
     <None Include="CCL_Injectors.cs" />
     <Compile Include="ITabInjector.cs" />
+    <Compile Include="List.cs" />
     <Compile Include="Outfitter adapted\ApparelStatCache.cs" />
     <Compile Include="Menus\Dialog_ManageOutfitsAutoEquip.cs" />
     <Compile Include="AutoEquip_JobGiver_OptimizeApparel.cs" />
