@@ -1,8 +1,5 @@
-﻿using RimWorld;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -17,7 +14,7 @@ namespace AutoEquip
         {
             get
             {
-                return new Vector2(1010f, 45f + (float)base.PawnsCount * 30f + 65f);
+                return new Vector2(1010f, 45f + PawnsCount * 30f + 65f);
             }
         }
 
@@ -43,7 +40,7 @@ namespace AutoEquip
             Text.Font = GameFont.Small;
             GUI.color = Color.white;
             Rect outRect = new Rect(0f, 45f, fillRect.width, fillRect.height - 45f);
-            base.DrawRows(outRect);
+            DrawRows(outRect);
         }
 
         protected override void DrawPawnRow(Rect rect, Pawn p)
