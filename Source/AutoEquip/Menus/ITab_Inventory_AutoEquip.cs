@@ -220,56 +220,55 @@ namespace AutoEquip
 
                 //      Widgets.ListSeparator(ref cur.y, header.width, "Apparel".Translate());
                 //       cur.y += 5f;
-                Widgets.ListSeparator(ref cur.y, header.width - _margin * 2, "PreferedTemperature".Translate());
+      //          Widgets.ListSeparator(ref cur.y, header.width - _margin * 2, "PreferedTemperature".Translate());
                 //          Text.Anchor = TextAnchor.UpperLeft;
 
 
                 // some padding
-                cur.y += 15f;
 
                 // temperature slider
                 ApparelStatCache pawnStatCache = SelPawn.GetApparelStatCache();
-                FloatRange targetTemps = pawnStatCache.TargetTemperatures;
-                FloatRange minMaxTemps = ApparelStatsHelper.MinMaxTemperatureRange;
+        //        FloatRange targetTemps = pawnStatCache.TargetTemperatures;
+        //        FloatRange minMaxTemps = ApparelStatsHelper.MinMaxTemperatureRange;
 
-                Rect sliderRect = new Rect(cur.x, cur.y, header.width - _margin * 4.25f, 40f);
-
-                Rect tempResetRect = new Rect(header.xMax - _margin * 4 - 1f, cur.y + 12f, 16f, 16f);
-                cur.y += 5f; // includes padding 
-
-                // current temperature settings
-                if (pawnStatCache.TargetTemperaturesOverride)
-                {
-                    GUI.color = Color.white;
-                }
-
-                else GUI.color = Color.grey;
-
-                Widgets_FloatRange.FloatRange(sliderRect, 123123123, ref targetTemps, minMaxTemps, ToStringStyle.Temperature);
-                GUI.color = Color.white;
-
-                if (Math.Abs(targetTemps.min - SelPawn.GetApparelStatCache().TargetTemperatures.min) > 1e-4 ||
-                     Math.Abs(targetTemps.max - SelPawn.GetApparelStatCache().TargetTemperatures.max) > 1e-4)
-                {
-                    SelPawn.GetApparelStatCache().TargetTemperatures = targetTemps;
-                }
-
-                if (pawnStatCache.TargetTemperaturesOverride)
-                {
-                    if (Widgets.ImageButton(tempResetRect, resetButton))
-                    {
-                        pawnStatCache.TargetTemperaturesOverride = false;
-                        pawnStatCache.UpdateTemperatureIfNecessary(true);
-                    }
-                    TooltipHandler.TipRegion(tempResetRect, "TemperatureRangeReset".Translate());
-                }
+    //          Rect sliderRect = new Rect(cur.x, cur.y, header.width - _margin * 4.25f, 40f);
+    //
+    //          Rect tempResetRect = new Rect(header.xMax - _margin * 4 - 1f, cur.y + 12f, 16f, 16f);
+    //          cur.y += 5f; // includes padding 
+    //
+    //          // current temperature settings
+    //          if (pawnStatCache.TargetTemperaturesOverride)
+    //          {
+    //              GUI.color = Color.white;
+    //          }
+    //
+    //          else GUI.color = Color.grey;
+    //
+    //          Widgets_FloatRange.FloatRange(sliderRect, 123123123, ref targetTemps, minMaxTemps, ToStringStyle.Temperature);
+    //          GUI.color = Color.white;
+    //
+    //          if (Math.Abs(targetTemps.min - SelPawn.GetApparelStatCache().TargetTemperatures.min) > 1e-4 ||
+    //               Math.Abs(targetTemps.max - SelPawn.GetApparelStatCache().TargetTemperatures.max) > 1e-4)
+    //          {
+    //              SelPawn.GetApparelStatCache().TargetTemperatures = targetTemps;
+    //          }
+    //
+    //          if (pawnStatCache.TargetTemperaturesOverride)
+    //          {
+    //              if (Widgets.ImageButton(tempResetRect, resetButton))
+    //              {
+    //                  pawnStatCache.TargetTemperaturesOverride = false;
+    //                  pawnStatCache.UpdateTemperatureIfNecessary(true);
+    //              }
+    //              TooltipHandler.TipRegion(tempResetRect, "TemperatureRangeReset".Translate());
+    //          }
 
                 Text.Font = GameFont.Small;
 
                 #endregion Fixed Header
 
             }
-            cur.y += 15f;
+     //       cur.y += 15f;
             listRect.yMin += cur.y;
             //      listRect.height -= _margin/2f;
             //      header.height += cur.y;
@@ -296,28 +295,28 @@ namespace AutoEquip
                     DrawThingRow(ref posY, apparelListRect.width, current2, true, ThingLabelColor, pawnSave, pawnCalc);
             }
 
-            if (pawnSave != null)
-            {
-                if ((pawnSave.ToWearApparel != null) &&
-                    (pawnSave.ToWearApparel.Any()))
-                {
-                    Widgets.ListSeparator(ref posY, apparelListRect.width, "ToWear".Translate());
-                    foreach (Apparel current2 in from ap in pawnSave.ToWearApparel
-                                                 orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
-                                                 select ap)
-                        DrawThingRow(ref posY, apparelListRect.width, current2, false, ThingToEquipLabelColor, pawnSave, pawnCalc);
-                }
-
-                if ((pawnSave.ToDropApparel != null) &&
-                    (pawnSave.ToDropApparel.Any()))
-                {
-                    Widgets.ListSeparator(ref posY, apparelListRect.width, "ToDrop".Translate());
-                    foreach (Apparel current2 in from ap in pawnSave.ToDropApparel
-                                                 orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
-                                                 select ap)
-                        DrawThingRow(ref posY, apparelListRect.width, current2, SelPawnForGear.apparel != null && SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
-                }
-            }
+        //  if (pawnSave != null)
+        //  {
+        //      if ((pawnSave.ToWearApparel != null) &&
+        //          (pawnSave.ToWearApparel.Any()))
+        //      {
+        //          Widgets.ListSeparator(ref posY, apparelListRect.width, "ToWear".Translate());
+        //          foreach (Apparel current2 in from ap in pawnSave.ToWearApparel
+        //                                       orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
+        //                                       select ap)
+        //              DrawThingRow(ref posY, apparelListRect.width, current2, false, ThingToEquipLabelColor, pawnSave, pawnCalc);
+        //      }
+        //
+        //      if ((pawnSave.ToDropApparel != null) &&
+        //          (pawnSave.ToDropApparel.Any()))
+        //      {
+        //          Widgets.ListSeparator(ref posY, apparelListRect.width, "ToDrop".Translate());
+        //          foreach (Apparel current2 in from ap in pawnSave.ToDropApparel
+        //                                       orderby ap.def.apparel.bodyPartGroups[0].listOrder descending
+        //                                       select ap)
+        //              DrawThingRow(ref posY, apparelListRect.width, current2, SelPawnForGear.apparel != null && SelPawnForGear.apparel.WornApparel.Contains(current2), ThingToDropLabelColor, pawnSave, pawnCalc);
+        //      }
+        //  }
 
             if (Event.current.type == EventType.Layout)
             {

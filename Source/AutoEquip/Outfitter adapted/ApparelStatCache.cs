@@ -152,7 +152,7 @@ namespace AutoEquip
                     averageTempNow -= 20f;
                 }
 
-                float calcweight = 1 + Math.Abs(_pawnBaseTempAverage - averageTempNow) / 10;
+                float calcweight = 1 + Math.Abs(_pawnBaseTempAverage - averageTempNow) / 50;
 
                 _temperatureWeight = calcweight;
 
@@ -161,6 +161,12 @@ namespace AutoEquip
                     _targetTemperatures = new FloatRange(Math.Max(min_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.min),
                                                           Math.Min(max_basetemp, ApparelStatsHelper.MinMaxTemperatureRange.max));
                 }
+
+                // TESTING
+
+         //     _pawnBaseTempMin = _pawn.GetStatValue(StatDefOf.ComfyTemperatureMin);
+         //      _pawnBaseTempMax = _pawn.GetStatValue(StatDefOf.ComfyTemperatureMax);
+
 
                 _pawnCalcTemperatures = new FloatRange(_pawnBaseTempMin, _pawnBaseTempMax);
 

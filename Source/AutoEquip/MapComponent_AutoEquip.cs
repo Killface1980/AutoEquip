@@ -96,7 +96,6 @@ namespace AutoEquip
 
             if (optimized)
             { 
-
                 return;
             }
 #if LOG
@@ -109,21 +108,21 @@ namespace AutoEquip
             foreach (Pawn pawn in Find.Map.mapPawns.FreeColonists)
             {
                 InjectTab(pawn.def);
-                SaveablePawn newPawnSaveable = GetCache(pawn);
-                PawnCalcForApparel newPawnCalc = new PawnCalcForApparel(newPawnSaveable);
-
-                newSaveableList.Add(newPawnSaveable);
-                newCalcList.Add(newPawnCalc);
-
-               newPawnCalc.InitializeFixedApparelsAndGetAvaliableApparels(allApparels);
+       //       SaveablePawn newPawnSaveable = GetCache(pawn);
+       //       PawnCalcForApparel newPawnCalc = new PawnCalcForApparel(newPawnSaveable);
+       //
+       //       newSaveableList.Add(newPawnSaveable);
+       //       newCalcList.Add(newPawnCalc);
+       //
+       //      newPawnCalc.InitializeFixedApparelsAndGetAvaliableApparels(allApparels);
             }
 
-            PawnCache = newSaveableList;
-            PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
+       //   PawnCache = newSaveableList;
+       //   PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
 
 
             nextOptimization = Find.TickManager.TicksGame + 5000;
-      //      optimized = true;
+            optimized = true;
             //this.nextOptimization = Find.TickManager.TicksGame + 5000;
         }
 

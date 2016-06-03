@@ -172,16 +172,35 @@ namespace AutoEquip
             num += (0.125f * ApparelScoreRaw_ProtectionBaseStat(ap));
             num *= ApparelScoreRaw_HitPointAdjust(ap);
 
-
-            float insulation = ApparelScoreRaw_InsulationColdAdjust(ap);
-            if (insulation < 1)
-                insulation /= 8;
-
-            num *= insulation;
+            num *= ApparelScoreRaw_InsulationColdAdjust(ap);
 
             // new insulation calc
 
+            return num;
+        }
 
+        public float ApparelScoreRaw(Apparel ap, bool useInsulation)
+        {
+            float num = 1;
+            if (ap == null)
+                return num;
+
+            num += ApparelScoreRaw_PawnStats(ap);
+            num += ApparelScoreRaw_PawnWorkStats(ap);
+            num += (0.125f * ApparelScoreRaw_ProtectionBaseStat(ap));
+            num *= ApparelScoreRaw_HitPointAdjust(ap);
+
+
+            if (useInsulation)
+            {
+                float insulation = ApparelScoreRaw_InsulationColdAdjust(ap);
+                if (insulation < 1)
+                    insulation /= 8;
+
+                num *= insulation; 
+            }
+
+            // new insulation calc
 
             return num;
         }
@@ -455,94 +474,23 @@ namespace AutoEquip
         #region [  OLD_CalculateApparelModifierRaw  ]
 
 
-
         public float ApparelScoreRaw_InsulationColdAdjust(Apparel ap)
         {
-            //   switch (_neededWarmth)
-            //   {
-            //       case NeededWarmth.Warm:
-            //           {
-            //               float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Cold, null);
-            //               return PawnCalcForApparel.InsulationColdScoreFactorCurve_NeedWarm.Evaluate(statValueAbstract);
-            //           }
-            //       case NeededWarmth.Cool:
-            //           {
-            //               float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Heat, null);
-            //               return PawnCalcForApparel.InsulationWarmScoreFactorCurve_NeedCold.Evaluate(statValueAbstract);
-            //           }
-            //       default:
-            //           return 1;
-            //   }
-
-
-
-            float score = 0;
-            // temperature
-            ApparelStatCache pawnStatCache = _pawn.GetApparelStatCache();
-
-            FloatRange targetTemperatures = _pawn.GetApparelStatCache().TargetTemperatures;
-            FloatRange pawnTemperatures = pawnStatCache.PawnTemperatures;
-
-            float minComfyTemperature = pawnTemperatures.min;
-            float maxComfyTemperature = pawnTemperatures.max;
-          //float minComfyTemperature = _pawn.GetStatValue(StatDefOf.ComfyTemperatureMin);
-          //float maxComfyTemperature = _pawn.GetStatValue(StatDefOf.ComfyTemperatureMax);
-
-            // offsets on apparel
-            float insulationCold = ap.GetStatValue(StatDefOf.Insulation_Cold);
-            float insulationHeat = ap.GetStatValue(StatDefOf.Insulation_Heat);
-
-            // if this gear is currently worn, we need to make sure the contribution to the pawn's comfy temps is removed so the gear is properly scored
-            if (_pawn.apparel.WornApparel.Contains(ap))
+            switch (_neededWarmth)
             {
-                minComfyTemperature -= insulationCold;
-                maxComfyTemperature -= insulationHeat;
+                case NeededWarmth.Warm:
+                    {
+                        float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Cold, null);
+                        return InsulationColdScoreFactorCurve_NeedWarm.Evaluate(statValueAbstract);
+                    }
+                case NeededWarmth.Cool:
+                    {
+                        float statValueAbstract = ap.def.GetStatValueAbstract(StatDefOf.Insulation_Heat, null);
+                        return InsulationWarmScoreFactorCurve_NeedCold.Evaluate(statValueAbstract);
+                    }
+                default:
+                    return 1;
             }
-
-
-            // now for the interesting bit.
-            float temperatureScoreOffset = 0f;
-            float tempWeight = _pawn.GetApparelStatCache().TemperatureWeight;
-            float neededInsulationCold = targetTemperatures.TrueMin - minComfyTemperature;  // isolation_cold is given as negative numbers < 0 means we're underdressed
-            float neededInsulationWarmth = targetTemperatures.TrueMax - maxComfyTemperature;  // isolation_warm is given as positive numbers.
-
-            // currently too cold
-            if (neededInsulationCold < 0)
-            {
-                temperatureScoreOffset += -insulationCold * tempWeight;
-            }
-            // currently warm enough
-            else
-            {
-                // this gear would make us too cold
-                if (insulationCold > neededInsulationCold)
-                {
-                    temperatureScoreOffset += (neededInsulationCold - insulationCold) * tempWeight;
-                }
-            }
-
-            //       Log.Message("neededInsulationCold:  " + neededInsulationCold + "  insulationCold:  " + insulationCold + "  tempWeight:  " + tempWeight);
-
-
-            // currently too warm
-            if (neededInsulationWarmth > 0)
-            {
-                temperatureScoreOffset += insulationHeat * tempWeight;
-            }
-            // currently cool enough
-            else
-            {
-                // this gear would make us too warm
-                if (insulationHeat < neededInsulationWarmth)
-                {
-                    temperatureScoreOffset += -(neededInsulationWarmth - insulationHeat) * tempWeight;
-                }
-            }
-            score = 1 + temperatureScoreOffset / 20f;
-            return score;
-
-
-
         }
 
         #endregion
@@ -784,7 +732,7 @@ namespace AutoEquip
         }
 
 
-        public NeededWarmth CalculateNeededWarmth(Pawn pawn, Month month)
+        public static NeededWarmth CalculateNeededWarmth(Pawn pawn, Month month)
         {
             float temperature = GenTemperature.AverageTemperatureAtWorldCoordsForMonth(Find.Map.WorldCoords, month);
 
@@ -799,23 +747,11 @@ namespace AutoEquip
             }
 
 
-            ApparelStatCache pawnStatCache = pawn.GetApparelStatCache();
-
-            if (pawnStatCache.MapTemperatures.max < pawnStatCache.PawnTemperatures.min)
-            {
-                return NeededWarmth.Warm;
-            }
-
-            if (pawnStatCache.MapTemperatures.min > pawnStatCache.PawnTemperatures.max)
-            {
-                return NeededWarmth.Cool;
-            }
-
-            //  if (temperature < pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null) - 10f)
-            //      return NeededWarmth.Warm;
-            //
-            //  if (temperature > pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMax, null) + 10f)
-            //      return NeededWarmth.Cool;
+              if (temperature < pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null) - 10f)
+                  return NeededWarmth.Warm;
+            
+              if (temperature > pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMax, null) + 10f)
+                  return NeededWarmth.Cool;
 
             return NeededWarmth.Any;
         }
