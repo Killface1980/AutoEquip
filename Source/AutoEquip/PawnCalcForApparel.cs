@@ -172,7 +172,10 @@ namespace AutoEquip
             num += (0.125f * ApparelScoreRaw_ProtectionBaseStat(ap));
             num *= ApparelScoreRaw_HitPointAdjust(ap);
 
-            num *= ApparelScoreRaw_InsulationColdAdjust(ap);
+            float insulation = ApparelScoreRaw_InsulationColdAdjust(ap);
+            if (insulation < 1)
+                insulation /= 8;
+            num *= insulation;
 
             // new insulation calc
 
