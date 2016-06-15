@@ -50,7 +50,10 @@ namespace AutoEquip
 
         public ITab_Pawn_AutoEquip() : base()
         {
-            size = new Vector2(432f, Screen.height/2);
+            float minheight = 400f;
+            size = new Vector2(432f, minheight);
+
+
             labelKey = "TabGear";
         }
 
