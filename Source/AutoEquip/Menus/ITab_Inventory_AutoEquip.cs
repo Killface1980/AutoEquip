@@ -50,7 +50,7 @@ namespace AutoEquip
 
         public ITab_Pawn_AutoEquip() : base()
         {
-            float minheight = 400f;
+            float minheight = 500f;
             size = new Vector2(432f, minheight);
 
 
@@ -516,7 +516,7 @@ namespace AutoEquip
         }
 
 
-        private void DrawThingRow(ref float y, float width, Thing thing, bool equiped, Color thingColor, SaveablePawn pawnSave, PawnCalcForApparel pawnCalc)
+        private void DrawThingRow(ref float y, float width, Thing thing, bool equipped, Color thingColor, SaveablePawn pawnSave, PawnCalcForApparel pawnCalc)
         {
             Rect rect = new Rect(0f, y, width, lineheight);
 
@@ -528,13 +528,13 @@ namespace AutoEquip
                 GUI.DrawTexture(rect, TexUI.HighlightTex);
             }
 
-            #region Button Clikcks
+            #region Button Clicks
 
             // LMB doubleclick
 
             if (Widgets.InvisibleButton(rect))
             {
-                if (!equiped && Event.current.button == 0)
+                if (!equipped && Event.current.button == 0)
                 {
                     Pawn apparelEquipedThing = null;
 
@@ -578,7 +578,7 @@ namespace AutoEquip
                         Find.WindowStack.Add(new Dialog_InfoCard(thing));
                     }, MenuOptionPriority.Medium, null, null));
 
-                    if (CanEdit && equiped)
+                    if (CanEdit && equipped)
                     {
                         ThingWithComps eq = thing as ThingWithComps;
 
@@ -657,7 +657,7 @@ namespace AutoEquip
                     if ((pawnSave != null) &&
                         (thing is Apparel))
                     {
-                        if (!equiped)
+                        if (!equipped)
                             floatOptionList.Add(new FloatMenuOption("Locate", delegate
                             {
                                 Pawn apparelEquipedThing = null;
@@ -738,15 +738,20 @@ namespace AutoEquip
             text_ApparelName = ext;
 
             var apparel = thing as Apparel;
-            if (apparel != null)
+
+
+
+             if (apparel != null)
             {
+
                 text_Score = Math.Round(pawnCalc.ApparelScoreRaw(apparel), 2).ToString("N2");
 
                 //  if ((pawnSave != null) && (pawnSave.TargetApparel != null))
                 //  {
                 //      text_ApparelName = pawnCalc.ApparelScoreRaw(apparel).ToString("N5") + "   " + text_ApparelName;
                 //  }
-                if (SelPawnForGear.outfits != null && SelPawnForGear.outfits.forcedHandler.IsForced(apparel))
+ 
+                 if (SelPawnForGear.outfits != null && SelPawnForGear.outfits.forcedHandler.IsForced(apparel))
                 {
                     text_Score = "ApparelForcedLower".Translate();
                     //   text_ApparelName = text_ApparelName + ", " + "ApparelForcedLower".Translate();
