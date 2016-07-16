@@ -21,7 +21,7 @@ namespace AutoEquip
             _stats = stats;
         }
 
-        public override Vector2 InitialWindowSize
+        public override Vector2 InitialSize
         {
             get
             {

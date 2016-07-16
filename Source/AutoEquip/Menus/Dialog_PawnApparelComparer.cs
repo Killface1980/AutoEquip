@@ -21,7 +21,7 @@ namespace AutoEquip
             _apparel = apparel;
         }
 
-        public override Vector2 InitialWindowSize
+        public override Vector2 InitialSize
         {
             get
             {
@@ -158,20 +158,20 @@ namespace AutoEquip
                 if ((apparelThing.def.DrawMatSingle != null) &&
                     (apparelThing.def.DrawMatSingle.mainTexture != null))
                     Widgets.ThingIcon(fieldRect, apparelThing);
-                if (Widgets.InvisibleButton(fieldRect))
+                if (Widgets.ButtonInvisible(fieldRect))
                 {
                     Close(true);
                     Find.MainTabsRoot.EscapeCurrentTab(true);
                     if (apparelEquipedThing != null)
                     {
-                        Find.CameraMap.JumpTo(apparelEquipedThing.PositionHeld);
+                        Find.CameraDriver.JumpTo(apparelEquipedThing.PositionHeld);
                         Find.Selector.ClearSelection();
                         if (apparelEquipedThing.Spawned)
                             Find.Selector.Select(apparelEquipedThing, true, true);
                     }
                     else
                     {
-                        Find.CameraMap.JumpTo(apparelThing.PositionHeld);
+                        Find.CameraDriver.JumpTo(apparelThing.PositionHeld);
                         Find.Selector.ClearSelection();
                         if (apparelThing.Spawned)
                             Find.Selector.Select(apparelThing, true, true);
@@ -198,11 +198,11 @@ namespace AutoEquip
                 if ((apparelEquipedThing.def.DrawMatSingle != null) &&
                     (apparelEquipedThing.def.DrawMatSingle.mainTexture != null))
                     Widgets.ThingIcon(fieldRect, apparelEquipedThing);
-                if (Widgets.InvisibleButton(fieldRect))
+                if (Widgets.ButtonInvisible(fieldRect))
                 {
                     Close(true);
                     Find.MainTabsRoot.EscapeCurrentTab(true);
-                    Find.CameraMap.JumpTo(apparelEquipedThing.PositionHeld);
+                    Find.CameraDriver.JumpTo(apparelEquipedThing.PositionHeld);
                     Find.Selector.ClearSelection();
                     if (apparelEquipedThing.Spawned)
                         Find.Selector.Select(apparelEquipedThing, true, true);
@@ -228,11 +228,11 @@ namespace AutoEquip
                 if ((apparelOwnerThing.def.DrawMatSingle != null) &&
                     (apparelOwnerThing.def.DrawMatSingle.mainTexture != null))
                     Widgets.ThingIcon(fieldRect, apparelOwnerThing);
-                if (Widgets.InvisibleButton(fieldRect))
+                if (Widgets.ButtonInvisible(fieldRect))
                 {
                     Close(true);
                     Find.MainTabsRoot.EscapeCurrentTab(true);
-                    Find.CameraMap.JumpTo(apparelOwnerThing.PositionHeld);
+                    Find.CameraDriver.JumpTo(apparelOwnerThing.PositionHeld);
                     Find.Selector.ClearSelection();
                     if (apparelOwnerThing.Spawned)
                         Find.Selector.Select(apparelOwnerThing, true, true);
@@ -256,7 +256,7 @@ namespace AutoEquip
             if (apparelThing != null)
             {
                 Text.Anchor = TextAnchor.UpperLeft;
-                if (Widgets.InvisibleButton(fieldRect))
+                if (Widgets.ButtonInvisible(fieldRect))
                 {
                     Close(true);
                     Find.MainTabsRoot.EscapeCurrentTab(true);

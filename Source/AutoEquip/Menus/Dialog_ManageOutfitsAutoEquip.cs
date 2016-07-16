@@ -48,7 +48,7 @@ namespace AutoEquip
             }
         }
 
-        public override Vector2 InitialWindowSize
+        public override Vector2 InitialSize
         {
             get { return new Vector2(700f, 700f); }
         }
@@ -66,36 +66,36 @@ namespace AutoEquip
             var num = 0f;
             var rect = new Rect(0f, 0f, 150f, 35f);
             num += 150f;
-            if (Widgets.TextButton(rect, "SelectOutfit".Translate(), true, false))
+            if (Widgets.ButtonText(rect, "SelectOutfit".Translate(), true, false))
             {
                 var list = new List<FloatMenuOption>();
-                foreach (var current in Find.Map.outfitDatabase.AllOutfits)
+                foreach (var current in Current.Game.outfitDatabase.AllOutfits)
                 {
                     var localOut = current;
                     list.Add(new FloatMenuOption(localOut.label, delegate { SelectedOutfit = localOut; },
                         MenuOptionPriority.Medium, null, null));
                 }
-                Find.WindowStack.Add(new FloatMenu(list, false));
+                Find.WindowStack.Add(new FloatMenu(list));
             }
             num += 10f;
             var rect2 = new Rect(num, 0f, 150f, 35f);
             num += 150f;
-            if (Widgets.TextButton(rect2, "NewOutfit".Translate(), true, false))
+            if (Widgets.ButtonText(rect2, "NewOutfit".Translate(), true, false))
             {
-                SelectedOutfit = Find.Map.outfitDatabase.MakeNewOutfit();
+                SelectedOutfit = Current.Game.outfitDatabase.MakeNewOutfit();
             }
             num += 10f;
             var rect3 = new Rect(num, 0f, 150f, 35f);
             num += 150f;
-            if (Widgets.TextButton(rect3, "DeleteOutfit".Translate(), true, false))
+            if (Widgets.ButtonText(rect3, "DeleteOutfit".Translate(), true, false))
             {
                 var list2 = new List<FloatMenuOption>();
-                foreach (var current2 in Find.Map.outfitDatabase.AllOutfits)
+                foreach (var current2 in Current.Game.outfitDatabase.AllOutfits)
                 {
                     var localOut = current2;
                     list2.Add(new FloatMenuOption(localOut.label, delegate
                     {
-                        var acceptanceReport = Find.Map.outfitDatabase.TryDelete(localOut);
+                        var acceptanceReport = Current.Game.outfitDatabase.TryDelete(localOut);
                         if (!acceptanceReport.Accepted)
                         {
                             Messages.Message(acceptanceReport.Reason, MessageSound.RejectInput);
@@ -113,7 +113,7 @@ namespace AutoEquip
                         }
                     }, MenuOptionPriority.Medium, null, null));
                 }
-                Find.WindowStack.Add(new FloatMenu(list2, false));
+                Find.WindowStack.Add(new FloatMenu(list2));
             }
             var rect4 = new Rect(0f, 40f, 300f, inRect.height - 40f - CloseButSize.y).ContractedBy(10f);
             if (SelectedOutfit == null)
@@ -183,7 +183,7 @@ namespace AutoEquip
             Text.Font = GameFont.Tiny;
             var num = rect.width - 2f;
             var rect2 = new Rect(rect.x + 1f, rect.y + 1f, num / 2f, 24f);
-            if (Widgets.TextButton(rect2, "ClearAll".Translate(), true, false))
+            if (Widgets.ButtonText(rect2, "ClearAll".Translate(), true, false))
                 stats.Clear();
 
             rect.yMin = rect2.yMax;
@@ -246,7 +246,7 @@ namespace AutoEquip
             rect6.yMin += 12f;
 
             var listingStandard = new Listing_Standard(rect6);
-            listingStandard.OverrideColumnWidth = rect6.width;
+            listingStandard.ColumnWidth = rect6.width;
 
 
 
@@ -263,7 +263,7 @@ namespace AutoEquip
         {
             var outfitStat = stats.FirstOrDefault(i => i.StatDef == stat);
             var active = outfitStat != null;
-            listingStandard.DoLabelCheckbox(stat.label, ref active);
+            listingStandard.CheckboxLabeled(stat.label, ref active);
 
             if (active)
             {
@@ -276,7 +276,7 @@ namespace AutoEquip
                 if (!stats.Contains(outfitStat))
                     stats.Add(outfitStat);
 
-                outfitStat.Strength = listingStandard.DoSlider(outfitStat.Strength, -1f, 1f);
+                outfitStat.Strength = listingStandard.Slider(outfitStat.Strength, -1f, 1f);
 
             }
             else

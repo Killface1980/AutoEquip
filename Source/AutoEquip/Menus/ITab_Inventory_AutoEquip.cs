@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
-using Combat_Realism;
+//using Combat_Realism;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -40,9 +40,9 @@ namespace AutoEquip
 
         public override bool IsVisible { get { return SelPawnForGear.RaceProps.ToolUser; } }
 
-        public static Texture2D resetButton = ContentFinder<Texture2D>.Get("reset"),
-                        deleteButton = ContentFinder<Texture2D>.Get("delete"),
-                        addButton = ContentFinder<Texture2D>.Get("add");
+  //    public static Texture2D resetButton = ContentFinder<Texture2D>.Get("reset"),
+  //                    deleteButton = ContentFinder<Texture2D>.Get("delete"),
+  //                    addButton = ContentFinder<Texture2D>.Get("add");
 
         #endregion Fields
 
@@ -110,7 +110,7 @@ namespace AutoEquip
             }
 
             #region CR Stuff
-
+            /*
             // get the inventory comp
             CompInventory comp = SelPawn.TryGetComp<CompInventory>();
 
@@ -124,7 +124,7 @@ namespace AutoEquip
                 Utility_Loadouts.DrawBar(weightRect, comp.currentWeight, comp.capacityWeight, "CR.Weight".Translate(), SelPawn.GetWeightTip());
                 Utility_Loadouts.DrawBar(bulkRect, comp.currentBulk, comp.capacityBulk, "CR.Bulk".Translate(), SelPawn.GetBulkTip());
             }
-
+            */
             #endregion CR Stuff
 
 
@@ -151,10 +151,10 @@ namespace AutoEquip
 
                 // select outfit
 
-                if (Widgets.TextButton(rectStatus, pawnSave.Pawn.outfits.CurrentOutfit.label, true, false))
+                if (Widgets.ButtonText(rectStatus, pawnSave.Pawn.outfits.CurrentOutfit.label, true, false))
                 {
                     List<FloatMenuOption> list = new List<FloatMenuOption>();
-                    foreach (Outfit current in Find.Map.outfitDatabase.AllOutfits)
+                    foreach (Outfit current in Current.Game.outfitDatabase.AllOutfits)
                     {
                         Outfit localOut = current;
                         list.Add(new FloatMenuOption(localOut.label, delegate
@@ -162,12 +162,12 @@ namespace AutoEquip
                             pawnSave.Pawn.outfits.CurrentOutfit = localOut;
                         }, MenuOptionPriority.Medium, null, null));
                     }
-                    Find.WindowStack.Add(new FloatMenu(list, false));
+                    Find.WindowStack.Add(new FloatMenu(list));
                 }
                 //edit outfit
                 rectStatus = new Rect(rectStatus.xMax + _margin, rectStatus.y, rectStatus.width, rectStatus.height);
 
-                if (Widgets.TextButton(rectStatus, "OutfitEdit".Translate(), true, false))
+                if (Widgets.ButtonText(rectStatus, "OutfitEdit".Translate(), true, false))
                 {
                     Find.WindowStack.Add(new Dialog_ManageOutfits(SelPawn.outfits.CurrentOutfit));
                 }
@@ -179,7 +179,7 @@ namespace AutoEquip
                 {
                     rectStatus = new Rect(rectStatus.xMax + _margin, rectStatus.y, rectStatus.width, rectStatus.height);
 
-                    if (Widgets.TextButton(rectStatus, "AutoEquipStatus".Translate(), true, false))
+                    if (Widgets.ButtonText(rectStatus, "AutoEquipStatus".Translate(), true, false))
                     {
                         if (pawnSave.Stats == null)
                             pawnSave.Stats = new List<Saveable_Outfit_StatDef>();
@@ -342,15 +342,15 @@ namespace AutoEquip
         protected void FillTabVanilla()
         {
             // get the inventory comp
-            CompInventory comp = SelPawn.TryGetComp<CompInventory>();
-
+            //CompInventory comp = SelPawn.TryGetComp<CompInventory>();
+            
             // set up rects
             Rect listRect = new Rect(
                 _margin,
                 _topPadding,
                 size.x - 2 * _margin,
                 size.y - _topPadding - _margin);
-
+            /*
             if (comp != null)
             {
                 // adjust rects if comp found
@@ -361,7 +361,7 @@ namespace AutoEquip
                 Utility_Loadouts.DrawBar(bulkRect, comp.currentBulk, comp.capacityBulk, "CR.Bulk".Translate(), SelPawn.GetBulkTip());
                 Utility_Loadouts.DrawBar(weightRect, comp.currentWeight, comp.capacityWeight, "CR.Weight".Translate(), SelPawn.GetWeightTip());
             }
-
+            */
             // start drawing list (rip from ITab_Pawn_Gear)
             GUI.BeginGroup(listRect);
             Text.Font = GameFont.Small;
@@ -414,13 +414,13 @@ namespace AutoEquip
         private void DrawThingRowVanilla(ref float y, float width, Thing thing)
         {
             Rect rect = new Rect(0f, y, width, 28f);
-            TooltipHandler.TipRegion(rect, thing.GetWeightAndBulkTip());
+            TooltipHandler.TipRegion(rect, thing.GetTooltip());
             if (Mouse.IsOver(rect))
             {
                 GUI.color = _highlightColor;
                 GUI.DrawTexture(rect, TexUI.HighlightTex);
             }
-            if (Widgets.InvisibleButton(rect) && Event.current.button == 1)
+            if (Widgets.ButtonInvisible(rect) && Event.current.button == 1)
             {
                 List<FloatMenuOption> floatOptionList = new List<FloatMenuOption>();
                 floatOptionList.Add(new FloatMenuOption("ThingInfo".Translate(), delegate
@@ -433,6 +433,7 @@ namespace AutoEquip
                     ThingWithComps eq = thing as ThingWithComps;
                     if (eq != null && eq.TryGetComp<CompEquippable>() != null)
                     {
+                        /*
                         CompInventory compInventory = SelPawnForGear.TryGetComp<CompInventory>();
                         if (compInventory != null)
                         {
@@ -465,6 +466,7 @@ namespace AutoEquip
                             }
                             floatOptionList.Add(equipOption);
                         }
+                        */
                     }
 
                     // Drop option
@@ -496,7 +498,7 @@ namespace AutoEquip
                     }
                     floatOptionList.Add(new FloatMenuOption("DropThing".Translate(), action, MenuOptionPriority.Medium, null, null));
                 }
-                FloatMenu window = new FloatMenu(floatOptionList, thing.LabelCap, false, false);
+                FloatMenu window = new FloatMenu(floatOptionList, thing.LabelCap);
                 Find.WindowStack.Add(window);
             }
             if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
@@ -520,7 +522,7 @@ namespace AutoEquip
         {
             Rect rect = new Rect(0f, y, width, lineheight);
 
-            TooltipHandler.TipRegion(rect, thing.GetWeightAndBulkTip());
+            TooltipHandler.TipRegion(rect, thing.GetTooltip());
 
             if (Mouse.IsOver(rect))
             {
@@ -532,7 +534,7 @@ namespace AutoEquip
 
             // LMB doubleclick
 
-            if (Widgets.InvisibleButton(rect))
+            if (Widgets.ButtonInvisible(rect))
             {
                 if (!equipped && Event.current.button == 0)
                 {
@@ -553,10 +555,10 @@ namespace AutoEquip
                     {
                         if (apparelEquipedThing != null)
                         {
-                            Find.CameraMap.JumpTo(apparelEquipedThing.PositionHeld);
+                            Find.CameraDriver.JumpTo(apparelEquipedThing.PositionHeld);
                             return;
                         }
-                        Find.CameraMap.JumpTo(thing.PositionHeld);
+                        Find.CameraDriver.JumpTo(thing.PositionHeld);
                         return;
                     }
                     _lastClick = Time.time;
@@ -589,6 +591,7 @@ namespace AutoEquip
                         //  ThingWithComps eq = thing as ThingWithComps;
                         if (eq != null && eq.TryGetComp<CompEquippable>() != null)
                         {
+                            /*
                             CompInventory compInventory = SelPawnForGear.TryGetComp<CompInventory>();
                             if (compInventory != null)
                             {
@@ -621,6 +624,7 @@ namespace AutoEquip
                                 }
                                 floatOptionList.Add(equipOption);
                             }
+                            */
                         }
 
                         #endregion CR Stuff #2
@@ -676,14 +680,14 @@ namespace AutoEquip
 
                                 if (apparelEquipedThing != null)
                                 {
-                                    Find.CameraMap.JumpTo(apparelEquipedThing.PositionHeld);
+                                    Find.CameraDriver.JumpTo(apparelEquipedThing.PositionHeld);
                                     //                      Find.Selector.ClearSelection();
                                     //                      if (apparelEquipedThing.Spawned)
                                     //                          Find.Selector.Select(apparelEquipedThing, true, true);
                                 }
                                 else
                                 {
-                                    Find.CameraMap.JumpTo(thing.PositionHeld);
+                                    Find.CameraDriver.JumpTo(thing.PositionHeld);
                                     //                      Find.Selector.ClearSelection();
                                     //                      if (thing.Spawned)
                                     //                          Find.Selector.Select(thing, true, true);
@@ -700,7 +704,7 @@ namespace AutoEquip
                         }, MenuOptionPriority.Medium, null, null));
                     }
 
-                    FloatMenu window = new FloatMenu(floatOptionList, thing.LabelCap, false, false);
+                    FloatMenu window = new FloatMenu(floatOptionList, thing.LabelCap);
                     Find.WindowStack.Add(window);
                 }
             }
@@ -767,7 +771,7 @@ namespace AutoEquip
             }
             else
             {
-                Widgets.Label(apparelText, thing.LabelBaseCap);
+                Widgets.Label(apparelText, thing.LabelCap);
             }
 
             if (useGraphicalBars)
@@ -887,7 +891,7 @@ namespace AutoEquip
             Rect rectIconBox = new Rect(x, y, weaponIconSize, weaponIconSize);
             Rect rectIcon = new Rect(rectIconBox.x + 6f, rectIconBox.y + 6f, rectIconBox.width - 12f, rectIconBox.height - 12f);
 
-            TooltipHandler.TipRegion(rectIconBox, thing.GetWeightAndBulkTip());
+            TooltipHandler.TipRegion(rectIconBox, thing.GetTooltip());
             // TooltipHandler.TipRegion(rectIconBox, thing.LabelCap);
 
 
@@ -915,7 +919,7 @@ namespace AutoEquip
             Rect rectIconBox = new Rect(x, y + 17f, inventoryIconSize, inventoryIconSize);
             Rect rectIcon = new Rect(rectIconBox.x + 6f, rectIconBox.y + 6f, rectIconBox.width - 12f, rectIconBox.height - 12f);
 
-            TooltipHandler.TipRegion(rectIconBox, thing.GetWeightAndBulkTip());
+            TooltipHandler.TipRegion(rectIconBox, thing.GetTooltip());
 
             RightMouseButtonClick(thing, rectIconBox);
 
@@ -942,7 +946,7 @@ namespace AutoEquip
 
         private void RightMouseButtonClick(Thing thing, Rect rect)
         {
-            if (Widgets.InvisibleButton(rect))
+            if (Widgets.ButtonInvisible(rect))
                 if (Event.current.button == 1)
                 {
                     List<FloatMenuOption> floatOptionList = new List<FloatMenuOption>();
@@ -962,6 +966,7 @@ namespace AutoEquip
                         //  ThingWithComps eq = thing as ThingWithComps;
                         if (eq != null && eq.TryGetComp<CompEquippable>() != null)
                         {
+                            /*
                             CompInventory compInventory = SelPawnForGear.TryGetComp<CompInventory>();
                             if (compInventory != null)
                             {
@@ -994,6 +999,7 @@ namespace AutoEquip
                                 }
                                 floatOptionList.Add(equipOption);
                             }
+                            */
                         }
 
                         #endregion CR Stuff #2
@@ -1026,7 +1032,7 @@ namespace AutoEquip
                         }
                         floatOptionList.Add(new FloatMenuOption("DropThing".Translate(), action, MenuOptionPriority.Medium, null, null));
                     }
-                    FloatMenu window = new FloatMenu(floatOptionList, thing.LabelCap, false, false);
+                    FloatMenu window = new FloatMenu(floatOptionList, thing.LabelCap);
                     Find.WindowStack.Add(window);
                 }
         }

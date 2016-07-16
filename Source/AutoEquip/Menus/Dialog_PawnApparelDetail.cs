@@ -21,7 +21,7 @@ namespace AutoEquip
             _apparel = apparel;
         }
 
-        public override Vector2 InitialWindowSize
+        public override Vector2 InitialSize
         {
             get
             {
@@ -46,7 +46,7 @@ namespace AutoEquip
         private string GetTitle()
         {
             if (this._apparel != null)
-                return this._apparel.LabelBaseCap;
+                return this._apparel.LabelCap;
             ThingDef thingDef = this.Def as ThingDef;
             if (thingDef != null)
                 return GenLabel.ThingLabel((BuildableDef)thingDef, this.stuff, 1).CapitalizeFirst();

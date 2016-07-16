@@ -1,4 +1,4 @@
-﻿using Combat_Realism;
+﻿// using Combat_Realism;
 using CommunityCoreLibrary;
 using RimWorld;
 using Verse;
@@ -51,15 +51,15 @@ namespace AutoEquip
             // CR Replacement
 
             // replace ITab in the unresolved list
-            var index2 = itabs.IndexOf(typeof(ITab_Inventory));
+            var index2 = itabs.IndexOf(typeof(ITab_Pawn_Gear));
             if (index != -1)
             {
-                itabs.Remove(typeof(ITab_Inventory));
+                itabs.Remove(typeof(ITab_Pawn_Gear));
                 itabs.Insert(index, typeof(ITab_Pawn_AutoEquip));
             }
 
             // replace resolved ITab, if needed.
-            var oldGearTab2 = ITabManager.GetSharedInstance(typeof(ITab_Inventory));
+            var oldGearTab2 = ITabManager.GetSharedInstance(typeof(ITab_Pawn_Gear));
             var newGearTab2 = ITabManager.GetSharedInstance(typeof(ITab_Pawn_AutoEquip));
             if (!itabsResolved.NullOrEmpty() && itabsResolved.Contains(oldGearTab2))
             {

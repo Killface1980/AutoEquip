@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-    <ModHelperDef>
+  <CommunityCoreLibrary.ModHelperDef>
         <defName>AutoEquip</defName>
-        <ModName>AutoEquipA13</ModName>
-      <minCCLversion>0.13.2</minCCLversion>
+        <ModName>AutoEquipA14</ModName>
+      <minCCLversion>0.14.0</minCCLversion>
       <SpecialInjectors>
 
         <li>AutoEquip.ITabInjector</li>
 
       </SpecialInjectors>
-    </ModHelperDef>
+    </CommunityCoreLibrary.ModHelperDef>
 </Defs>

@@ -20,7 +20,7 @@ namespace AutoEquip
             pawn.mindState.nextApparelOptimizeTick = Find.TickManager.TicksGame + AutoEquip_JobGiver_OptimizeApparel.ApparelOptimizeCheckInterval + Rand.Range(1, 5) * 101;
         }
 
-        internal Job TryGiveTerminalJob(Pawn pawn)
+        internal Job TryGiveJob(Pawn pawn)
         {
            
             if (pawn.outfits == null)
@@ -28,7 +28,7 @@ namespace AutoEquip
                 Log.ErrorOnce(pawn + " tried to run JobGiver_OptimizeApparel without an OutfitTracker", 5643897);
                 return null;
             }
-            if (pawn.Faction != Faction.OfColony)
+            if (pawn.Faction != Faction.OfPlayer)
             {
                 Log.ErrorOnce("Non-colonist " + pawn + " tried to optimize apparel.", 764323);
                 return null;
