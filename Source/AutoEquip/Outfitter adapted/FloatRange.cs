@@ -3,6 +3,7 @@ using Verse;
 
 namespace AutoEquip
 {
+    [StaticConstructorOnStartup]
     public static class Widgets_FloatRange
     {
         public enum Handle

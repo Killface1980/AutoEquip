@@ -39,21 +39,6 @@ namespace AutoEquip
 
         public void FixedUpdate()
         {
-            if (_reinjectNeeded)
-            {
-                _reinjectTime -= Time.fixedDeltaTime;
-
-                if (_reinjectTime <= 0)
-                {
-                    _reinjectNeeded = false;
-                    _reinjectTime = 0;
-
-#if LOG
-                    Log.Message("AutoEquip Injected");
-#endif
-                    MapComponent_AutoEquip component = MapComponent_AutoEquip.Get;
-                }
-            }
         }
 
         public void Start()

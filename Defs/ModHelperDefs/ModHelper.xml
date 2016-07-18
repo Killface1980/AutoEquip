@@ -4,6 +4,11 @@
         <defName>AutoEquip</defName>
         <ModName>AutoEquipA14</ModName>
       <minCCLversion>0.14.0</minCCLversion>
+    <MapComponents>
+
+      <li>AutoEquip.MapComponent_AutoEquip</li>
+
+    </MapComponents>
       <SpecialInjectors>
 
         <li>AutoEquip.ITabInjector</li>

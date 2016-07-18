@@ -15,7 +15,6 @@ namespace AutoEquip
   //        Log.Message("AutoEquip with Infusion Initialized");
   //        PawnCalcForApparel.ApparelScoreRaw_PawnStatsHandlers += PawnCalcForApparel.InfusionApparelScoreRaw_PawnStatsHandlers;
   //    }
-
         public int nextOptimization;
         public List<Saveable_Outfit> OutfitCache = new List<Saveable_Outfit>();
         public List<SaveablePawn> PawnCache = new List<SaveablePawn>();
