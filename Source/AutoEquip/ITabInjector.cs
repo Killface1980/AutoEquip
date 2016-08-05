@@ -1,4 +1,8 @@
 ﻿// using Combat_Realism;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using CommunityCoreLibrary;
 using RimWorld;
 using Verse;
@@ -35,40 +39,19 @@ namespace AutoEquip
             if (index != -1)
             {
                 itabs.Remove(typeof(ITab_Pawn_Gear));
-                itabs.Insert(index, typeof(ITab_Pawn_AutoEquip));
+                itabs.Insert(index, typeof(ITab_Pawn_GearModded));
             }
 
             // replace resolved ITab, if needed.
             var oldGearTab = ITabManager.GetSharedInstance(typeof(ITab_Pawn_Gear));
-            var newGearTab = ITabManager.GetSharedInstance(typeof(ITab_Pawn_AutoEquip));
+            var newGearTab = ITabManager.GetSharedInstance(typeof(ITab_Pawn_GearModded));
             if (!itabsResolved.NullOrEmpty() && itabsResolved.Contains(oldGearTab))
             {
                 int resolvedIndex = itabsResolved.IndexOf(oldGearTab);
                 itabsResolved.Insert(resolvedIndex, newGearTab);
                 itabsResolved.Remove(oldGearTab);
             }
-
-            // CR Replacement
-
-            // replace ITab in the unresolved list
-            var index2 = itabs.IndexOf(typeof(ITab_Pawn_Gear));
-            if (index != -1)
-            {
-                itabs.Remove(typeof(ITab_Pawn_Gear));
-                itabs.Insert(index, typeof(ITab_Pawn_AutoEquip));
-            }
-
-            // replace resolved ITab, if needed.
-            var oldGearTab2 = ITabManager.GetSharedInstance(typeof(ITab_Pawn_Gear));
-            var newGearTab2 = ITabManager.GetSharedInstance(typeof(ITab_Pawn_AutoEquip));
-            if (!itabsResolved.NullOrEmpty() && itabsResolved.Contains(oldGearTab2))
-            {
-                int resolvedIndex2 = itabsResolved.IndexOf(oldGearTab2);
-                itabsResolved.Insert(resolvedIndex2, newGearTab2);
-                itabsResolved.Remove(oldGearTab2);
-            }
-
-
+            
             return true;
         }
 

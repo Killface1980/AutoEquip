@@ -85,7 +85,6 @@ namespace AutoEquip
                 itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, 28f);
                 if (Mouse.IsOver(itemRect))
                 {
-                    GUI.color = ITab_Pawn_AutoEquip.HighlightColor;
                     GUI.DrawTexture(itemRect, TexUI.HighlightTex);
                     GUI.color = Color.white;
                 }

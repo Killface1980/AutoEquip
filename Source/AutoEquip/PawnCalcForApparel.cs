@@ -25,7 +25,6 @@ namespace AutoEquip
         private List<Apparel> _calculatedApparelItems;
         private List<float> _calculatedApparelScore;
         private List<Apparel> _fixedApparels;
-        private float? _totalStats;
 
 
         private static NeededWarmth _neededWarmth;
@@ -632,7 +631,6 @@ namespace AutoEquip
         private void LoseConflict(Apparel apparel)
         {
             _optimized = false;
-            _totalStats = null;
             int index = _calculatedApparelItems.IndexOf(apparel);
             if (index == -1)
                 Log.Warning("Warning on LoseConflict loser didnt have the apparel");

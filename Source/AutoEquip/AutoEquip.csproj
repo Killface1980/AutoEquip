@@ -50,8 +50,9 @@
   <ItemGroup>
     <None Include="CCL_Injectors.cs" />
     <Compile Include="ITabInjector.cs" />
-    <None Include="Menus\TabToRewrite.cs" />
-    <None Include="Menus\TexButton.cs" />
+    <Compile Include="Menus\Helper.cs" />
+    <Compile Include="Menus\TabToRewrite.cs" />
+    <Compile Include="Menus\TexButton.cs" />
     <Compile Include="Menus\Dialog_ManageOutfitsAutoEquip.cs" />
     <Compile Include="AutoEquip_JobGiver_OptimizeApparel.cs" />
     <Compile Include="Menus\Dialog_ManagePawnOutfit.cs" />
@@ -65,7 +66,7 @@
     <Compile Include="Saveables\Saveable_Outfit_StatDef.cs" />
     <Compile Include="Saveables\Saveable_Pawn_WorkStatDef.cs" />
     <Compile Include="Saveables\Saveable_Pawn.cs" />
-    <Compile Include="Menus\ITab_Inventory_AutoEquip.cs" />
+    <None Include="Menus\ITab_Inventory_AutoEquip.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\About\About.xml">

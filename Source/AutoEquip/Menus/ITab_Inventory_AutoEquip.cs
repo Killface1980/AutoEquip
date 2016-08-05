@@ -411,7 +411,7 @@ namespace AutoEquip
 
         private void DrawThingRowVanilla(ref float y, float width, Thing thing)
         {
-            Rect rect = new Rect(0f, y, width, 28f);
+            Rect rect = new Rect(0f, y, width, ThingRowHeight);
             TooltipHandler.TipRegion(rect, thing.GetTooltip());
             if (Mouse.IsOver(rect))
             {
@@ -505,14 +505,14 @@ namespace AutoEquip
             }
             Text.Anchor = TextAnchor.MiddleLeft;
             GUI.color = _thingLabelColor;
-            Rect rect2 = new Rect(36f, y, width - 36f, 28f);
+            Rect rect2 = new Rect(ThingLeftX, y, width - ThingLeftX, 28f);
             string text = thing.LabelCap;
             if (thing is Apparel && this.SelPawnForGear.outfits != null && this.SelPawnForGear.outfits.forcedHandler.IsForced((Apparel)thing))
             {
                 text = text + ", " + "ApparelForcedLower".Translate();
             }
             Widgets.Label(rect2, text);
-            y += 28f;
+            y += ThingRowHeight;
         }
 
 

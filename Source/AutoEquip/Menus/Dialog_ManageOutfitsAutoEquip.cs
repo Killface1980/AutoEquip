@@ -60,7 +60,12 @@ namespace AutoEquip
                 SelectedOutfit.label = "Unnamed";
             }
         }
+        //StorageSearch
+        private string searchText;
 
+        private bool isFocused;
+
+        //
         public override void DoWindowContents(Rect inRect)
         {
             var num = 0f;
@@ -126,8 +131,61 @@ namespace AutoEquip
                 return;
             }
             GUI.BeginGroup(rect4);
-            var rect5 = new Rect(0f, 0f, 200f, 30f);
+            var rect5 = new Rect(0f, 0f, 180f, 30f);
             DoNameInputRect(rect5, ref SelectedOutfit.label, 30);
+
+            #region Storage Search
+
+            var clearSearchRect = new Rect(rect4.width - 20f, (29f - 14f) / 2f, 14f, 14f);
+            var shouldClearSearch = (Widgets.ButtonImage(clearSearchRect, Widgets.CheckboxOffTex));
+
+            var searchRect = new Rect(rect5.width+10f, 0f, rect4.width - rect5.width - 10f, 29f);
+            var watermark = (searchText != string.Empty || isFocused) ? searchText : "Search";
+
+            var escPressed = (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape);
+            var clickedOutside = (!Mouse.IsOver(searchRect) && Event.current.type == EventType.MouseDown);
+
+            if (!isFocused)
+            {
+                GUI.color = new Color(1f, 1f, 1f, 0.6f);
+            }
+
+            GUI.SetNextControlName("StorageSearchInput");
+            var searchInput = Widgets.TextField(searchRect, watermark);
+            GUI.color = Color.white;
+
+            if (isFocused)
+            {
+                searchText = searchInput;
+            }
+
+            if ((GUI.GetNameOfFocusedControl() == "StorageSearchInput" || isFocused) && (escPressed || clickedOutside))
+            {
+                GUIUtility.keyboardControl = 0;
+                isFocused = false;
+            }
+            else if (GUI.GetNameOfFocusedControl() == "StorageSearchInput" && !isFocused)
+            {
+                isFocused = true;
+            }
+
+            if (shouldClearSearch)
+            {
+                searchText = string.Empty;
+            }
+            TutorUIHighlighter.HighlightOpportunity("StoragePriority", rect);
+
+
+            //        if (_apparelGlobalFilter != null)
+  //        {
+  //            parentFilter = _apparelGlobalFilter;
+  //        }
+ //         Rect rect5a = new Rect(0f, 35f, rect4.width, rect4.height - 35f);
+ //         HelperThingFilterUI.DoThingFilterConfigWindow(rect5a, ref this._scrollPosition, SelectedOutfit.filter, parentFilter, 8, searchText);
+
+            #endregion
+
+
             var rect6 = new Rect(0f, 40f, rect4.width, rect4.height - 45f - 10f);
 
             // fix for the filter
@@ -137,12 +195,13 @@ namespace AutoEquip
                 _apparelGlobalFilter = new ThingFilter();
                 _apparelGlobalFilter.SetAllow(ThingCategoryDefOf.Apparel, true);
             }
+                var parentFilter = _apparelGlobalFilter;
 
             //
 
+            HelperThingFilterUI.DoThingFilterConfigWindow(rect6, ref _scrollPosition, SelectedOutfit.filter, parentFilter, 8, searchText);
 
-            ThingFilterUI.DoThingFilterConfigWindow(rect6, ref _scrollPosition, SelectedOutfit.filter,
-                _apparelGlobalFilter, 16);
+            //ThingFilterUI.DoThingFilterConfigWindow(rect6, ref _scrollPosition, SelectedOutfit.filter, _apparelGlobalFilter, 16);
             GUI.EndGroup();
 
             var saveout = MapComponent_AutoEquip.Get.GetOutfit(SelectedOutfit);
