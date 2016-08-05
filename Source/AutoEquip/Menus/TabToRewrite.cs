@@ -20,7 +20,7 @@ namespace AutoEquip
 
         private const float ThingIconSize = 28f;
 
-        private const float ThingRowHeight = 28f;
+        private const float ThingRowHeight = 38f;
 
         private const float ThingLeftX = 36f;
 
@@ -245,7 +245,7 @@ namespace AutoEquip
         {
             Apparel ap = thing as Apparel;
 
-            Rect rect = new Rect(0f, y, width, 28f);
+            Rect rect = new Rect(0f, y, width, ThingRowHeight);
             Widgets.InfoCardButton(rect.width - 24f, y, thing.def);
             rect.width -= 24f;
             if (this.CanControl)
@@ -394,7 +394,7 @@ namespace AutoEquip
             }
             Text.Anchor = TextAnchor.MiddleLeft;
             GUI.color = ITab_Pawn_GearModded.ThingLabelColor;
-            Rect rect3 = new Rect(ThingLeftX, y, width - ThingLeftX, 28f);
+            Rect rect3 = new Rect(ThingLeftX, y, width - ThingLeftX, ThingRowHeight);
 #region Modded
             string text = thing.LabelCap;
             string text_Score = Math.Round(pawnCalc.ApparelScoreRaw(ap), 2).ToString("N2");
@@ -408,7 +408,7 @@ namespace AutoEquip
                 text = text + ", " + text_Score;
             }
             Widgets.Label(rect3, text);
-            y += 28f;
+            y += ThingRowHeight;
         }
 
         private void DrawThingRowVanilla(ref float y, float width, Thing thing)

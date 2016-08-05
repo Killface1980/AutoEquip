@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using RimWorld;
@@ -61,8 +62,7 @@ namespace AutoEquip
             }
         }
         //StorageSearch
-        private string searchText;
-
+        private string searchText = "";
         private bool isFocused;
 
         //
@@ -141,6 +141,7 @@ namespace AutoEquip
 
             var searchRect = new Rect(rect5.width+10f, 0f, rect4.width - rect5.width - 10f, 29f);
             var watermark = (searchText != string.Empty || isFocused) ? searchText : "Search";
+
 
             var escPressed = (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape);
             var clickedOutside = (!Mouse.IsOver(searchRect) && Event.current.type == EventType.MouseDown);
