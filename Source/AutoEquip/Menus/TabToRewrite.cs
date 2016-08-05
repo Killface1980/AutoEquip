@@ -18,7 +18,7 @@ namespace AutoEquip
 
         private const float TopPadding = 20f;
 
-        private const float ThingIconSize = 28f;
+        private const float ThingIconSize = 32f;
 
         private const float ThingRowHeight = 38f;
 
@@ -246,11 +246,11 @@ namespace AutoEquip
             Apparel ap = thing as Apparel;
 
             Rect rect = new Rect(0f, y, width, ThingRowHeight);
-            Widgets.InfoCardButton(rect.width - 24f, y, thing.def);
+            Widgets.InfoCardButton(rect.width - 24f, y+4f, thing.def);
             rect.width -= 24f;
             if (this.CanControl)
             {
-                Rect rect2 = new Rect(rect.width - 24f, y, 24f, 24f);
+                Rect rect2 = new Rect(rect.width - 24f, y+3f, 24f, 24f);
                 TooltipHandler.TipRegion(rect2, "DropThing".Translate());
                 if (Widgets.ButtonImage(rect2, TexButton.Drop))
                 {
@@ -390,11 +390,11 @@ namespace AutoEquip
 
             if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null)
             {
-                Widgets.ThingIcon(new Rect(4f, y, 28f, 28f), thing);
+                Widgets.ThingIcon(new Rect(4f, y, ThingIconSize, ThingIconSize), thing);
             }
             Text.Anchor = TextAnchor.MiddleLeft;
             GUI.color = ITab_Pawn_GearModded.ThingLabelColor;
-            Rect rect3 = new Rect(ThingLeftX, y, width - ThingLeftX, ThingRowHeight);
+            Rect rect3 = new Rect(ThingLeftX, y, width - ThingLeftX -58f, ThingRowHeight);
 #region Modded
             string text = thing.LabelCap;
             string text_Score = Math.Round(pawnCalc.ApparelScoreRaw(ap), 2).ToString("N2");
@@ -447,7 +447,7 @@ namespace AutoEquip
                 text = text + ", " + "ApparelForcedLower".Translate();
             }
             Widgets.Label(rect3, text);
-            y += 28f;
+            y += ThingRowHeight;
         }
 
         private void InterfaceDrop(Thing t)
