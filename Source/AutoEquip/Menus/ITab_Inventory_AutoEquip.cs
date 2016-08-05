@@ -129,8 +129,6 @@ namespace AutoEquip
 
 
             Text.Font = GameFont.Small;
-
-            Text.Font = GameFont.Small;
             GUI.color = Color.white;
 
 
@@ -182,7 +180,7 @@ namespace AutoEquip
                     if (Widgets.ButtonText(rectStatus, "AutoEquipStatus".Translate(), true, false))
                     {
                         if (pawnSave.Stats == null)
-                            pawnSave.Stats = new List<Saveable_Outfit_StatDef>();
+                            pawnSave.Stats = new List<Saveable_Pawn_StatDef>();
                         Find.WindowStack.Add(new Dialog_ManagePawnOutfit(pawnSave.Stats));
                     }
                 }
@@ -230,7 +228,7 @@ namespace AutoEquip
                 // some padding
 
                 // temperature slider
-                ApparelStatCache pawnStatCache = SelPawn.GetApparelStatCache();
+        //        ApparelStatCache pawnStatCache = SelPawn.GetApparelStatCache();
         //        FloatRange targetTemps = pawnStatCache.TargetTemperatures;
         //        FloatRange minMaxTemps = ApparelStatsHelper.MinMaxTemperatureRange;
 

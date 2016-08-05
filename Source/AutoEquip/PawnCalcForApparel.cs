@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace AutoEquip
@@ -12,7 +13,7 @@ namespace AutoEquip
         private Pawn _pawn;
         private SaveablePawn _saveablePawn;
         private Outfit _outfit;
-        private Saveable_Outfit_StatDef[] _stats;
+        private Saveable_Pawn_StatDef[] _stats;
         private Saveable_Pawn_WorkStatDef[] _workstats;
 
 
@@ -94,7 +95,7 @@ namespace AutoEquip
             _neededWarmth = CalculateNeededWarmth(_pawn, GenDate.CurrentMonth);
         }
 
-        public IEnumerable<Saveable_Outfit_StatDef> Stats => _stats;
+        public IEnumerable<Saveable_Pawn_StatDef> Stats => _stats;
 
         public IEnumerable<Saveable_Pawn_WorkStatDef> WorkStats => _workstats;
 
@@ -200,7 +201,7 @@ namespace AutoEquip
                 if (insulation < 1)
                     insulation /= 8;
 
-                num *= insulation; 
+                num *= insulation;
             }
 
             // new insulation calc
@@ -220,69 +221,15 @@ namespace AutoEquip
 
         public float ApparelScoreRaw_PawnStats(Apparel ap)
         {
-            float statScore = 0f;
-
-            foreach (Saveable_Outfit_StatDef stat in Stats)
-            {
-                try
-                {
-                    var statValue = GetStatValue(ap, stat);
-                    var strength = stat.Strength;
-
-                    if (statValue.Equals(0))
-                        statValue = 1;
-
-                    if (statValue < 1)
-                    {
-                        statValue = 1 / statValue;  // inverts negative values and 1:x
-                        strength = strength * -1;
-                    }
-
-
-
-                    // if (strength < 0)
-                    //     num = strength / 2 * -1;
-
-                    //   else if (statValue == 0 && strength > 0)
-                    //       num = strength / 2 * -1;
-
-                    if (statValue <= 0.999f || statValue >= 1.001f)
-                    {
-                        statScore += statValue * strength;
-                    }
-                }
-
-
-                catch (Exception e)
-                {
-                    throw new Exception("Error Calculation Stat: " + stat.StatDef, e);
-                }
-            }
-
-            return statScore;
-            //   float score = num / count;
-            //
-            //   return score;
-        }
-
-        public float ApparelScoreRaw_PawnWorkStats(Apparel ap)
-        {
             float workScore = 0f;
-            //       float count = 0f;
 
-            foreach (Saveable_Pawn_WorkStatDef workstat in WorkStats)
+            foreach (Saveable_Pawn_StatDef stat in Stats)
             {
                 try
                 {
-                    var workStatValue = GetWorkStatValue(ap, workstat);
+                    var workStatValue = GetStatValue(ap, stat);
 
-                    var workStatStrength = workstat.Strength;
-
-                    //         if (workStatStrength < 0)
-                    //         {
-                    //             nint = 1 / nint;  // inverts negative values and 1:x
-                    //             workStatStrength = workStatStrength * -1;
-                    //         }
+                    var workStatStrength = stat.Strength;
 
                     if (workStatValue.Equals(0))
                         workStatValue = 1;
@@ -296,28 +243,50 @@ namespace AutoEquip
                     if (workStatValue <= 0.99f || workStatValue >= 1.01f)
                     {
                         workScore += workStatValue * workStatStrength;
-                        //              count++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Error Calculation Stat: " + stat.StatDef, e);
+                }
+            }
+            return workScore;
+
+        }
+
+        public float ApparelScoreRaw_PawnWorkStats(Apparel ap)
+        {
+            float workScore = 0f;
+
+            foreach (Saveable_Pawn_WorkStatDef workstat in WorkStats)
+            {
+                try
+                {
+                    var workStatValue = GetWorkStatValue(ap, workstat);
+
+                    var workStatStrength = workstat.Strength;
+
+                    if (workStatValue.Equals(0))
+                        workStatValue = 1;
+
+                    if (workStatValue < 1)
+                    {
+                        workStatValue = 1 / workStatValue;  // inverts negative values and 1:x
+                        workStatStrength = workStatStrength * -1;
                     }
 
-                    //var nint = GetWorkStatValue(ap, workstat);
-                    //num += nint * workstat.Strength;
-                    //count++;
+                    if (workStatValue <= 0.99f || workStatValue >= 1.01f)
+                    {
+                        workScore += workStatValue * workStatStrength;
+                    }
                 }
                 catch (Exception e)
                 {
                     throw new Exception("Error Calculation Stat: " + workstat.StatDef, e);
                 }
             }
-
-            //  if (count < 0.99f)
-            //      count = 1f;
-
             return workScore;
-            //  float score = num / count;
-            //
-            //  return score;
         }
-
 
         public static IEnumerable<KeyValuePair<StatDef, float>> GetStatsOfWorkType(WorkTypeDef worktype)
         {
@@ -381,10 +350,10 @@ namespace AutoEquip
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.5f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("AimingDelayFactor"), -0.75f);
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ShootingAccuracy"), 1f);
-                 //   yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("AimingAccuracy"), 1f); // CR
-                 //   yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ReloadSpeed"), 0.25f); // CR
-                                                                                                                        //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0625f);
-                                                                                                                        //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0625f);
+                    //   yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("AimingAccuracy"), 1f); // CR
+                    //   yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("ReloadSpeed"), 0.25f); // CR
+                    //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0625f);
+                    //       yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0625f);
                     yield break;
                 case "Cooking":
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MoveSpeed"), 0.0625f);
@@ -404,8 +373,8 @@ namespace AutoEquip
                     //        yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("MeleeHitChance"), 0.25f);
                     //               yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Blunt, 0.0625f);
                     //                yield return new KeyValuePair<StatDef, float>(StatDefOf.ArmorRating_Sharp, 0.0625f);
-           //         yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryWeight"), 0.25f); // CR
-           //         yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryBulk"), 0.25f); // CR
+                    //         yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryWeight"), 0.25f); // CR
+                    //         yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("CarryBulk"), 0.25f); // CR
                     yield break;
                 case "Warden":
                     yield return new KeyValuePair<StatDef, float>(DefDatabase<StatDef>.GetNamed("SocialImpact"), 0.5f);
@@ -430,14 +399,11 @@ namespace AutoEquip
             }
         }
 
-
-        public float GetStatValue(Apparel apparel, Saveable_Outfit_StatDef stat)
+        public float GetStatValue(Apparel apparel, Saveable_Pawn_StatDef stat)
         {
 
             float baseStat = apparel.GetStatValue(stat.StatDef, true);
-            float currentStat = baseStat;
-
-            currentStat += apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat.StatDef);
+            float currentStat = baseStat + apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat.StatDef);
             //            currentStat += apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat.StatDef);
 
             DoApparelScoreRaw_PawnStatsHandlers(_pawn, apparel, stat.StatDef, ref currentStat);
@@ -447,19 +413,19 @@ namespace AutoEquip
             //       return apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat.StatDef) - baseStat;
             //   }
 
-            if (baseStat == 0)
-                return currentStat;
-            return currentStat / baseStat;
+            if (baseStat != 0)
+            {
+                currentStat = currentStat / baseStat;
+            }
+
+            return currentStat;
         }
 
         public float GetWorkStatValue(Apparel apparel, Saveable_Pawn_WorkStatDef workStat)
         {
             float baseStat = apparel.GetStatValue(workStat.StatDef, true);
-            float currentStat = baseStat;
 
-
-
-            currentStat = baseStat + apparel.def.equippedStatOffsets.GetStatOffsetFromList(workStat.StatDef);
+            var currentStat = baseStat + apparel.def.equippedStatOffsets.GetStatOffsetFromList(workStat.StatDef);
 
             DoApparelScoreRaw_PawnStatsHandlers(_pawn, apparel, workStat.StatDef, ref currentStat);
 
@@ -623,7 +589,8 @@ namespace AutoEquip
                 pawnX.LoseConflict(apparel);
             }
 
-            else {
+            else
+            {
                 pawnY.LoseConflict(apparel);
             }
 
@@ -750,11 +717,11 @@ namespace AutoEquip
             }
 
 
-              if (temperature < pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null) - 10f)
-                  return NeededWarmth.Warm;
-            
-              if (temperature > pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMax, null) + 10f)
-                  return NeededWarmth.Cool;
+            if (temperature < pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMin, null) - 10f)
+                return NeededWarmth.Warm;
+
+            if (temperature > pawn.def.GetStatValueAbstract(StatDefOf.ComfyTemperatureMax, null) + 10f)
+                return NeededWarmth.Cool;
 
             return NeededWarmth.Any;
         }

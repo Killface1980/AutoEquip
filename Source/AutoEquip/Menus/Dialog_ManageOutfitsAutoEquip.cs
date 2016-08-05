@@ -177,7 +177,7 @@ namespace AutoEquip
             }
         }
  
-        public static void DoStatsInput(Rect rect, ref Vector2 scrollPosition, List<Saveable_Outfit_StatDef> stats)
+        public static void DoStatsInput(Rect rect, ref Vector2 scrollPosition, List<Saveable_Pawn_StatDef> stats)
         {
             Widgets.DrawMenuSection(rect, true);
             Text.Font = GameFont.Tiny;
@@ -259,7 +259,7 @@ namespace AutoEquip
             Widgets.EndScrollView();
         }
 
-        private static void DrawStat(List<Saveable_Outfit_StatDef> stats, Listing_Standard listingStandard, StatDef stat)
+        private static void DrawStat(List<Saveable_Pawn_StatDef> stats, Listing_Standard listingStandard, StatDef stat)
         {
             var outfitStat = stats.FirstOrDefault(i => i.StatDef == stat);
             var active = outfitStat != null;
@@ -269,7 +269,7 @@ namespace AutoEquip
             {
                 if (outfitStat == null)
                 {
-                    outfitStat = new Saveable_Outfit_StatDef();
+                    outfitStat = new Saveable_Pawn_StatDef();
                     outfitStat.StatDef = stat;
                     outfitStat.Strength = 0;
                 }

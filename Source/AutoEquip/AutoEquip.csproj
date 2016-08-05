@@ -11,6 +11,7 @@
     <AssemblyName>AutoEquip</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -41,10 +42,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\RimWorldWin_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -53,18 +50,15 @@
   <ItemGroup>
     <None Include="CCL_Injectors.cs" />
     <Compile Include="ITabInjector.cs" />
-    <Compile Include="List.cs" />
-    <Compile Include="Outfitter adapted\ApparelStatCache.cs" />
+    <None Include="Menus\TabToRewrite.cs" />
+    <None Include="Menus\TexButton.cs" />
     <Compile Include="Menus\Dialog_ManageOutfitsAutoEquip.cs" />
     <Compile Include="AutoEquip_JobGiver_OptimizeApparel.cs" />
     <Compile Include="Menus\Dialog_ManagePawnOutfit.cs" />
     <Compile Include="Menus\Dialog_PawnApparelComparer.cs" />
     <Compile Include="Menus\Dialog_PawnApparelDetail.cs" />
-    <None Include="Menus\MainTabWindow_AssignAutoEquip.cs" />
     <Compile Include="MapComponent_AutoEquip.cs" />
     <Compile Include="ModInitializer.cs" />
-    <Compile Include="Outfitter adapted\ApparelStatsHelper.cs" />
-    <Compile Include="Outfitter adapted\FloatRange.cs" />
     <Compile Include="PawnCalcForApparel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Saveables\Saveable_Outfit.cs" />
@@ -76,15 +70,18 @@
   <ItemGroup>
     <Content Include="..\..\About\About.xml">
       <Link>About.xml</Link>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="..\..\Defs\ModHelperDefs\ModHelper.xml">
       <Link>ModHelper.xml</Link>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="..\..\Defs\ThingDefs\Initializer.xml">
       <Link>Initializer.xml</Link>
     </Content>
     <Content Include="..\..\Languages\English\Keyed\AutoEquip.xml">
       <Link>AutoEquip.xml</Link>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

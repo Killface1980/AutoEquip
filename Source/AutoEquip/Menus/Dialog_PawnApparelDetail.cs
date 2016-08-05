@@ -93,7 +93,7 @@ namespace AutoEquip
 
             groupRect.height -= 60f; // test
 
-            Saveable_Outfit_StatDef[] stats = conf.Stats.ToArray();
+            Saveable_Pawn_StatDef[] stats = conf.Stats.ToArray();
             Saveable_Pawn_WorkStatDef[] workstats = conf.WorkStats.ToArray();
             List<Saveable_Pawn_WorkStatDef> filteredworkstats = new List<Saveable_Pawn_WorkStatDef>();
 
@@ -124,9 +124,10 @@ namespace AutoEquip
 
             bool check = false;
 
-            foreach (Saveable_Outfit_StatDef stat in stats)
+            for (int index = 0; index < stats.Length; index++)
             {
-                itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, Text.LineHeight * 1.2f);
+                Saveable_Pawn_StatDef stat = stats[index];
+                itemRect = new Rect(listRect.xMin, listRect.yMin, listRect.width, Text.LineHeight*1.2f);
                 if (Mouse.IsOver(itemRect))
                 {
                     GUI.color = ITab_Pawn_AutoEquip.HighlightColor;
@@ -138,19 +139,18 @@ namespace AutoEquip
                 var valueDisplay = value;
                 var statStrengthDialog = stat.Strength;
 
-                if (value != 0)
-                {
-                    if (value < 1) // flipped for calc + *-1
-                    {
-                        statStrengthDialog = statStrengthDialog * -1;
-                        valueDisplay = 1 / value;
-                        sumStatsValue += valueDisplay;
-                    }
-                    if (value != 1)
-                        sumStatsValue += value;
-                }
 
-                float statscore = valueDisplay * statStrengthDialog;
+                if (value < 1) // flipped for calc + *-1
+                {
+                    statStrengthDialog = statStrengthDialog*-1;
+                    valueDisplay = 1/value;
+                    //          sumStatsValue += valueDisplay;
+                }
+                //      if (value != 1)
+                sumStatsValue += value;
+
+
+                float statscore = valueDisplay*statStrengthDialog;
 
                 if (valueDisplay == 1)
                     statscore = 0;
@@ -164,7 +164,6 @@ namespace AutoEquip
                 listRect.yMin = itemRect.yMax;
 
                 check = true;
-
             }
 
             if (check)

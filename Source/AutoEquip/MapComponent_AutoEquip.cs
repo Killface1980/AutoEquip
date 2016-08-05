@@ -63,9 +63,10 @@ namespace AutoEquip
 
             Saveable_Outfit ret = new Saveable_Outfit();
             ret.Outfit = outfit;
-            ret.Stats.Add(new Saveable_Outfit_StatDef { StatDef = StatDefOf.ArmorRating_Sharp, Strength = 0.5f });
-            ret.Stats.Add(new Saveable_Outfit_StatDef { StatDef = StatDefOf.ArmorRating_Blunt, Strength = 0.5f });
-
+      //    ret.Stats.Add(new Saveable_Pawn_StatDef { StatDef = StatDefOf.ArmorRating_Sharp, Strength = 0.5f });
+      //    ret.Stats.Add(new Saveable_Pawn_StatDef { StatDef = StatDefOf.ArmorRating_Blunt, Strength = 0.5f });
+            ret.AppendIndividualPawnStatus = true;
+            ret.AddWorkStats = true;
             OutfitCache.Add(ret);
 
             return ret;
@@ -107,17 +108,17 @@ namespace AutoEquip
             foreach (Pawn pawn in Find.Map.mapPawns.FreeColonists)
             {
                 InjectTab(pawn.def);
-       //       SaveablePawn newPawnSaveable = GetCache(pawn);
-       //       PawnCalcForApparel newPawnCalc = new PawnCalcForApparel(newPawnSaveable);
-       //
-       //       newSaveableList.Add(newPawnSaveable);
-       //       newCalcList.Add(newPawnCalc);
-       //
-       //      newPawnCalc.InitializeFixedApparelsAndGetAvaliableApparels(allApparels);
+              SaveablePawn newPawnSaveable = GetCache(pawn);
+              PawnCalcForApparel newPawnCalc = new PawnCalcForApparel(newPawnSaveable);
+       
+              newSaveableList.Add(newPawnSaveable);
+              newCalcList.Add(newPawnCalc);
+       
+             newPawnCalc.InitializeFixedApparelsAndGetAvaliableApparels(allApparels);
             }
 
-       //   PawnCache = newSaveableList;
-       //   PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
+          PawnCache = newSaveableList;
+          PawnCalcForApparel.DoOptimizeApparel(newCalcList, allApparels);
 
 
             nextOptimization = Find.TickManager.TicksGame + 5000;

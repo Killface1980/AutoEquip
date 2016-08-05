@@ -8,7 +8,7 @@ namespace AutoEquip
     {
         public Outfit Outfit;
         public bool AddWorkStats;
-        public List<Saveable_Outfit_StatDef> Stats = new List<Saveable_Outfit_StatDef>();
+        public List<Saveable_Pawn_StatDef> Stats = new List<Saveable_Pawn_StatDef>();
         public List<Saveable_Pawn_WorkStatDef> WorkStats = new List<Saveable_Pawn_WorkStatDef>();
         public bool AppendIndividualPawnStatus;
 

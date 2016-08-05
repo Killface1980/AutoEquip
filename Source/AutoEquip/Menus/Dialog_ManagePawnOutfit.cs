@@ -7,10 +7,10 @@ namespace AutoEquip
     public class Dialog_ManagePawnOutfit : Window
 //    public class Dialog_ManagePawnOutfit : Window
     {
-        private readonly List<Saveable_Outfit_StatDef> _stats;
+        private readonly List<Saveable_Pawn_StatDef> _stats;
         private Vector2 _scrollPositionStats;
 
-        public Dialog_ManagePawnOutfit(List<Saveable_Outfit_StatDef> stats)
+        public Dialog_ManagePawnOutfit(List<Saveable_Pawn_StatDef> stats)
         {
             forcePause = true;
             doCloseX = true;

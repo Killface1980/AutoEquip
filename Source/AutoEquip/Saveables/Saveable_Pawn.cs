@@ -10,7 +10,7 @@ namespace AutoEquip
     {
         // Exposed members
         public Pawn Pawn;
-        public List<Saveable_Outfit_StatDef> Stats = new List<Saveable_Outfit_StatDef>();
+        public List<Saveable_Pawn_StatDef> Stats = new List<Saveable_Pawn_StatDef>();
         public List<Saveable_Pawn_WorkStatDef> WorkStats = new List<Saveable_Pawn_WorkStatDef>();
 
         public List<Apparel> ToWearApparel = new List<Apparel>();
@@ -26,38 +26,54 @@ namespace AutoEquip
             Scribe_Collections.LookList(ref WorkStats, "WorkStats", LookMode.Deep);
         }
 
-        public IEnumerable<Saveable_Outfit_StatDef> NormalizeCalculedStatDef()
+        public IEnumerable<Saveable_Pawn_StatDef> NormalizeCalculedStatDef()
         {
             Saveable_Outfit outfit = MapComponent_AutoEquip.Get.GetOutfit(Pawn);
-            List<Saveable_Outfit_StatDef> calculatedStatDef = new List<Saveable_Outfit_StatDef>(outfit.Stats);
-
-            if ((outfit.AppendIndividualPawnStatus) && (Stats != null))
-            {
-                if (Find.TickManager.TicksGame - _lastStatUpdate > 1900)
+            if (outfit.AppendIndividualPawnStatus)
+                if (Find.TickManager.TicksGame - _lastWorkStatUpdate > 1900)
                 {
-                    foreach (Saveable_Outfit_StatDef stat in Stats)
+                    List<Saveable_Pawn_StatDef> calculatedStatDef = new List<Saveable_Pawn_StatDef>(outfit.Stats);
                     {
-                        int index = -1;
-                        for (int i = 0; i < calculatedStatDef.Count; i++)
+                        foreach (var stat in Stats)
                         {
-                            if (calculatedStatDef[i].StatDef == stat.StatDef)
+                            
+                        
+                        Saveable_Pawn_StatDef statdef = null;
+                        foreach (Saveable_Pawn_StatDef saveablePawnStatDef in calculatedStatDef)
+                        {
+                            if (saveablePawnStatDef.StatDef == stat.StatDef)
                             {
-                                index = i;
+                                statdef = saveablePawnStatDef;
+
                                 break;
                             }
+
                         }
 
-                        if (index == -1)
-                            calculatedStatDef.Add(stat);
+                        if (statdef == null)
+                        {
+                            statdef = new Saveable_Pawn_StatDef();
 
-                        else
-                            calculatedStatDef[index] = stat;
+                            statdef.StatDef = stat.StatDef;
+
+                            statdef.Strength = stat.Strength;
+
+                            calculatedStatDef.Add(statdef);
+                        }
+                        //       else workstatdef.Strength = Math.Max(workstatdef.Strength, workStat.Value * priorityAdjust);
+
+                            //    WorkStats.Add(workstatdef);
+
+                        }
                     }
-                    _lastStatUpdate = Find.TickManager.TicksGame;
-                }
-            }
 
-            return calculatedStatDef.OrderByDescending(i => Math.Abs(i.Strength));
+                    Stats = new List<Saveable_Pawn_StatDef>(calculatedStatDef.OrderByDescending(i => Math.Abs(i.Strength)).ToArray());
+                }
+
+            _lastWorkStatUpdate = Find.TickManager.TicksGame;
+
+            return Stats;
+
         }
 
         public IEnumerable<Saveable_Pawn_WorkStatDef> NormalizeCalculedWorkStatDef()
